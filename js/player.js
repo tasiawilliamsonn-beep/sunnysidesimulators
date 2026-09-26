@@ -80,6 +80,35 @@ function EscapePlayer(mount, room, opts) {
   function stageTitle(i) { return stages[i].title.replace(/^(Stop|Lock|Level|Evidence File|Door|Container|Panel|Chapter)\s*#?\d+:\s*/i, ''); }
   var code = (room.code && room.code.length === stages.length) ? room.code.toUpperCase().split('') : stages.map(function (_, i) { return String(hash(room.id + ':' + i) % 10); });
 
+  /* ---------- mission levels, game styles, icons ---------- */
+  var LEVELS = {
+    explorer: { id: 'explorer', name: 'Explorer', tag: 'Extra support', desc: 'Sentence starters are filled in, hints are free, you get unlimited "remove 2" power-ups, and writing tasks are shorter.', removes: 99, hintCost: 0, writeMul: 0.6, prefill: true, hearts: 5, xpMul: 1, calc: true },
+    agent: { id: 'agent', name: 'Agent', tag: 'On level', desc: 'The standard mission. You get 3 "remove 2" power-ups, and each hint costs a little XP.', removes: 3, hintCost: 30, writeMul: 1, prefill: false, hearts: 3, xpMul: 1, calc: false },
+    legend: { id: 'legend', name: 'Legend', tag: 'Extra challenge', desc: 'No power-ups, hints cost more, and writing tasks need longer answers with TWO pieces of evidence. You earn 1.5× XP.', removes: 0, hintCost: 60, writeMul: 1.4, prefill: false, hearts: 3, xpMul: 1.5, twoEvidence: true, calc: false }
+  };
+  function curLevel() { return LEVELS[(typeof S !== 'undefined' && S && S.level) || 'agent'] || LEVELS.agent; }
+  var GAME = room.game || { quest: 'boss', fieldtrip: 'board', mystery: 'case', gallery: 'museum', escape: 'locks' }[room.format] || 'locks';
+  function svgI(d, extra) { return '<svg class="ep-i" viewBox="0 0 24 24" aria-hidden="true"' + (extra || '') + '>' + d + '</svg>'; }
+  var ICON = {
+    xp: svgI('<path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="currentColor"/>'),
+    flame: svgI('<path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-4 2-7 2 1 3 3 3 5 1-2 1-5 0-9z" fill="currentColor"/>'),
+    heart: svgI('<path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" fill="currentColor"/>'),
+    star: svgI('<path d="M12 2l3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9z" fill="currentColor"/>'),
+    speaker: svgI('<path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'),
+    tools: svgI('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="10" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="18" cy="18" r="2.4" fill="none" stroke="currentColor" stroke-width="2.2"/>'),
+    scissors: svgI('<circle cx="6" cy="7" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5 20 18M8.5 15.5 20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>')
+  };
+  var canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  function speak(t) {
+    if (!canSpeak) return;
+    try { window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(String(t).replace(/\s+/g, ' ').trim().slice(0, 4000)); u.rate = 0.92; window.speechSynthesis.speak(u); } catch (e) { }
+  }
+  function hush() { try { if (canSpeak) window.speechSynthesis.cancel(); } catch (e) { } }
+  function presetLevel() {
+    if (opts.level && LEVELS[opts.level]) return opts.level;
+    try { var m = String(location.search + location.hash).match(/level=(explorer|agent|legend)/); return m ? m[1] : null; } catch (e) { return null; }
+  }
+
   /* ---------- puzzle types ---------- */
   var T = {};
   var PAIR_COLORS = ['#1F6FD1', '#E4572E', '#2A9D8F', '#9B6BFF', '#D6A93A', '#C2185B', '#6D4C41'];
@@ -557,6 +586,106 @@ function EscapePlayer(mount, room, opts) {
     instant: true
   };
 
+  /* ---------- written evidence tasks (RACE, CER, historian, math) ---------- */
+  var FRAMES = {
+    RACE: { name: 'RACE response', parts: [
+      { k: 'R', name: 'Restate', tip: 'Turn the question into the start of your answer.', starter: 'In the text,', min: 6, keys: 1 },
+      { k: 'A', name: 'Answer', tip: 'Answer every part of the question in your own words.', starter: 'I think', min: 6 },
+      { k: 'C', name: 'Cite evidence', tip: 'Copy exact words from the text inside quotation marks. Tap an evidence card to add one.', starter: 'According to the text,', min: 6, quote: 1 },
+      { k: 'E', name: 'Explain', tip: 'Explain HOW your evidence proves your answer.', starter: 'This shows that', min: 12, link: 1, vocab: 1 }] },
+    CER: { name: 'Claim, Evidence, Reasoning', parts: [
+      { k: 'C', name: 'Claim', tip: 'One sentence that answers the question.', starter: 'I claim that', min: 6, keys: 1 },
+      { k: 'E', name: 'Evidence', tip: 'Give data or observations. Use numbers or quote the text. Tap an evidence card to add one.', starter: 'The evidence is', min: 8, evid: 1 },
+      { k: 'R', name: 'Reasoning', tip: 'Connect the evidence to the claim with a science idea.', starter: 'This happens because', min: 12, link: 1, vocab: 1 }] },
+    SOURCE: { name: 'Historian\'s claim', parts: [
+      { k: 'C', name: 'Claim', tip: 'One sentence that answers the question.', starter: 'I claim that', min: 6, keys: 1 },
+      { k: 'E', name: 'Evidence', tip: 'Quote the sources or give facts and dates. Tap an evidence card to add one.', starter: 'The evidence shows', min: 8, evid: 1 },
+      { k: 'S', name: 'Source check', tip: 'Who made the source, when, and why? Is it primary or secondary? Can we trust it?', starter: 'This source is', min: 8, source: 1 },
+      { k: 'X', name: 'Explain', tip: 'Explain why your evidence proves your claim.', starter: 'This matters because', min: 10, link: 1, vocab: 1 }] },
+    MATH: { name: 'Solve, Show, Explain', parts: [
+      { k: 'A', name: 'Solve', tip: 'Type your final answer (number only).', answer: 1 },
+      { k: 'S', name: 'Show your work', tip: 'Write the equation or steps you used, with numbers and operation signs.', starter: '', min: 3, work: 1 },
+      { k: 'E', name: 'Explain', tip: 'Explain your strategy using math words.', starter: 'First I', min: 12, link: 1, vocab: 1 }] }
+  };
+  var LINK_WORDS = ['because', 'this shows', 'this means', 'therefore', 'so ', 'which', 'since', 'as a result', 'proves', 'shows that', 'this is why', 'that is why', 'caused', 'means that'];
+  var SOURCE_WORDS = ['primary', 'secondary', 'source', 'written', 'wrote', 'made', 'created', 'author', 'eyewitness', 'reliable', 'trust', 'bias', 'record', 'artifact', 'document', 'map', 'letter', 'census', 'museum', 'official', 'historian'];
+  function wordCount(t) { return String(t || '').trim().split(/\s+/).filter(function (x) { return /[a-z0-9]/i.test(x); }).length; }
+  function hasAny(t, list) { t = ' ' + String(t || '').toLowerCase() + ' '; return (list || []).some(function (w) { return t.indexOf(String(w).toLowerCase()) >= 0; }); }
+  function quoteCount(t) { return (String(t || '').match(/["“][^"”]{3,}["”]/g) || []).length; }
+  function numCount(t) { return (String(t || '').match(/\d[\d,.]*/g) || []).length; }
+  function partRules(part, p, text) {
+    var L = curLevel(), out = [];
+    if (part.answer) return out;
+    var min = Math.max(3, Math.round(part.min * L.writeMul)), n = wordCount(text);
+    out.push({ ok: n >= min, label: 'At least ' + min + ' words (' + n + ')' });
+    if (part.keys && p.keys) out.push({ ok: hasAny(text, p.keys), label: 'Uses words from the question' });
+    if (part.quote) out.push(L.twoEvidence ? { ok: quoteCount(text) >= 2, label: 'Two quotes in "quotation marks"' } : { ok: quoteCount(text) >= 1, label: 'A quote in "quotation marks"' });
+    if (part.evid) { var ev = quoteCount(text) + numCount(text); out.push(L.twoEvidence ? { ok: ev >= 2, label: 'Two pieces of evidence (quotes or numbers)' } : { ok: ev >= 1, label: 'A quote or a number from the text' }); }
+    if (part.source) out.push({ ok: hasAny(text, SOURCE_WORDS), label: 'Says who made the source or if it can be trusted' });
+    if (part.work) out.push({ ok: /\d/.test(text) && /[+\-−×x*÷\/=]/.test(text), label: 'Numbers and operation signs' });
+    if (part.link) out.push({ ok: hasAny(text, LINK_WORDS), label: 'A linking phrase (because, this shows, so...)' });
+    if (part.vocab && p.vocab && p.vocab.length) out.push({ ok: hasAny(text, p.vocab), label: 'A key word: ' + p.vocab.slice(0, 4).join(', ') });
+    return out;
+  }
+  function ckHTML(rules) { return rules.map(function (r) { return '<li class="' + (r.ok ? 'ok' : '') + '">' + esc(r.label) + '</li>'; }).join(''); }
+  T.write = {
+    parts: function (p) { return (FRAMES[p.frame] || FRAMES.RACE).parts; },
+    html: function (p, w, key) {
+      var fr = FRAMES[p.frame] || FRAMES.RACE, L = curLevel();
+      if (!w.v) {
+        var d = (typeof S !== 'undefined' && S && S.drafts && S.drafts[key]) || null;
+        w.v = d ? Object.assign({}, d) : {};
+        if (!d && L.prefill) fr.parts.forEach(function (pt) { if (pt.starter) w.v[pt.k] = pt.starter + ' '; });
+      }
+      if (w.solved) {
+        var mine = (typeof S !== 'undefined' && S && S.writing && S.writing[key]) || w.v;
+        return '<div class="ep-wdone">' + fr.parts.map(function (pt) { return '<p><b class="ep-wk">' + pt.k + '</b><b>' + esc(pt.name) + ':</b> ' + esc(mine[pt.k] || '') + '</p>'; }).join('') + '</div>' +
+          (p.exemplar ? '<details class="ep-model"><summary>Compare with a model answer</summary>' + fr.parts.map(function (pt) { return '<p><b>' + esc(pt.name) + ':</b> ' + esc(p.exemplar[pt.k] || '') + '</p>'; }).join('') + '<p class="ep-small">How does yours compare? Did you cite evidence and explain it?</p></details>' : '');
+      }
+      var chips = (p.evidence || []).length ? '<div class="ep-evbank"><div class="ep-evh">Evidence cards: tap one to add it to your ' + (fr.parts.filter(function (pt) { return pt.quote || pt.evid; })[0] || { name: 'answer' }).name.toLowerCase() + '</div><div class="ep-chips">' + p.evidence.map(function (e, k) { return '<button type="button" class="ep-chip' + (e.d ? ' data' : '') + '" data-ev="' + k + '">' + esc(e.d || e) + '</button>'; }).join('') + '</div></div>' : '';
+      return '<div class="ep-tip"><b>' + esc(fr.name) + '.</b> Write each part. The checklist turns green as you meet each requirement.' + (L.twoEvidence ? ' <b>Legend:</b> use two pieces of evidence.' : '') + '</div>' + chips +
+        '<div class="ep-write">' + fr.parts.map(function (pt) {
+          var head = '<div class="ep-wlab"><b class="ep-wk">' + pt.k + '</b><span><b>' + esc(pt.name) + '</b><br><span class="ep-wtip">' + esc(pt.tip) + '</span></span></div>';
+          if (pt.answer) return '<div class="ep-wpart">' + head + '<div class="ep-answer"><input type="text" class="ep-box wide" data-w="' + pt.k + '" value="' + esc(w.v[pt.k] || '') + '" aria-label="' + esc(pt.name) + '" inputmode="decimal">' + (p.unit ? '<span class="ep-unit">' + esc(p.unit) + '</span>' : '') + '</div></div>';
+          return '<div class="ep-wpart">' + head + '<textarea data-w="' + pt.k + '" rows="3" aria-label="' + esc(pt.name) + '" placeholder="' + esc(pt.starter ? pt.starter + '…' : 'Type here…') + '">' + esc(w.v[pt.k] || '') + '</textarea>' +
+            (pt.starter && !L.prefill ? '<button type="button" class="ep-starter" data-st="' + pt.k + '">Use a sentence starter: "' + esc(pt.starter) + '…"</button>' : '') +
+            '<ul class="ep-ck" data-ck="' + pt.k + '">' + ckHTML(partRules(pt, p, w.v[pt.k])) + '</ul></div>';
+        }).join('') + '</div>';
+    },
+    bind: function (box, p, w, api) {
+      if (w.solved) return;
+      var fr = FRAMES[p.frame] || FRAMES.RACE, key = box.getAttribute('data-key');
+      function upd(k) {
+        var pt = fr.parts.filter(function (x) { return x.k === k; })[0], ul = box.querySelector('[data-ck="' + k + '"]');
+        if (ul) ul.innerHTML = ckHTML(partRules(pt, p, w.v[k]));
+        if (typeof S !== 'undefined' && S) { S.drafts = S.drafts || {}; S.drafts[key] = Object.assign({}, w.v); saveSoon(); }
+      }
+      box.querySelectorAll('[data-w]').forEach(function (el) { el.addEventListener('input', function () { w.v[el.getAttribute('data-w')] = el.value; upd(el.getAttribute('data-w')); }); });
+      box.querySelectorAll('[data-st]').forEach(function (b) {
+        b.onclick = function () { var k = b.getAttribute('data-st'), pt = fr.parts.filter(function (x) { return x.k === k; })[0], ta = box.querySelector('[data-w="' + k + '"]'); ta.value = (pt.starter + ' ' + ta.value).replace(/\s+$/, '') + ' '; w.v[k] = ta.value; upd(k); ta.focus(); };
+      });
+      var target = (fr.parts.filter(function (pt) { return pt.quote || pt.evid; })[0] || {}).k;
+      box.querySelectorAll('[data-ev]').forEach(function (b) {
+        b.onclick = function () { if (!target) return; var ta = box.querySelector('[data-w="' + target + '"]'), q = p.evidence[+b.getAttribute('data-ev')]; var add = q.d ? q.d : /^["“]/.test(q) ? q : '"' + q + '"'; ta.value = (ta.value.replace(/\s+$/, '') + ' ' + add).trim() + ' '; w.v[target] = ta.value; upd(target); ta.focus(); };
+      });
+    },
+    check: function (p, w) {
+      var fr = FRAMES[p.frame] || FRAMES.RACE, left = 0;
+      fr.parts.forEach(function (pt) {
+        if (pt.answer) { if (!String(w.v[pt.k] || '').trim()) left++; return; }
+        partRules(pt, p, w.v[pt.k]).forEach(function (r) { if (!r.ok) left++; });
+      });
+      if (left) return { warn: 'Almost there! ' + left + ' checklist item' + (left === 1 ? ' is' : 's are') + ' still unchecked. Look for the gray circles.' };
+      var ap = fr.parts.filter(function (pt) { return pt.answer; })[0];
+      if (ap) {
+        var got = w.v[ap.k], ok = [].concat(p.answer).some(function (a) { var n1 = toNum(got), n2 = toNum(a); return n1 != null && n2 != null ? Math.abs(n1 - n2) < 1e-9 : norm(got) === norm(a); });
+        if (!ok) return { ok: false, msg: 'Your writing looks great, but check your final answer. Redo the math in your "Show your work" box.' };
+      }
+      return { ok: true };
+    },
+    fill: function (p, w) { w.v = Object.assign({}, p.exemplar || {}); var ap = T.write.parts(p).filter(function (pt) { return pt.answer; })[0]; if (ap) w.v[ap.k] = String([].concat(p.answer)[0]); }
+  };
+
   /* ---------- self test ---------- */
   if (opts.selfTest) {
     var problems = [];
@@ -795,6 +924,105 @@ function EscapePlayer(mount, room, opts) {
 .ep-confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:160}
 .ep-confetti i{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:ep-fall linear forwards}
 @keyframes ep-fall{to{transform:translateY(110vh) rotate(720deg)}}
+.ep-i{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em}
+.ep-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.ep-pill{display:inline-flex;align-items:center;gap:5px}
+.ep-xp{background:var(--accent2);color:#1d1d1d;border-color:#1d1d1d}.ep-xp strong{color:#1d1d1d}
+.ep-streak.hot{background:#E4572E;color:#fff;border-color:#8e1a1f}.ep-streak.hot strong{color:#fff}
+.ep-lvl{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:2px 8px;background:#1d2433;color:#fff;margin-left:4px}
+.ep-lvl.lv-explorer,.ep-level.lv-explorer .ep-lvtag{background:#23A26A;color:#fff}.ep-lvl.lv-legend,.ep-level.lv-legend .ep-lvtag{background:#6C3FC9;color:#fff}.ep-level.lv-agent .ep-lvtag{background:#1F6FD1;color:#fff}
+.ep-supbtn{min-height:40px;font-size:16px;padding:6px 14px}
+.ep-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.ep-level{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;cursor:pointer;border:3px solid var(--line);background:rgba(255,255,255,.6);color:var(--card-ink);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.35}
+.ep-level b{font-family:var(--display);font-weight:400;font-size:22px}
+.ep-lvtag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:2px 8px}
+.ep-level[aria-checked=true]{outline:5px solid var(--accent);outline-offset:2px;background:#fff}
+.ep-level[disabled]{opacity:.4;cursor:not-allowed}
+.ep-listen{float:right;display:inline-flex;align-items:center;gap:6px;border:2px solid currentColor;background:transparent;border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700;cursor:pointer;margin:0 0 6px 10px}
+.ep-qhead .ep-listen{float:none;margin:0 0 0 auto}
+.ep-toast{position:fixed;left:50%;top:16%;background:var(--accent2);color:#1d1d1d;font-family:var(--display);font-size:32px;padding:10px 24px;border-radius:999px;border:3px solid #1d1d1d;z-index:158;pointer-events:none;animation:ep-toast 1.7s forwards;white-space:nowrap;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.ep-toast small{font-family:"Atkinson Hyperlegible",sans-serif;font-size:16px;font-weight:700;margin-left:6px}
+@keyframes ep-toast{0%{opacity:0;transform:translate(-50%,24px) scale(.7)}14%{opacity:1;transform:translate(-50%,0) scale(1.06)}24%{transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-34px)}}
+.ep-gain{display:inline-block;background:var(--accent2);color:#1d1d1d;border-radius:999px;padding:0 10px;font-weight:700}
+.ep-drawer-wrap{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:155}
+.ep-drawer{position:absolute;top:0;right:0;bottom:0;width:min(430px,100%);overflow:auto;background:#fff;color:#1d2433;padding:20px 20px 40px;border-left:4px solid #1d2433;box-shadow:-10px 0 30px rgba(0,0,0,.3);font-size:17px}
+.ep-drawer h2{font-family:var(--display);font-weight:400;font-size:30px}
+.ep-drawer h3{font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin:20px 0 8px;color:#5d6475}
+.ep-drawer .ep-small{color:#5d6475}
+.ep-drawer .ep-btn.plain{color:#1d2433}
+.ep-tog{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;text-align:left;border:2px solid #d5dae4;background:#f7f8fb;color:#1d2433;border-radius:12px;padding:10px 12px;margin:6px 0;cursor:pointer}
+.ep-tog i{flex:none;width:46px;height:26px;border-radius:999px;background:#c5cbd8;position:relative;transition:background .15s}
+.ep-tog i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.ep-tog[aria-pressed=true]{border-color:#1F6FD1;background:#EAF2FF}.ep-tog[aria-pressed=true] i{background:#1F6FD1}.ep-tog[aria-pressed=true] i::after{left:23px}
+.ep-vocab{margin:0;display:grid;gap:6px}.ep-vocab dt{font-weight:700}.ep-vocab dd{margin:0 0 6px;color:#3d4556}
+.ep-notes,.ep-write textarea,.ep-worktext{width:100%;font:inherit;font-size:17px;line-height:1.45;border:2px solid #9aa3b5;border-radius:10px;padding:10px 12px;background:#fff;color:#1d2433;resize:vertical}
+.ep-calc{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.ep-calc input{flex:1;min-width:140px}.ep-calc output{font-weight:700;font-size:20px;min-width:80px}
+.ep-s-big .ep-wrap{zoom:1.16}
+.ep-s-easy{letter-spacing:.035em;word-spacing:.18em}.ep-s-easy p,.ep-s-easy li,.ep-s-easy .ep-qtext{line-height:1.85}
+.ep-s-contrast{--card:#fff;--card-ink:#000;--card-head:#000;--ink:#000;--muted:#1d1d1d;--panel:#000;--panel-ink:#fff;--panel-dim:#fff;--bg:#fff;--bg-img:none;--line:#000}
+.ep-ruler{position:fixed;left:0;right:0;height:44px;pointer-events:none;z-index:140;box-shadow:0 0 0 100vmax rgba(0,0,0,.38);border-top:3px solid #FFD166;border-bottom:3px solid #FFD166}
+.ep-hubvis{margin:0 0 20px}.ep-hubvis>svg{width:100%;height:auto;display:block;overflow:visible}
+.ep-hn{cursor:pointer;outline:none}.ep-hn.locked{opacity:.4;cursor:not-allowed}
+.ep-hn:hover:not(.locked)>*:first-child,.ep-hn:focus-visible>*:first-child{filter:brightness(1.08)}
+.ep-hn:focus-visible{outline:3px solid var(--accent2)}
+.hv-ink{fill:var(--ink);font-weight:700}.hv-ink.b,.hv-cardink.b{font-weight:800;letter-spacing:.08em}
+.hv-cardink{fill:#1d2433;font-weight:700}
+.hv-trail{fill:none;stroke:var(--ink);stroke-width:5;stroke-dasharray:4 10;stroke-linecap:round;opacity:.45}
+.hv-node{fill:var(--card);stroke:var(--line);stroke-width:3.5}.hv-node.done{fill:var(--good)}.hv-node.cur{fill:var(--accent2);stroke-width:5}
+.hv-num{fill:var(--card-ink);font-weight:800}.done>.hv-num,.ep-hn.done .hv-num{fill:#fff}
+.hv-mat{fill:#FFFDF4;opacity:.8;stroke:var(--line);stroke-width:2}
+.hv-pawn circle,.hv-pawn path{fill:var(--accent);stroke:#1d1d1d;stroke-width:3}
+.hv-shackle{fill:none;stroke:#9aa0a8;stroke-width:12;stroke-linecap:round}
+.hv-body{fill:var(--accent);stroke:#1d1d1d;stroke-width:3.5}.hv-body.done{fill:var(--good)}.hv-body.cur{fill:var(--accent2)}
+.hv-hole{fill:#1d1d1d}.hv-digit{fill:#fff;font-weight:800}
+.hv-cork{fill:#B98A55;stroke:#6b4a26;stroke-width:6}
+.hv-card{fill:#FFFDF4;stroke:#6b5a3a;stroke-width:1.5;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}.hv-card.verdict{fill:#FFF1B8}
+.hv-pin{fill:#C8272D;stroke:#6b1111;stroke-width:2}
+.hv-string{stroke:#C8272D;stroke-width:3;fill:none}
+.hv-solved{fill:none;stroke:#C8272D;stroke-width:3}.hv-solvedt{fill:#C8272D;font-weight:800;letter-spacing:.12em}
+.hv-floor{fill:#EDE3CF;stroke:#6b5646;stroke-width:5}.hv-lobby{fill:#D8C9A8;stroke:#6b5646;stroke-width:2;stroke-dasharray:6 5}
+.hv-room{fill:#FFFDF4;stroke:#6b5646;stroke-width:4}.hv-room.done{fill:#FFE9A8}
+.hv-door{fill:#EDE3CF}.hv-letter{fill:#6b5646;font-weight:800}
+.hv-stampc{fill:none;stroke:#C8272D;stroke-width:3}.hv-stamps{fill:#C8272D}
+.ep-stamps{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:10px}
+.ep-stamp{width:86px;height:86px;border-radius:50%;border:3px dashed var(--muted);display:grid;place-items:center;align-content:center;text-align:center;font-size:12px;color:var(--muted);transform:rotate(var(--rot,0deg))}
+.ep-stamp .ep-i{width:26px;height:26px}
+.ep-stamp.on{border:4px double #C8272D;color:#C8272D;background:rgba(255,255,255,.7)}
+.ep-stamp.big{width:120px;height:120px;margin:6px auto 10px;font-size:14px}.ep-stamp.big .ep-i{width:40px;height:40px}
+.ep-boss{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center;background:var(--card);color:var(--card-ink);border:3px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.ep-bosspic{width:130px;height:130px;animation:ep-bob 2.4s ease-in-out infinite}.ep-bosspic.dead{animation:none;transform:rotate(-12deg);opacity:.75}
+.ep-card>.ep-bosspic{display:block;margin:0 auto}
+@keyframes ep-bob{50%{transform:translateY(-6px)}}
+.hv-boss{fill:var(--accent);stroke:#1d1d1d;stroke-width:4}.hv-horn{fill:var(--accent2);stroke:#1d1d1d;stroke-width:3;stroke-linejoin:round}
+.ep-bossname{font-family:var(--display);font-size:28px;line-height:1.05;margin-bottom:6px}
+.ep-hp{height:22px;border:3px solid #1d1d1d;border-radius:999px;background:#fff;overflow:hidden;margin:4px 0}.ep-hp i{display:block;height:100%;background:linear-gradient(90deg,#E4572E,#F2B84B);transition:width .4s}
+.ep-hp.sm{height:14px;width:120px;border-width:2px;display:inline-block;vertical-align:middle;margin:0}
+.ep-taunt{font-style:italic;margin:6px 0 0}
+.ep-hearts{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:-4px 0 12px;color:#E4572E}.ep-hearts .ep-i{width:28px;height:28px}.ep-hearts .lost{opacity:.22;filter:grayscale(1)}
+.ep-bossmini{margin-left:auto;display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--ink)}
+.ep-wcard .ep-qtext{font-size:clamp(19px,3.2vw,21px)}
+.ep-evbank{background:rgba(255,255,255,.1);border:2px dashed var(--panel-dim);border-radius:12px;padding:10px 12px;margin:0 0 12px}
+.ep-evh{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--panel-dim)}
+.ep-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ep-chip.data{background:#E3F0FF;border-color:#1F6FD1}
+.ep-chip{background:#FFF4C2;border:2px solid #C99A00;color:#1d2433;border-radius:10px;padding:6px 10px;font-size:15px;text-align:left;cursor:pointer;line-height:1.3}
+.ep-write{display:grid;gap:12px}
+.ep-wpart{background:#fff;color:#1d2433;border-radius:12px;padding:12px 14px;border:3px solid #1d2433}
+.ep-wlab{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;line-height:1.3}
+.ep-wk{display:inline-grid;place-items:center;min-width:36px;height:36px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:22px;font-weight:400;margin-right:8px;flex:none}
+.ep-wtip{font-size:14px;color:#5d6475}
+.ep-starter{margin-top:6px;font-size:14px;border:2px solid #9aa3b5;background:#f2f4f8;color:#1d2433;border-radius:999px;padding:4px 12px;cursor:pointer}
+.ep-ck{list-style:none;padding:0;margin:8px 0 0;font-size:14px;display:flex;flex-wrap:wrap;gap:4px 14px;color:#6b7280}
+.ep-ck li::before{content:"○ ";font-weight:700}.ep-ck li.ok{color:#1f6b2a;font-weight:700}.ep-ck li.ok::before{content:"✓ "}
+.ep-wdone{background:#fff;color:#1d2433;border-radius:12px;padding:12px 14px}.ep-wdone p{margin:0 0 8px;display:flex;gap:6px;align-items:flex-start}
+.ep-model{margin-top:12px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 14px}.ep-model summary{cursor:pointer;font-weight:700}.ep-model p{margin:8px 0}
+.ep-rank{font-size:20px;margin:10px 0}
+.ep-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin:8px 0 6px}
+.ep-badge{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;line-height:1.25}.ep-badge svg{width:62px;height:62px}.ep-badge b{font-size:14px}.ep-badge span{opacity:.8}
+.ep-badge.off{opacity:.32;filter:grayscale(1)}
+.ep-turnin{margin-top:18px}.ep-worktext{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;min-height:220px}
+@media (max-width:640px){.ep-levels{grid-template-columns:1fr}.ep-boss{grid-template-columns:90px 1fr}.ep-bosspic{width:90px;height:90px}.ep-toast{font-size:24px}}
+@media print{.ep-turnin textarea{border:0;height:auto;min-height:0;overflow:visible}.ep-supbtn,.ep-listen{display:none!important}}
 @media (prefers-reduced-motion:reduce){.ep *{animation:none!important;transition:none!important}.ep-confetti{display:none}}
 @media (max-width:560px){.ep{font-size:18px}.ep-wrap{padding:14px 16px 48px}.ep-panel,.ep-card{padding:16px}.ep-hero{gap:12px}.ep-emblem{width:62px;height:62px}.ep-bars div{grid-template-columns:104px 1fr 46px}.ep-matchgrid{gap:8px}.ep-mitem{font-size:15px;padding:8px}.ep-mitem.paired{padding-left:38px}.ep-stepper{grid-template-columns:84px 42px 40px 42px}}
 @media print{.ep{background:#fff!important}.ep-band,.ep-noprint,.ep-status{display:none!important}}
@@ -810,21 +1038,48 @@ function EscapePlayer(mount, room, opts) {
 
   /* ---------- state ---------- */
   var KEY = 'crossroads-escape-v2:' + room.id;
-  function blank() { return { name: '', started: false, elapsed: 0, solved: {}, firstTry: {}, tries: {}, hinted: {}, done: [], pi: {}, wrong: 0, finished: false, screen: 'start', current: 0 }; }
+  function blank() { return { name: '', started: false, elapsed: 0, solved: {}, firstTry: {}, tries: {}, hinted: {}, done: [], pi: {}, wrong: 0, finished: false, screen: 'start', current: 0, level: presetLevel() || 'agent', xp: 0, streak: 0, best: 0, hearts: {}, removed: {}, removesUsed: 0, drafts: {}, writing: {}, notes: '', sup: {}, gains: {} }; }
   var S = blank();
   if (!opts.preview) { try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.solved) S = Object.assign(blank(), saved); } catch (e) { } }
+  if (presetLevel()) S.level = presetLevel();
+  if (!LEVELS[S.level]) S.level = 'agent';
   function save() { if (opts.preview) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+  var saveTimer = null;
+  function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 600); }
   if (S.finished) S.screen = 'done'; else if (!S.started) S.screen = 'start'; else if (S.screen !== 'stage' && S.screen !== 'final') S.screen = 'hub';
   var work = {}, tick = null, hintShown = {};
 
   var root = document.createElement('div');
-  root.className = 'ep th-' + themeId + ' ep-f-' + (room.format || 'escape');
+  root.className = 'ep th-' + themeId + ' ep-f-' + (room.format || 'escape') + ' ep-g-' + GAME;
   mount.innerHTML = ''; mount.appendChild(root);
 
   function totalPuzzles() { return stages.reduce(function (n, s) { return n + s.puzzles.length; }, 0); }
   function stageOpen(i) { return !fmt.ordered || i === 0 || S.done[i - 1] || opts.preview; }
   function allDone() { return stages.every(function (_, i) { return S.done[i]; }); }
   function emblem(cls) { return '<svg class="ep-emblem ' + (cls || '') + '" viewBox="0 0 64 64" aria-hidden="true">' + TH.emblem + '</svg>'; }
+  function writeTasks() { var out = []; stages.forEach(function (s, i) { s.puzzles.forEach(function (p, j) { if (p.type === 'write') out.push({ p: p, key: i + '-' + j }); }); }); return out; }
+
+  /* supports: display toggles, reading ruler, read-aloud */
+  function applySup() {
+    ['big', 'easy', 'contrast'].forEach(function (k) { root.classList.toggle('ep-s-' + k, !!S.sup[k]); });
+    var r = root.querySelector('.ep-ruler');
+    if (S.sup.ruler && !r) { r = document.createElement('div'); r.className = 'ep-ruler'; r.style.top = '40%'; root.appendChild(r); }
+    if (!S.sup.ruler && r) r.remove();
+  }
+  document.addEventListener('pointermove', function (e) { var r = root.querySelector('.ep-ruler'); if (r) r.style.top = (e.clientY - 22) + 'px'; });
+  function readable(el) {
+    var c = el.cloneNode(true);
+    c.querySelectorAll('.ep-listen,svg,.ep-hintbox:not(.show),.ep-fb:not(.show),textarea,input,.ep-status,[data-hint],[data-check],[data-solve],[data-next],[data-rm2],.ep-starter').forEach(function (x) { x.remove(); });
+    return c.textContent;
+  }
+  root.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-say]');
+    if (b) { var t = b.getAttribute('data-say'), el = t === 'stage' ? root.querySelector('.ep-stagecard') : root.querySelector('.ep-qcard'); if (el) speak(readable(el)); return; }
+    if (S.sup.tap && e.target.closest && !e.target.closest('button,input,textarea,a,select,summary,.ep-seg,.ep-t,.ep-drawer')) {
+      var p = e.target.closest('p,li,h1,h2,h3,.ep-qtext,figcaption,blockquote,td,th,dd,dt'); if (p) speak(readable(p));
+    }
+  });
+  function listenBtn(what) { return canSpeak ? '<button type="button" class="ep-listen" data-say="' + what + '" aria-label="Listen: read this aloud">' + ICON.speaker + '<span>Listen</span></button>' : ''; }
 
   function startTimer() {
     if (tick) return;
@@ -838,31 +1093,166 @@ function EscapePlayer(mount, room, opts) {
       if (Math.floor(S.elapsed) % 5 === 0) save();
     }, 1000);
   }
+  function pieceWord() { return { board: 'Stamps', museum: 'Stamps', 'case': 'Files', boss: 'Levels', locks: 'Code pieces' }[GAME] || 'Pieces'; }
   function statusBar() {
-    return '<div class="ep-status" id="ep-status"><span>' + (S.name ? 'Player: <strong>' + esc(S.name) + '</strong>' : '') + '</span><span class="ep-spacer"></span>' +
+    var L = curLevel();
+    return '<div class="ep-status" id="ep-status"><span>' + (S.name ? 'Player: <strong>' + esc(S.name) + '</strong> ' : '') + '<span class="ep-lvl lv-' + L.id + '">' + esc(L.name) + '</span></span><span class="ep-spacer"></span>' +
+      '<span class="ep-pill ep-xp" title="Experience points">' + ICON.xp + '<strong>' + S.xp + '</strong> XP</span>' +
+      '<span class="ep-pill ep-streak' + (S.streak >= 3 ? ' hot' : '') + '" title="First-try streak">' + ICON.flame + '<strong>' + S.streak + '</strong><span class="ep-sr"> in a row</span></span>' +
       '<span class="ep-pill">Time <strong id="ep-clock">' + fmtTime(S.elapsed) + '</strong></span>' +
-      '<span class="ep-pill">Code pieces <strong>' + S.done.filter(Boolean).length + '/' + stages.length + '</strong></span>' +
-      '<span class="ep-pill">Hints <strong>' + Object.keys(S.hinted).length + '</strong></span>' +
+      '<span class="ep-pill">' + esc(pieceWord()) + ' <strong>' + S.done.filter(Boolean).length + '/' + stages.length + '</strong></span>' +
+      '<button type="button" class="ep-btn small ep-supbtn" data-sup>' + ICON.tools + 'Supports</button>' +
       (opts.onExit ? '<button type="button" class="ep-btn plain small" data-exit>Exit preview</button>' : '') + '</div>';
   }
   function scrollTop() { try { (root.closest('.cx-play-scroll') || window).scrollTo(0, 0); } catch (e) { window.scrollTo(0, 0); } }
-  function go(screen, i) { S.screen = screen; if (i != null) S.current = i; save(); render(); scrollTop(); }
-  function bindCommon() { root.querySelectorAll('[data-exit]').forEach(function (b) { b.onclick = function () { if (tick) clearInterval(tick); if (opts.onExit) opts.onExit(); }; }); }
+  function go(screen, i) { hush(); S.screen = screen; if (i != null) S.current = i; save(); render(); scrollTop(); }
+  function bindCommon() {
+    root.querySelectorAll('[data-exit]').forEach(function (b) { b.onclick = function () { hush(); if (tick) clearInterval(tick); if (opts.onExit) opts.onExit(); }; });
+    root.querySelectorAll('[data-sup]').forEach(function (b) { b.onclick = openSupports; });
+  }
   function refreshStatus() { var st = root.querySelector('#ep-status'); if (st) { st.outerHTML = statusBar(); bindCommon(); } }
+  function toast(html) {
+    var t = document.createElement('div'); t.className = 'ep-toast'; t.setAttribute('role', 'status'); t.innerHTML = html;
+    root.appendChild(t); setTimeout(function () { t.remove(); }, 1700);
+  }
+
+  function openSupports() {
+    var L = curLevel(), ov = document.createElement('div'); ov.className = 'ep-drawer-wrap';
+    var vocab = room.vocab || [], calcOK = !isMath || L.calc;
+    function tog(k, name, sub) { return '<button type="button" class="ep-tog" data-tog="' + k + '" aria-pressed="' + !!S.sup[k] + '"><span><b>' + name + '</b><br><span class="ep-small">' + sub + '</span></span><i aria-hidden="true"></i></button>'; }
+    ov.innerHTML = '<div class="ep-drawer" role="dialog" aria-label="Student supports"><div class="ep-row"><h2 style="margin:0">Supports</h2><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" data-close>Close</button></div>' +
+      '<p class="ep-small">Use any of these tools, any time. They never lower your score.</p>' +
+      (canSpeak ? '<h3>Listen</h3><div class="ep-row"><button type="button" class="ep-btn small" data-read>' + ICON.speaker + 'Read this page</button><button type="button" class="ep-btn plain small" data-hush>Stop</button></div>' + tog('tap', 'Tap to hear', 'Tap any sentence to hear it read aloud.') : '') +
+      '<h3>See</h3>' + tog('big', 'Bigger text', 'Makes everything larger.') + tog('easy', 'Easy-read spacing', 'More space between letters, words, and lines.') + tog('contrast', 'High contrast', 'Black text on white cards.') + tog('ruler', 'Reading ruler', 'A bright strip follows your pointer so you can track each line.') +
+      (vocab.length ? '<h3>Word bank</h3><dl class="ep-vocab">' + vocab.map(function (v) { return '<dt>' + esc(v[0]) + '</dt><dd>' + esc(v[1]) + '</dd>'; }).join('') + '</dl>' : '') +
+      '<h3>Scratch pad</h3><textarea class="ep-notes" data-notes rows="5" placeholder="Jot notes, list clues, or plan your writing.">' + esc(S.notes || '') + '</textarea>' +
+      (calcOK ? '<h3>Calculator</h3><div class="ep-calc"><input type="text" data-cin aria-label="Calculator" placeholder="e.g. 18 ÷ 4" inputmode="decimal"><button type="button" class="ep-btn small" data-calc>=</button><output data-cout></output></div>' : '<p class="ep-small"><b>Calculator:</b> available at the Explorer level. At this level, show your thinking on the scratch pad.</p>') +
+      '<h3>Mission level: ' + esc(L.name) + '</h3><p class="ep-small">' + esc(L.desc) + '</p>' +
+      '<p class="ep-small">"Remove 2" power-ups left: <b>' + (L.removes > 20 ? 'unlimited' : Math.max(0, L.removes - (S.removesUsed || 0))) + '</b> · Hint cost: <b>' + (L.hintCost ? L.hintCost + ' XP' : 'free') + '</b></p></div>';
+    root.appendChild(ov);
+    function close() { ov.remove(); }
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    ov.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    ov.querySelector('[data-close]').onclick = close; ov.querySelector('[data-close]').focus();
+    ov.querySelectorAll('[data-tog]').forEach(function (b) { b.onclick = function () { var k = b.getAttribute('data-tog'); S.sup[k] = !S.sup[k]; b.setAttribute('aria-pressed', !!S.sup[k]); applySup(); save(); }; });
+    var rd = ov.querySelector('[data-read]'); if (rd) rd.onclick = function () { close(); speak(readable(root.querySelector('.ep-wrap'))); };
+    var hs = ov.querySelector('[data-hush]'); if (hs) hs.onclick = hush;
+    var nt = ov.querySelector('[data-notes]'); nt.addEventListener('input', function () { S.notes = nt.value; saveSoon(); });
+    var cb = ov.querySelector('[data-calc]');
+    if (cb) {
+      var ci = ov.querySelector('[data-cin]'), co = ov.querySelector('[data-cout]');
+      var calc = function () {
+        var ex = ci.value.replace(/×/g, '*').replace(/÷/g, '/').replace(/[−–]/g, '-').replace(/[x]/gi, '*').replace(/,/g, '');
+        if (!/^[\d+\-*/().\s]+$/.test(ex)) { co.textContent = 'Use numbers and + − × ÷ only'; return; }
+        try { var v = Function('"use strict";return (' + ex + ')')(); co.textContent = isFinite(v) ? '= ' + (Math.round(v * 1e6) / 1e6) : 'Error'; } catch (er) { co.textContent = 'Error'; }
+      };
+      cb.onclick = calc; ci.addEventListener('keydown', function (e) { if (e.key === 'Enter') calc(); });
+    }
+  }
+
+  /* ---------- hub pictures: a different game board for each format ---------- */
+  function wrapLines(s, n, max) {
+    var words = String(s).split(/\s+/), lines = [], cur = '';
+    words.forEach(function (x) { if ((cur + ' ' + x).trim().length > n && cur) { lines.push(cur); cur = x; } else cur = (cur + ' ' + x).trim(); });
+    if (cur) lines.push(cur);
+    if (lines.length > max) { lines = lines.slice(0, max); lines[max - 1] = lines[max - 1].replace(/\s*\S*$/, '') + '…'; }
+    return lines;
+  }
+  function tx(x, y, lines, size, cls, lh) { return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" text-anchor="middle" class="' + (cls || 'hv-ink') + '">' + lines.map(function (l, k) { return '<tspan x="' + x + '" dy="' + (k ? (lh || size * 1.2) : 0) + '">' + esc(l) + '</tspan>'; }).join('') + '</text>'; }
+  function nodeState(i) { return S.done[i] ? 'done' : !stageOpen(i) ? 'locked' : 'open'; }
+  function curStage() { for (var i = 0; i < stages.length; i++) if (!S.done[i] && stageOpen(i)) return i; return -1; }
+  function hn(i, inner) { var st = nodeState(i); return '<g class="ep-hn ' + st + '" data-i="' + i + '" tabindex="' + (st === 'locked' ? -1 : 0) + '" role="button" aria-label="' + esc(nodeName(i) + ': ' + stageTitle(i) + (st === 'done' ? ' (done)' : st === 'locked' ? ' (locked)' : '')) + '">' + inner + '</g>'; }
+  function hsvg(w, h, body, label) { return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="group" aria-label="' + esc(label) + '">' + body + '</svg>'; }
+  function bossHP() { var t = totalPuzzles(), left = 0; stages.forEach(function (s, i) { s.puzzles.forEach(function (_, j) { if (!S.solved[i + '-' + j]) left++; }); }); return t ? left / t : 0; }
+  function bossSVG(f) {
+    var dead = f <= 0, eye = dead ? '<path d="M44,50 l12,12 M56,50 l-12,12 M84,50 l12,12 M96,50 l-12,12" stroke="#1d1d1d" stroke-width="5" stroke-linecap="round"/>' : '<circle cx="50" cy="56" r="11" fill="#fff" stroke="#1d1d1d" stroke-width="3"/><circle cx="90" cy="56" r="11" fill="#fff" stroke="#1d1d1d" stroke-width="3"/><circle cx="' + (f < .4 ? 47 : 53) + '" cy="58" r="5" fill="#1d1d1d"/><circle cx="' + (f < .4 ? 87 : 93) + '" cy="58" r="5" fill="#1d1d1d"/><path d="M38,40 l20,8 M102,40 l-20,8" stroke="#1d1d1d" stroke-width="5" stroke-linecap="round"/>';
+    return '<svg class="ep-bosspic' + (dead ? ' dead' : '') + '" viewBox="0 0 140 140" aria-hidden="true"><path d="M30,40 L22,8 L50,28 Z M110,40 L118,8 L90,28 Z" class="hv-horn"/><path d="M20,70 C20,30 120,30 120,70 C120,100 110,128 70,128 C30,128 20,100 20,70 Z" class="hv-boss"/>' + eye +
+      (dead ? '<path d="M50,100 Q70,88 90,100" fill="none" stroke="#1d1d1d" stroke-width="5" stroke-linecap="round"/>' : '<path d="M44,92 L54,104 L62,94 L70,106 L78,94 L86,104 L96,92 Z" fill="#fff" stroke="#1d1d1d" stroke-width="3" stroke-linejoin="round"/>') + '</svg>';
+  }
+  function pathNodes(n, W, top, bot) { var pts = []; for (var i = 0; i < n; i++) pts.push([Math.round(50 + i * (W - 100) / Math.max(1, n - 1)), i % 2 ? top : bot]); return pts; }
+  function trail(pts) { var d = 'M' + pts[0][0] + ',' + pts[0][1]; for (var i = 1; i < pts.length; i++) { var mx = (pts[i - 1][0] + pts[i][0]) / 2; d += ' C' + mx + ',' + pts[i - 1][1] + ' ' + mx + ',' + pts[i][1] + ' ' + pts[i][0] + ',' + pts[i][1]; } return '<path d="' + d + '" class="hv-trail"/>'; }
+  function hubVisual() {
+    var n = stages.length, cur = curStage(), b = '';
+    if (GAME === 'locks') {
+      var W = n * 120 + 20;
+      stages.forEach(function (_, i) {
+        var x = 20 + i * 120, d = S.done[i];
+        b += hn(i, '<path d="' + (d ? 'M' + (x + 28) + ',60 v-24 a22 22 0 0 1 44 0 v6' : 'M' + (x + 28) + ',74 v-28 a22 22 0 0 1 44 0 v28') + '" class="hv-shackle"/>' +
+          '<rect x="' + (x + 12) + '" y="72" width="76" height="64" rx="12" class="hv-body' + (d ? ' done' : i === cur ? ' cur' : '') + '"/>' +
+          (d ? tx(x + 50, 116, [code[i]], 32, 'hv-digit') : '<circle cx="' + (x + 50) + '" cy="98" r="8" class="hv-hole"/><rect x="' + (x + 46) + '" y="100" width="8" height="18" rx="3" class="hv-hole"/>') +
+          tx(x + 50, 160, [nodeName(i)], 14));
+      });
+      return hsvg(W, 172, b, 'Locks');
+    }
+    if (GAME === 'board') {
+      var pts = pathNodes(n, 640, 86, 170);
+      b = '<rect x="4" y="4" width="632" height="246" rx="18" class="hv-mat"/>' + trail(pts);
+      pts.forEach(function (pt, i) {
+        var d = S.done[i], up = i % 2;
+        b += hn(i, '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="27" class="hv-node' + (d ? ' done' : i === cur ? ' cur' : '') + '"/>' + tx(pt[0], pt[1] + 8, [d ? '✓' : String(i + 1)], 24, 'hv-num') +
+          tx(pt[0], up ? pt[1] - 52 : pt[1] + 46, wrapLines(stageTitle(i), 15, 2), 13, 'hv-cardink', 15));
+      });
+      if (cur >= 0) { var p0 = pts[cur]; b += '<g class="hv-pawn" transform="translate(' + (p0[0] - 36) + ',' + (p0[1] - 4) + ')"><circle cx="0" cy="-16" r="9"/><path d="M-13,12 Q0,-14 13,12 Z"/></g>'; }
+      return hsvg(640, 254, b, 'Game board route') + '<div class="ep-stamps">' + stages.map(function (_, i) { return '<span class="ep-stamp' + (S.done[i] ? ' on' : '') + '" style="--rot:' + ((i * 37) % 17 - 8) + 'deg">' + (S.done[i] ? ICON.star : '') + '<b>' + esc(nodeName(i)) + '</b></span>'; }).join('') + '</div>';
+    }
+    if (GAME === 'boss') {
+      var f = bossHP(), pct = Math.round(f * 100), taunt = f <= 0 ? 'Defeated! Head to the final lock to finish the quest.' : f > .75 ? '"You will never clear all ' + n + ' of my levels!"' : f > .4 ? '"Lucky guesses! Let\'s see you do that again."' : '"No... my power is fading!"';
+      var pts2 = pathNodes(n, 640, 40, 96), b2 = trail(pts2);
+      pts2.forEach(function (pt, i) { var d = S.done[i]; b2 += hn(i, '<rect x="' + (pt[0] - 26) + '" y="' + (pt[1] - 22) + '" width="52" height="44" rx="10" class="hv-node' + (d ? ' done' : i === cur ? ' cur' : '') + '"/>' + tx(pt[0], pt[1] + 8, [d ? '✓' : 'L' + (i + 1)], 20, 'hv-num')); });
+      return '<div class="ep-boss">' + bossSVG(f) + '<div><div class="ep-bossname">' + esc(room.boss || 'The Quest Boss') + '</div><div class="ep-hp" role="img" aria-label="Boss health ' + pct + ' percent"><i style="width:' + pct + '%"></i></div><div class="ep-small">Boss health: ' + pct + '%. Every correct answer is a hit!</div><p class="ep-taunt">' + esc(taunt) + '</p></div></div>' + hsvg(640, 130, b2, 'Quest levels');
+    }
+    if (GAME === 'case') {
+      var P = [[25, 25], [465, 25], [25, 215], [465, 215], [245, 8], [245, 250]], cx = 320, cy = 180;
+      b = '<rect x="0" y="0" width="640" height="360" rx="14" class="hv-cork"/>';
+      stages.forEach(function (_, i) { var q = P[i % 6]; if (S.done[i]) b += '<path d="M' + (q[0] + 75) + ',' + (q[1] + 12) + ' L' + cx + ',' + (cy - 50) + '" class="hv-string"/>'; });
+      b += '<g><rect x="245" y="128" width="150" height="104" rx="4" class="hv-card verdict"/>' + tx(cx, 158, ['THE VERDICT'], 14, 'hv-cardink b') + tx(cx, 186, allDone() ? ['Ready to', 'close the case!'] : [S.done.filter(Boolean).length + ' of ' + n + ' files', 'solved'], 14, 'hv-cardink', 18) + '<circle cx="' + cx + '" cy="' + (cy - 50) + '" r="7" class="hv-pin"/></g>';
+      stages.forEach(function (_, i) {
+        var q = P[i % 6], d = S.done[i], rot = (i % 2 ? 2.5 : -2.5);
+        b += hn(i, '<g transform="rotate(' + rot + ' ' + (q[0] + 75) + ' ' + (q[1] + 50) + ')"><rect x="' + q[0] + '" y="' + q[1] + '" width="150" height="100" rx="4" class="hv-card' + (i === cur && !fmt.ordered ? '' : '') + '"/>' +
+          tx(q[0] + 75, q[1] + 36, ['FILE #' + (i + 1)], 13, 'hv-cardink b') + tx(q[0] + 75, q[1] + 56, wrapLines(stageTitle(i), 18, 2), 13, 'hv-cardink', 16) +
+          (d ? '<g transform="rotate(-10 ' + (q[0] + 110) + ' ' + (q[1] + 84) + ')"><rect x="' + (q[0] + 66) + '" y="' + (q[1] + 70) + '" width="80" height="24" rx="4" class="hv-solved"/>' + tx(q[0] + 106, q[1] + 88, ['SOLVED'], 15, 'hv-solvedt') + '</g>' : '') +
+          '<circle cx="' + (q[0] + 75) + '" cy="' + (q[1] + 12) + '" r="7" class="hv-pin"/></g>');
+      });
+      return hsvg(640, 360, b, 'Case board');
+    }
+    // museum floor plan
+    var R = [[20, 20, 140, 120], [175, 20, 140, 120], [330, 20, 140, 120], [485, 20, 140, 120], [20, 170, 140, 120], [485, 170, 140, 120]];
+    b = '<rect x="4" y="4" width="632" height="302" rx="10" class="hv-floor"/><rect x="200" y="190" width="240" height="100" rx="8" class="hv-lobby"/>' + tx(320, 236, ['LOBBY'], 16, 'hv-cardink b') + tx(320, 258, ['You are here'], 12, 'hv-cardink');
+    stages.forEach(function (_, i) {
+      var r = R[i % 6], d = S.done[i];
+      b += hn(i, '<rect x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '" rx="6" class="hv-room' + (d ? ' done' : '') + '"/><rect x="' + (r[0] + r[2] / 2 - 18) + '" y="' + (r[1] + r[3] - 5) + '" width="36" height="10" class="hv-door"/>' +
+        tx(r[0] + 22, r[1] + 30, [LETTERS[i]], 24, 'hv-letter') + tx(r[0] + r[2] / 2, r[1] + 62, wrapLines(stageTitle(i), 16, 3), 13, 'hv-cardink', 16) +
+        (d ? '<g transform="translate(' + (r[0] + r[2] - 26) + ',' + (r[1] + 24) + ')"><circle r="17" class="hv-stampc"/><path d="M0,-10 l3,7 7,.5 -5.5,4.5 2,7 -6.5,-4 -6.5,4 2,-7 -5.5,-4.5 7,-.5z" class="hv-stamps"/></g>' : ''));
+    });
+    return hsvg(640, 310, b, 'Museum floor plan');
+  }
 
   /* ---------- screens ---------- */
+  var HOWTO = {
+    locks: [['Solve', 'Read each clue card, then solve its puzzles.'], ['Unlock', 'Every lock you open gives one piece of the final code.']],
+    boss: [['Battle', 'Every correct answer hits the boss. Knock its health to zero!'], ['Hearts', 'Wrong answers cost a heart. Lose them all and you regroup with a hint.']],
+    board: [['Travel', 'Move your game piece stop by stop along the route.'], ['Stamp', 'Each stop earns a passport stamp and a code piece.']],
+    'case': [['Investigate', 'Open the evidence files in any order.'], ['Connect', 'Solved files get pinned to the case board for the verdict.']],
+    museum: [['Explore', 'Visit the exhibits in any order on the floor plan.'], ['Stamp', 'Each exhibit you finish earns a stamp and a code piece.']]
+  };
   function renderStart() {
+    var locked = presetLevel();
+    var how = (HOWTO[GAME] || HOWTO.locks).concat([['Earn XP', 'First-try answers and streaks earn bonus XP and badges.'], writeTasks().length ? ['Prove it', 'Finish with a written evidence task that you turn in.'] : ['Stuck?', 'Tap Show a hint or open Supports. Mistakes are part of learning.']]);
     root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' +
       (opts.onExit ? '<div class="ep-row"><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" data-exit>Exit preview</button></div>' : '') +
       '<div class="ep-hero">' + emblem() + '<div><h1 class="ep-sign">' + esc(room.title) + '</h1></div></div>' +
       '<p class="ep-tag">' + esc(fmt.label) + ' · Grade ' + esc(room.grade) + ' · ' + esc(room.standard) + '</p>' +
       '<div class="ep-card"><h2>' + esc(room.startHead || 'Your mission') + '</h2>' + room.story + '<p><b>' + esc(fmt.intro) + '</b></p>' +
-      '<div class="ep-howto"><div><b>Solve</b>Read each clue card, then answer the puzzles one at a time.</div><div><b>Collect</b>Every finished ' + esc(fmt.node.toLowerCase()) + ' gives you one piece of the final code.</div><div><b>Escape</b>Type the whole code into the final lock.</div><div><b>Stuck?</b>Tap Show a hint. Wrong answers are part of learning.</div></div>' +
-      '<label for="ep-name">Your name or team name</label><input id="ep-name" type="text" maxlength="40" autocomplete="off" placeholder="e.g. Team Lightning" value="' + esc(S.name) + '" style="margin-top:6px">' +
+      '<div class="ep-howto">' + how.map(function (h) { return '<div><b>' + h[0] + '</b>' + h[1] + '</div>'; }).join('') + '</div>' +
+      '<h3>Choose your mission level</h3>' + (locked ? '<p class="ep-small">Your teacher chose your level for this mission.</p>' : '<p class="ep-small">Pick the level that fits you today. You can play again at a different level later.</p>') +
+      '<div class="ep-levels" role="radiogroup" aria-label="Mission level">' + Object.keys(LEVELS).map(function (k) { var L = LEVELS[k]; return '<button type="button" role="radio" class="ep-level lv-' + k + '" data-lv="' + k + '" aria-checked="' + (S.level === k) + '"' + (locked && locked !== k ? ' disabled' : '') + '><b>' + L.name + '</b><span class="ep-lvtag">' + L.tag + '</span><span class="ep-lvdesc">' + L.desc + '</span></button>'; }).join('') + '</div>' +
+      '<label for="ep-name" style="display:block;margin-top:18px">Your name or team name</label><input id="ep-name" type="text" maxlength="40" autocomplete="off" placeholder="e.g. Team Lightning" value="' + esc(S.name) + '" style="margin-top:6px">' +
       '<div style="margin-top:18px"><button type="button" class="ep-btn full" id="ep-start">Start the ' + esc(fmt.label.toLowerCase()) + '</button></div>' +
-      '<p class="ep-small" style="margin-top:12px">About ' + esc(room.minutes || '25–30') + ' minutes · ' + stages.length + ' ' + esc(fmt.node.toLowerCase()) + 's · ' + totalPuzzles() + ' puzzles. Scratch paper is handy for showing your work.</p></div>' +
+      '<p class="ep-small" style="margin-top:12px">About ' + esc(room.minutes || '25–30') + ' minutes · ' + stages.length + ' ' + esc(fmt.node.toLowerCase()) + 's · ' + totalPuzzles() + ' challenges' + (writeTasks().length ? ', including a written evidence task' : '') + '. Tap <b>Supports</b> any time for read-aloud, bigger text, a word bank, and a scratch pad.</p>' +
+      '<div class="ep-row" style="margin-top:6px"><button type="button" class="ep-btn plain small" data-sup>' + ICON.tools + 'Supports</button></div></div>' +
       '<div class="ep-row" style="margin-top:22px"><button type="button" class="ep-btn plain small" id="ep-qrbtn">Teacher: make a QR code</button><button type="button" class="ep-btn plain small" id="ep-reset">Teacher: reset this device</button></div></div><div class="ep-band bottom"></div>';
     var start = root.querySelector('#ep-start'), inp = root.querySelector('#ep-name');
+    root.querySelectorAll('[data-lv]').forEach(function (b) { b.onclick = function () { S.level = b.getAttribute('data-lv'); root.querySelectorAll('[data-lv]').forEach(function (x) { x.setAttribute('aria-checked', x === b); }); save(); }; });
     start.onclick = function () {
       var t = inp.value.trim();
       if (!t) { inp.focus(); inp.placeholder = 'Type a name first'; inp.classList.remove('ep-shake'); void inp.offsetWidth; inp.classList.add('ep-shake'); return; }
@@ -879,28 +1269,38 @@ function EscapePlayer(mount, room, opts) {
     var ready = allDone();
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
       '<div class="ep-hero" style="margin-top:0">' + emblem('sm') + '<div><h1 class="ep-sign md">' + esc(room.hubTitle || fmt.map) + '</h1></div></div>' +
-      '<p class="ep-tag">' + esc(fmt.intro) + '</p><div class="ep-rooms">' + stages.map(function (s, i) {
+      '<p class="ep-tag">' + esc(fmt.intro) + '</p><div class="ep-hubvis">' + hubVisual() + '</div><div class="ep-rooms">' + stages.map(function (s, i) {
         var solved = !!S.done[i], open = stageOpen(i), cur = open && !solved && fmt.ordered && (i === 0 || S.done[i - 1]);
         var inProg = s.puzzles.filter(function (_, j) { return S.solved[i + '-' + j]; }).length;
         var state = solved ? '✓ ' + esc(code[i]) : !open ? 'Locked' : inProg ? inProg + '/' + s.puzzles.length + ' →' : fmt.verb + ' →';
         return '<button type="button" class="ep-room' + (solved ? ' solved' : '') + (!open ? ' locked' : '') + (cur ? ' open' : '') + '" data-i="' + i + '"' + (open ? '' : ' disabled') + '>' +
           '<span class="num">' + (solved ? '✓' : (room.format === 'gallery' ? LETTERS[i] : i + 1)) + '</span><span><span class="lbl">' + esc(nodeName(i)) + '</span><br><span class="name">' + esc(stageTitle(i)) + '</span></span><span class="state">' + state + '</span></button>';
       }).join('') + '</div>' +
-      '<div class="ep-card" style="margin-top:22px"><h2>' + esc(room.finalTitle || 'The final lock') + '</h2><p>Your code pieces, in order:</p><div class="ep-digits">' + code.map(function (c, i) { return '<div class="ep-digit' + (S.done[i] ? '' : ' empty') + '">' + (S.done[i] ? esc(c) : '?') + '</div>'; }).join('') + '</div>' +
+      '<div class="ep-card" style="margin-top:22px"><h2>' + esc(room.finalTitle || (GAME === 'boss' ? 'The final strike' : 'The final lock')) + '</h2><p>Your code pieces, in order:</p><div class="ep-digits">' + code.map(function (c, i) { return '<div class="ep-digit' + (S.done[i] ? '' : ' empty') + '">' + (S.done[i] ? esc(c) : '?') + '</div>'; }).join('') + '</div>' +
       '<div style="margin-top:18px"><button type="button" class="ep-btn full" id="ep-door"' + (ready ? '' : ' disabled') + '>' + (ready ? 'Go to the final lock' : 'Collect all ' + stages.length + ' pieces first') + '</button></div></div></div>';
     root.querySelectorAll('.ep-room:not([disabled])').forEach(function (b) { b.onclick = function () { go('stage', +b.getAttribute('data-i')); }; });
+    root.querySelectorAll('.ep-hn:not(.locked)').forEach(function (g) {
+      g.addEventListener('click', function () { go('stage', +g.getAttribute('data-i')); });
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go('stage', +g.getAttribute('data-i')); } });
+    });
     root.querySelector('#ep-door').onclick = function () { if (allDone()) go('final'); };
     bindCommon();
   }
 
+  function heartsHTML(i) {
+    if (GAME !== 'boss') return '';
+    var max = curLevel().hearts, h = S.hearts[i] == null ? max : S.hearts[i], s = '';
+    for (var k = 0; k < max; k++) s += '<span class="' + (k < h ? '' : 'lost') + '">' + ICON.heart + '</span>';
+    return '<div class="ep-hearts" id="ep-hearts" role="img" aria-label="' + h + ' of ' + max + ' hearts">' + s + '<span class="ep-bossmini"><span>' + esc(room.boss || 'Boss') + '</span><span class="ep-hp sm"><i style="width:' + Math.round(bossHP() * 100) + '%"></i></span></span></div>';
+  }
   function renderStage() {
     var i = S.current, s = stages[i];
     if (S.pi[i] == null) S.pi[i] = 0;
     var flips = s.cards ? '<div class="ep-flips">' + s.cards.map(function (c, k) { return '<button type="button" class="ep-flip" data-flip="' + k + '" aria-label="Flip card: ' + esc(strip(c[0])) + '"><span class="ep-flip-in"><span class="ep-flip-f">' + fx(c[0]) + '</span><span class="ep-flip-b">' + fx(c[1]) + '</span></span></button>'; }).join('') + '</div>' : '';
-    var back = { escape: '← Back to the locks', gallery: '← Back to the gallery', fieldtrip: '← Back to the route', mystery: '← Back to the case board', quest: '← Back to the quest map' }[room.format] || '← Back';
+    var back = { escape: '← Back to the locks', gallery: '← Back to the floor plan', fieldtrip: '← Back to the game board', mystery: '← Back to the case board', quest: '← Back to the quest map' }[room.format] || '← Back';
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
-      '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">' + back + '</button><span class="ep-spacer"></span><span class="ep-small">' + esc(nodeName(i)) + ' of ' + stages.length + '</span></div>' +
-      '<div class="ep-card ep-stagecard"><div class="ep-kicker">' + esc(nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips +
+      '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">' + back + '</button><span class="ep-spacer"></span><span class="ep-small">' + esc(nodeName(i)) + ' of ' + stages.length + '</span></div>' + heartsHTML(i) +
+      '<div class="ep-card ep-stagecard">' + listenBtn('stage') + '<div class="ep-kicker">' + esc(nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips +
       (s.sim ? '<div class="ep-sim"><div class="ep-sim-h">' + esc(s.sim.title || 'Try it yourself') + '</div><div data-sim></div></div>' : '') + '</div>' +
       '<div id="ep-qa"></div></div>';
     root.querySelector('#ep-back').onclick = function () { go('hub'); };
@@ -918,20 +1318,24 @@ function EscapePlayer(mount, room, opts) {
   }
 
   function renderPuzzle(i, keepFb) {
-    var s = stages[i], j = S.pi[i], p = s.puzzles[j], key = i + '-' + j, t = T[p.type];
+    var s = stages[i], j = S.pi[i], p = s.puzzles[j], key = i + '-' + j, t = T[p.type], L = curLevel();
     var w = work[key] || (work[key] = {}); w.solved = !!S.solved[key];
     var qa = root.querySelector('#ep-qa');
     var prev = keepFb ? qa.querySelector('.ep-fb') : null, prevCls = prev ? prev.className : '', prevHtml = prev ? prev.innerHTML : '';
     var dots = s.puzzles.map(function (_, k) { return '<i class="' + (S.solved[i + '-' + k] ? 'done' : k === j ? 'cur' : '') + '"></i>'; }).join('');
     var needsCheck = !t.instant && !w.solved, stageDoneNow = s.puzzles.every(function (_, k) { return S.solved[i + '-' + k]; });
-    qa.innerHTML = '<div class="ep-panel ep-qcard" data-key="' + key + '"><div class="ep-qhead"><span class="ep-qcount">Puzzle ' + (j + 1) + ' of ' + s.puzzles.length + '</span><span class="ep-dots" aria-hidden="true">' + dots + '</span></div>' +
+    var left = Math.max(0, L.removes - (S.removesUsed || 0));
+    var canRemove = p.type === 'mc' && p.choices.length >= 4 && !w.solved && !S.removed[key] && left > 0;
+    var isWrite = p.type === 'write';
+    qa.innerHTML = '<div class="ep-panel ep-qcard' + (isWrite ? ' ep-wcard' : '') + '" data-key="' + key + '"><div class="ep-qhead"><span class="ep-qcount">' + (isWrite ? 'Evidence task · ' : '') + 'Challenge ' + (j + 1) + ' of ' + s.puzzles.length + '</span>' + listenBtn('q') + '<span class="ep-dots" aria-hidden="true">' + dots + '</span></div>' +
       '<div class="ep-qtext">' + fx(p.q) + '</div>' + (p.type !== 'tap' ? visualHTML(p.visual) : '') + '<div class="ep-ans">' + t.html(p, w, key) + '</div>' +
       '<div class="ep-fb" role="status" aria-live="polite"></div>' +
-      (!w.solved ? '<div class="ep-row" style="margin-top:12px">' + (needsCheck ? '<button type="button" class="ep-btn" data-check>Check</button>' : '') +
-        (p.hint ? '<button type="button" class="ep-btn plain small" data-hint>Show a hint</button>' : '') +
-        (opts.preview ? '<button type="button" class="ep-btn small ep-teacher" data-solve>Teacher: show answer</button>' : '') + '</div>' +
+      (!w.solved ? '<div class="ep-row" style="margin-top:12px">' + (needsCheck ? '<button type="button" class="ep-btn" data-check>' + (isWrite ? 'Submit my response' : 'Check') + '</button>' : '') +
+        (p.hint ? '<button type="button" class="ep-btn plain small" data-hint>Show a hint' + (L.hintCost && !S.hinted[key] ? ' (−' + L.hintCost + ' XP)' : '') + '</button>' : '') +
+        (canRemove ? '<button type="button" class="ep-btn plain small" data-rm2>' + ICON.scissors + 'Remove 2 wrong' + (left < 20 ? ' (' + left + ' left)' : '') + '</button>' : '') +
+        (opts.preview ? '<button type="button" class="ep-btn small ep-teacher" data-solve>Teacher: ' + (isWrite ? 'fill model answer' : 'show answer') + '</button>' : '') + '</div>' +
         '<div class="ep-hintbox' + (hintShown[key] ? ' show' : '') + '">' + (p.hint ? '<b>Hint:</b> ' + fx(p.hint) : '') + '</div>' : '') +
-      (w.solved ? '<div class="ep-fb good show"><b>Correct!</b> ' + (p.explain ? fx(p.explain) : '') + '</div><div class="ep-row" style="margin-top:12px"><button type="button" class="ep-btn" data-next>' + (stageDoneNow ? 'Get your code piece' : 'Next puzzle →') + '</button></div>' : '') + '</div>';
+      (w.solved ? '<div class="ep-fb good show"><b>' + (isWrite ? 'Response saved!' : 'Correct!') + '</b> ' + (S.gains[key] ? '<span class="ep-gain">+' + S.gains[key] + ' XP</span> ' : '') + (p.explain ? fx(p.explain) : isWrite ? 'It will appear on your turn-in page at the end.' : '') + '</div><div class="ep-row" style="margin-top:12px"><button type="button" class="ep-btn" data-next>' + (stageDoneNow ? 'Get your code piece' : 'Next challenge →') + '</button></div>' : '') + '</div>';
     var box = qa.querySelector('.ep-qcard'), fb = box.querySelector('.ep-fb');
     if (prev && !w.solved) { fb.className = prevCls; fb.innerHTML = prevHtml; }
     function say(cls, html) { fb.className = 'ep-fb show ' + cls; fb.innerHTML = html; }
@@ -940,10 +1344,12 @@ function EscapePlayer(mount, room, opts) {
       warn: function (m) { say('warn', m); },
       win: function () { solve(i, j); },
       miss: function (msg) {
-        S.tries[key] = (S.tries[key] || 0) + 1; S.wrong++; save();
+        S.tries[key] = (S.tries[key] || 0) + 1; S.wrong++; S.streak = 0;
         var extra = S.tries[key] >= 2 && p.hint && !hintShown[key] ? ' Tap <b>Show a hint</b> if you\'re stuck.' : '';
         say('bad', (msg ? fx(msg) : 'Not quite. Reread the clue card and try again.') + extra);
         var tgt = box.querySelector('.ep-ans'); tgt.classList.remove('ep-shake'); void tgt.offsetWidth; tgt.classList.add('ep-shake');
+        if (GAME === 'boss') loseHeart(i, key, p);
+        save(); refreshStatus();
       },
       check: function () {
         var r = t.check(p, w);
@@ -955,27 +1361,63 @@ function EscapePlayer(mount, room, opts) {
     };
     t.bind(box, p, w, api);
     var cb = box.querySelector('[data-check]'); if (cb) cb.onclick = function () { api.check(); };
-    var hb = box.querySelector('[data-hint]'); if (hb) hb.onclick = function () { if (!S.hinted[key]) { S.hinted[key] = true; save(); refreshStatus(); } hintShown[key] = true; box.querySelector('.ep-hintbox').classList.add('show'); };
-    var sb = box.querySelector('[data-solve]'); if (sb) sb.onclick = function () { t.fill(p, w); var r = t.check(p, w); if (r && r.ok) solve(i, j); else say('warn', 'Answer key problem: ' + ((r && (r.warn || r.msg)) || 'check failed')); };
+    var hb = box.querySelector('[data-hint]'); if (hb) hb.onclick = function () { showHint(key); };
+    var rb = box.querySelector('[data-rm2]'); if (rb) rb.onclick = function () {
+      var wrong = p.choices.map(function (_, k) { return k; }).filter(function (k) { return k !== p.answer && !(w.crossed && w.crossed[k]); });
+      shuffled(wrong, room.id + key + 'rm').slice(0, 2).forEach(function (k) { w.crossed = w.crossed || {}; w.crossed[k] = true; });
+      S.removed[key] = true; S.removesUsed = (S.removesUsed || 0) + 1; save(); renderPuzzle(i, true);
+    };
+    var sb = box.querySelector('[data-solve]'); if (sb) sb.onclick = function () { t.fill(p, w); if (isWrite) { renderPuzzle(i); return; } var r = t.check(p, w); if (r && r.ok) solve(i, j); else say('warn', 'Answer key problem: ' + ((r && (r.warn || r.msg)) || 'check failed')); };
     var nb = box.querySelector('[data-next]'); if (nb) nb.onclick = function () {
       if (stageDoneNow) { stageComplete(i); return; }
       S.pi[i] = s.puzzles.map(function (_, k) { return k; }).filter(function (k) { return !S.solved[i + '-' + k]; })[0]; save();
       renderPuzzle(i); var q = root.querySelector('#ep-qa'); if (q.scrollIntoView) q.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   }
+  function showHint(key) {
+    if (!S.hinted[key]) { S.hinted[key] = true; save(); refreshStatus(); }
+    hintShown[key] = true;
+    var hb = root.querySelector('.ep-hintbox'); if (hb) hb.classList.add('show');
+    var btn = root.querySelector('[data-hint]'); if (btn) btn.textContent = 'Hint shown below';
+  }
+  function loseHeart(i, key, p) {
+    var max = curLevel().hearts;
+    if (S.hearts[i] == null) S.hearts[i] = max;
+    S.hearts[i]--;
+    if (S.hearts[i] <= 0) {
+      S.hearts[i] = max; S.xp = Math.max(0, S.xp - 30);
+      var ov = document.createElement('div'); ov.className = 'ep-overlay';
+      ov.innerHTML = '<div class="ep-card" role="dialog" aria-label="Regroup"><div class="ep-pop">Regroup!</div><p>' + esc(room.boss || 'The boss') + ' knocked you back, but heroes learn from every hit. Your hearts are refilled.</p>' + (p.hint ? '<p class="ep-hintbox show" style="text-align:left"><b>Hint:</b> ' + fx(p.hint) + '</p>' : '<p>Reread the clue card slowly. Use the Supports button if it helps.</p>') + '<button type="button" class="ep-btn full" id="ep-ok">Back into battle</button></div>';
+      root.appendChild(ov);
+      if (p.hint) { S.hinted[key] = true; hintShown[key] = true; }
+      var ok = ov.querySelector('#ep-ok'); ok.focus(); ok.onclick = function () { ov.remove(); renderPuzzle(i, true); var hb = root.querySelector('.ep-hintbox'); if (hb && p.hint) hb.classList.add('show'); };
+    }
+    var hh = root.querySelector('#ep-hearts'); if (hh) hh.outerHTML = heartsHTML(i);
+  }
 
   function solve(i, j) {
-    var key = i + '-' + j;
+    var key = i + '-' + j, p = stages[i].puzzles[j], L = curLevel();
+    if (S.solved[key]) return;
     S.solved[key] = true;
-    if (S.firstTry[key] == null) S.firstTry[key] = !S.tries[key] && !S.hinted[key];
+    var tries = S.tries[key] || 0, first = !tries && !S.hinted[key] && !S.removed[key];
+    if (S.firstTry[key] == null) S.firstTry[key] = first;
+    var gain = p.type === 'write' ? 200 : Math.max(40, 100 - 20 * tries);
+    if (S.hinted[key] && L.hintCost) gain = Math.max(20, gain - L.hintCost);
+    if (S.removed[key]) gain = Math.max(20, gain - 20);
+    if (p.type !== 'write') { if (first) { S.streak++; if (S.streak >= 3) gain += 25 * Math.min(S.streak - 2, 3); } else S.streak = 0; }
+    gain = Math.round(gain * L.xpMul); S.xp += gain; S.gains[key] = gain; S.best = Math.max(S.best || 0, S.streak);
+    if (p.type === 'write' && work[key]) S.writing[key] = Object.assign({}, work[key].v);
     save(); renderPuzzle(i); refreshStatus();
+    var hh = root.querySelector('#ep-hearts'); if (hh) hh.outerHTML = heartsHTML(i);
+    toast('+' + gain + ' XP' + (S.streak >= 3 && first ? ' <small>' + S.streak + ' in a row!</small>' : '') + (GAME === 'boss' ? ' <small>Boss hit!</small>' : ''));
   }
 
   function stageComplete(i) {
     S.done[i] = true; save();
+    var extra = { boss: '<p>Level cleared! ' + esc(room.boss || 'The boss') + ' is down to <b>' + Math.round(bossHP() * 100) + '%</b> health.</p>', board: '<div class="ep-stamp on big">' + ICON.star + '<b>' + esc(nodeName(i)) + '</b></div><p>Passport stamped! Your game piece moves ahead.</p>', 'case': '<p>This file is pinned to the case board with a red string.</p>', museum: '<p>Exhibit stamped on your floor plan.</p>', locks: '' }[GAME] || '';
     var ov = document.createElement('div'); ov.className = 'ep-overlay';
-    ov.innerHTML = '<div class="ep-card" role="dialog" aria-label="Code piece found"><div class="ep-pop">' + esc(fmt.done) + '</div><p>Write this code piece on your paper. It goes in slot ' + (i + 1) + ':</p><div class="ep-bigdigit">' + esc(code[i]) + '</div>' +
-      '<button type="button" class="ep-btn full" id="ep-ok">' + (allDone() ? 'Go to the final lock' : 'Back to the map') + '</button></div>';
+    ov.innerHTML = '<div class="ep-card" role="dialog" aria-label="Code piece found"><div class="ep-pop">' + esc(fmt.done) + '</div>' + extra + '<p>Write this code piece on your paper. It goes in slot ' + (i + 1) + ':</p><div class="ep-bigdigit">' + esc(code[i]) + '</div>' +
+      '<button type="button" class="ep-btn full" id="ep-ok">' + (allDone() ? 'Go to the final lock' : { board: 'Back to the game board', 'case': 'Back to the case board', museum: 'Back to the floor plan', boss: 'Back to the quest map' }[GAME] || 'Back to the map') + '</button></div>';
     root.appendChild(ov); confetti(30);
     var ok = ov.querySelector('#ep-ok'); ok.focus();
     ok.onclick = function () { ov.remove(); go(allDone() ? 'final' : 'hub'); };
@@ -984,14 +1426,14 @@ function EscapePlayer(mount, room, opts) {
   function renderFinal() {
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
       '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">← Back</button></div>' +
-      '<div class="ep-card" id="ep-doorcard" style="text-align:center">' + emblem() + '<h2>' + esc(room.finalTitle || 'The final lock') + '</h2>' + (room.finalPrompt || '<p>Type your code pieces in order, slot 1 to slot ' + code.length + '.</p>') +
+      '<div class="ep-card" id="ep-doorcard" style="text-align:center">' + (GAME === 'boss' ? bossSVG(0) : emblem()) + '<h2>' + esc(room.finalTitle || (GAME === 'boss' ? 'The final strike' : 'The final lock')) + '</h2>' + (room.finalPrompt || '<p>Type your code pieces in order, slot 1 to slot ' + code.length + '.</p>') +
       '<div class="ep-keypad">' + code.map(function (_, k) { return '<input type="text" maxlength="1" data-k="' + k + '" aria-label="Code character ' + (k + 1) + '" autocomplete="off">'; }).join('') + '</div>' +
       '<div class="ep-fb" id="ep-doorfb" role="status" aria-live="polite"></div><div style="margin-top:14px"><button type="button" class="ep-btn full" id="ep-try">Unlock</button></div></div></div>';
     root.querySelector('#ep-back').onclick = function () { go('hub'); };
     var ins = Array.prototype.slice.call(root.querySelectorAll('.ep-keypad input'));
     function tryCode() {
       var v = ins.map(function (x) { return x.value.toUpperCase(); }).join(''), fb = root.querySelector('#ep-doorfb');
-      if (v === code.join('')) { S.finished = true; S.finishTime = S.elapsed; go('done'); confetti(90); return; }
+      if (v === code.join('')) { S.finished = true; S.finishTime = S.elapsed; S.xp += Math.round(150 * curLevel().xpMul); go('done'); confetti(90); return; }
       S.wrong++; save(); fb.className = 'ep-fb show bad';
       fb.textContent = v.length < code.length ? 'The lock needs all ' + code.length + ' pieces.' : 'The lock won\'t budge. Check the order: slot 1 through slot ' + code.length + '.';
       var c = root.querySelector('#ep-doorcard'); c.classList.remove('ep-shake'); void c.offsetWidth; c.classList.add('ep-shake');
@@ -1005,15 +1447,60 @@ function EscapePlayer(mount, room, opts) {
     bindCommon();
   }
 
+  /* ---------- results: XP, rank, badges, and the Canvas turn-in ---------- */
+  function accuracy() { var total = totalPuzzles(), first = Object.keys(S.firstTry).filter(function (k) { return S.firstTry[k]; }).length; return total ? Math.round(first / total * 100) : 100; }
+  function badges() {
+    var hints = Object.keys(S.hinted).length, grit = Object.keys(S.tries).some(function (k) { return S.tries[k] >= 3 && S.solved[k]; });
+    var used = Object.keys(S.sup || {}).some(function (k) { return S.sup[k]; }) || !!String(S.notes || '').trim();
+    return [
+      { n: 'Sharpshooter', d: '80% or more right on the first try', on: accuracy() >= 80, c: '#E4572E' },
+      { n: 'On Fire', d: 'A streak of 5 first-try answers', on: (S.best || 0) >= 5, c: '#F2B84B' },
+      { n: 'Independent', d: 'Used 1 hint or fewer', on: hints <= 1, c: '#3A7BE0' },
+      { n: 'Evidence Expert', d: 'Completed the written evidence task', on: writeTasks().every(function (t) { return S.solved[t.key]; }) && writeTasks().length > 0, c: '#23A26A' },
+      { n: 'Never Give Up', d: 'Solved a challenge after 3 or more tries', on: grit, c: '#9B6BFF' },
+      { n: 'Speed Runner', d: 'Finished in under 20 minutes', on: (S.finishTime || S.elapsed) < 1200, c: '#C2185B' },
+      { n: 'Smart Tools', d: 'Used a support tool or the scratch pad', on: used, c: '#2A9D8F' },
+      { n: 'Legend', d: 'Finished at the Legend level', on: S.level === 'legend', c: '#6D4C41' }
+    ];
+  }
+  function medal(c) { return '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20,2 h10 l6,22 h-10z M44,2 h-10 l-6,22 h10z" fill="' + c + '" opacity=".75"/><circle cx="32" cy="40" r="20" fill="' + c + '" stroke="#1d1d1d" stroke-width="3"/><path d="M32,28 l3.6,7.6 8.4,.9 -6.3,5.7 1.8,8.3 -7.5,-4.3 -7.5,4.3 1.8,-8.3 -6.3,-5.7 8.4,-.9z" fill="#fff"/></svg>'; }
+  function rankName() {
+    var max = 0; stages.forEach(function (s) { s.puzzles.forEach(function (p) { max += p.type === 'write' ? 200 : 100; }); });
+    var f = S.xp / Math.max(1, max * curLevel().xpMul + 150 * curLevel().xpMul);
+    var role = { locks: 'Escape Artist', boss: 'Hero', board: 'Traveler', 'case': 'Detective', museum: 'Curator' }[GAME] || 'Explorer';
+    return (f >= .95 ? 'Legendary ' : f >= .8 ? 'Master ' : f >= .6 ? 'Expert ' : 'Rising ') + role;
+  }
+  function workText() {
+    var L = curLevel(), lines = ['Crossroads Escapes: ' + room.title, 'Standard: ' + (room.standard || ''), 'Name: ' + (S.name || ''), 'Mission level: ' + L.name, 'Completion code: ' + completionCode(S.name), 'Time: ' + fmtTime(S.finishTime || S.elapsed) + ' | XP: ' + S.xp + ' | First-try accuracy: ' + accuracy() + '% | Hints: ' + Object.keys(S.hinted).length, 'Badges: ' + (badges().filter(function (b) { return b.on; }).map(function (b) { return b.n; }).join(', ') || 'none yet'), ''];
+    writeTasks().forEach(function (t) {
+      var fr = FRAMES[t.p.frame] || FRAMES.RACE, v = S.writing[t.key] || (work[t.key] && work[t.key].v) || {};
+      lines.push('--- ' + fr.name + ' ---', 'Task: ' + strip(t.p.q));
+      fr.parts.forEach(function (pt) { lines.push(pt.name + ': ' + String(v[pt.k] || '').trim()); });
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
   function renderDone() {
-    var total = totalPuzzles(), first = Object.keys(S.firstTry).filter(function (k) { return S.firstTry[k]; }).length, acc = total ? Math.round(first / total * 100) : 100;
+    var bs = badges(), title = { boss: 'Boss defeated!', board: 'Trip complete!', 'case': 'Case closed!', museum: 'Gallery complete!', locks: 'You escaped!' }[GAME] || 'You escaped!';
     root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + (opts.onExit ? '<div class="ep-row ep-noprint"><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" data-exit>Exit preview</button></div>' : '') +
-      '<div class="ep-card ep-cert" style="text-align:center;margin-top:18px"><div class="ep-pop" style="font-size:52px">You escaped!</div>' + emblem() + '<h2>Nice work, ' + esc(S.name || 'explorer') + '!</h2>' + (room.finale || '') +
-      '<div class="ep-stats"><div class="ep-stat"><b>' + fmtTime(S.finishTime || S.elapsed) + '</b>Time</div><div class="ep-stat"><b>' + acc + '%</b>First-try accuracy</div><div class="ep-stat"><b>' + (S.wrong || 0) + '</b>Wrong tries</div><div class="ep-stat"><b>' + Object.keys(S.hinted).length + '</b>Hints used</div></div>' +
-      '<p><b>Completion code</b> (turn this in to your teacher)</p><div class="ep-code">' + esc(completionCode(S.name)) + '</div>' +
-      '<p class="ep-small" style="margin-top:12px">' + esc(room.title) + ' · Grade ' + esc(room.grade) + ' · ' + esc(room.standard) + ' · ' + new Date().toLocaleDateString() + '</p>' +
-      '<div class="ep-row ep-noprint" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn" id="ep-print">Print certificate</button><button type="button" class="ep-btn plain" id="ep-again">Play again</button></div></div></div><div class="ep-band bottom"></div>';
+      '<div class="ep-card ep-cert" style="text-align:center;margin-top:18px"><div class="ep-pop" style="font-size:52px">' + title + '</div>' + (GAME === 'boss' ? bossSVG(0) : emblem()) + '<h2>Nice work, ' + esc(S.name || 'explorer') + '!</h2>' + (room.finale || '') +
+      '<p class="ep-rank">Rank: <b>' + esc(rankName()) + '</b> · ' + esc(curLevel().name) + ' level</p>' +
+      '<div class="ep-stats"><div class="ep-stat"><b>' + S.xp + '</b>XP</div><div class="ep-stat"><b>' + fmtTime(S.finishTime || S.elapsed) + '</b>Time</div><div class="ep-stat"><b>' + accuracy() + '%</b>First-try accuracy</div><div class="ep-stat"><b>' + (S.best || 0) + '</b>Best streak</div></div>' +
+      '<h3>Badges</h3><div class="ep-badges">' + bs.map(function (b) { return '<div class="ep-badge' + (b.on ? '' : ' off') + '" title="' + esc(b.d) + '">' + medal(b.c) + '<b>' + esc(b.n) + '</b><span>' + esc(b.d) + '</span></div>'; }).join('') + '</div>' +
+      '<p style="margin-top:14px"><b>Completion code</b></p><div class="ep-code">' + esc(completionCode(S.name)) + '</div>' +
+      '<p class="ep-small" style="margin-top:12px">' + esc(room.title) + ' · Grade ' + esc(room.grade) + ' · ' + esc(room.standard) + ' · ' + new Date().toLocaleDateString() + '</p></div>' +
+      '<div class="ep-card ep-turnin"><h2>Turn in your work</h2><p><b>Step 1.</b> Tap <b>Copy my work</b>. <b>Step 2.</b> Paste it into the Canvas assignment and submit. Your teacher will read your written evidence and check your completion code.</p>' +
+      '<textarea class="ep-worktext" readonly rows="12" aria-label="Your work to turn in">' + esc(workText()) + '</textarea><div class="ep-row ep-noprint" style="margin-top:12px"><button type="button" class="ep-btn" id="ep-copy">Copy my work</button><button type="button" class="ep-btn plain" id="ep-dl">Download as a file</button><span class="ep-small" id="ep-copymsg" role="status"></span></div></div>' +
+      '<div class="ep-row ep-noprint" style="justify-content:center;margin-top:16px"><button type="button" class="ep-btn" id="ep-print">Print certificate and work</button><button type="button" class="ep-btn plain" id="ep-again">Play again</button></div></div><div class="ep-band bottom"></div>';
     root.querySelector('#ep-print').onclick = function () { window.print(); };
+    var ta = root.querySelector('.ep-worktext'), msg = root.querySelector('#ep-copymsg');
+    root.querySelector('#ep-copy').onclick = function () {
+      function fallback() { ta.focus(); ta.select(); try { document.execCommand('copy'); msg.textContent = 'Copied! Now paste it into Canvas.'; } catch (e) { msg.textContent = 'Press Ctrl+C (or ⌘+C) to copy the selected text.'; } }
+      try { navigator.clipboard.writeText(ta.value).then(function () { msg.textContent = 'Copied! Now paste it into Canvas.'; }, fallback); } catch (e) { fallback(); }
+    };
+    root.querySelector('#ep-dl').onclick = function () {
+      try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ta.value], { type: 'text/plain' })); a.download = (room.title + ' - ' + (S.name || 'my work')).replace(/[^\w\- ]+/g, '') + '.txt'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { msg.textContent = 'Download is blocked here. Use Copy my work instead.'; }
+    };
     var armed = false, ag = root.querySelector('#ep-again');
     ag.onclick = function () { if (!armed) { armed = true; ag.textContent = 'Tap again to erase progress'; return; } S = blank(); work = {}; save(); render(); };
     bindCommon();
@@ -1052,6 +1539,7 @@ function EscapePlayer(mount, room, opts) {
 
   function render() {
     ({ start: renderStart, hub: renderHub, stage: renderStage, final: renderFinal, done: renderDone }[S.screen] || renderStart)();
+    applySup();
     startTimer();
   }
   render();

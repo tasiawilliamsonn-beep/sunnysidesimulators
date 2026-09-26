@@ -11,6 +11,14 @@ Each room includes:
 - **Teacher resources**: free, reputable sites for reteaching and extension.
 - **Canvas export**: one self-contained `.html` file per room.
 
+## Game styles, levels, supports, and turn-in
+
+- **Five game styles.** Escape rooms use padlocks, quests are boss battles (a health bar and hearts, plus a "Regroup" hint), field trips use a board-game route with passport stamps, mysteries use a cork-board case file, and gallery walks use a museum floor plan. Every room awards XP, first-try streak bonuses, a rank, and 8 badges.
+- **Mission levels for differentiation.** *Explorer* (pre-filled sentence starters, free hints, unlimited "remove 2 wrong answers," a calculator, shorter writing), *Agent* (on level), and *Legend* (no power-ups, longer writing that needs two pieces of evidence). To assign a level, add `?level=explorer`, `?level=agent`, or `?level=legend` to a room link.
+- **Supports toolbar.** Read-aloud (Listen buttons and tap-to-hear), bigger text, easy-read spacing, high contrast, a reading ruler, a word bank, a scratch pad, and a calculator.
+- **Written evidence tasks** (`data/tasks.js`). RACE (ELA), CER (science), a historian's claim with a source check (social studies), and solve–show–explain (math). A live checklist has to be complete before the final code unlocks. Rooms with a task: g5-sci-missing-mass, g6-sci-cold-cocoa, g5-ss-midnight-messenger, g6-ss-plague-detective, g5-ela-context-caper, g6-ela-evidence-vault, g6-ela-theme-quest, g5-math-bakery-mystery, and g6-math-sale-scam. To add more, add entries to `data/tasks.js`.
+- **Turn-in.** The final screen builds a block of text with the student's name, level, completion code, stats, badges, and full written response. Students copy it into a Canvas Text Entry submission.
+
 ## Using it
 
 Open `index.html` in any browser. You can also publish the repo with GitHub Pages (Settings → Pages → deploy from the branch root) so the site has a web address.

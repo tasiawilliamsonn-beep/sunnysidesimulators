@@ -25,4 +25,12 @@
       if (d.remove) d.remove.slice().sort(function (a, b) { return b - a; }).forEach(function (k) { s.puzzles.splice(k, 1); });
     });
   });
+  // written evidence tasks and quest bosses (data/tasks.js)
+  var TASKS = window.CX_TASKS || {};
+  (window.CX_ROOMS || []).forEach(function (r) {
+    var t = TASKS[r.id];
+    if (!t) return;
+    if (t.boss) r.boss = t.boss;
+    if (t.task) r.stages[r.stages.length - 1].puzzles.push(Object.assign({ type: 'write' }, t.task));
+  });
 })();

@@ -4,14 +4,14 @@ const ctx = { window: {} }; vm.createContext(ctx);
 const dir = path.join(__dirname, '..', 'data');
 // Same order as index.html: standards, base rooms, fx upgrades, then apply-fx merges them.
 const all = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
-const files = ['standards.js', ...all.filter(f => /^g\d-/.test(f)), ...all.filter(f => /^fx-/.test(f)), 'apply-fx.js'];
+const files = ['standards.js', ...all.filter(f => /^g\d-/.test(f)), ...all.filter(f => /^fx-/.test(f)), 'tasks.js', 'apply-fx.js'];
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(dir, f), 'utf8'), ctx, { filename: f });
 for (const f of ['themes.js', 'kit.js', 'player.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', f), 'utf8'), ctx, { filename: f });
 const STD = {}; ctx.window.CX_STANDARDS.forEach(s => STD[s.id] = s);
 const rooms = ctx.window.CX_ROOMS;
 const errs = [], ids = new Set();
 const FORMATS = ['escape', 'gallery', 'fieldtrip', 'mystery', 'quest'];
-const INTERACTIVE = ['frac', 'numberline', 'plot', 'highlight', 'shade', 'build', 'coins', 'assemble', 'maya', 'balance', 'tap'];
+const INTERACTIVE = ['frac', 'numberline', 'plot', 'highlight', 'shade', 'build', 'coins', 'assemble', 'maya', 'balance', 'tap', 'write'];
 function err(r, m) { errs.push(`${r.id || '?'}: ${m}`); }
 for (const r of rooms) {
   if (ids.has(r.id)) err(r, 'duplicate id'); ids.add(r.id);

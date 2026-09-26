@@ -211,3 +211,9 @@ textarea.code { width: 100%; min-height: 90px; font-family: var(--mono); font-si
   details.key { break-inside: avoid; }
   details.key ol { display: block; }
 }
+.tbl{border-collapse:collapse;width:100%;margin:8px 0 14px;font-size:15px}
+.tbl th,.tbl td{border:1px solid var(--line,#cfd6e2);padding:8px 10px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(0,0,0,.05)}
+#s-game code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px}
+#s-game details{margin-top:8px}
+@media (max-width:640px){#s-game .tbl{display:block;overflow-x:auto}}

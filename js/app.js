@@ -111,7 +111,42 @@
     if (p.type === 'maya') return p.answer + ' (' + Math.floor(p.answer / 5) + ' bar' + (Math.floor(p.answer / 5) === 1 ? '' : 's') + ', ' + (p.answer % 5) + ' dot' + (p.answer % 5 === 1 ? '' : 's') + ')';
     if (p.type === 'balance') return 'x = ' + p.answer;
     if (p.type === 'tap') return 'Tap ' + tapLabel(p);
+    if (p.type === 'write') return 'Written response (' + ({ RACE: 'RACE', CER: 'CER', SOURCE: 'claim, evidence, source check, explain', MATH: 'solve, show, explain' }[p.frame] || p.frame) + ')' + (p.answer ? '. Answer: ' + [].concat(p.answer)[0] + (p.unit ? ' ' + p.unit : '') : '') + '. Model: ' + Object.keys(p.exemplar || {}).map(function (k) { return p.exemplar[k]; }).join(' ');
     return '';
+  }
+  var GAME_INFO = {
+    locks: ['Padlock escape', 'Each lock on the board opens and shows its code digit when students clear it.'],
+    boss: ['Boss battle', 'Every correct answer damages the boss\'s health bar. Wrong answers cost a heart; losing all hearts triggers a "Regroup" with an automatic hint, so there is no dead end.'],
+    board: ['Board-game route', 'Students move a game piece along a winding route and collect passport stamps at each stop.'],
+    'case': ['Cork-board case file', 'Solved evidence files are stamped SOLVED and pinned with red string to the verdict card.'],
+    museum: ['Museum floor plan', 'Students tour exhibit rooms on a floor plan in any order and collect a stamp in each room.']
+  };
+  function gameOf(r) { return r.game || { quest: 'boss', fieldtrip: 'board', mystery: 'case', gallery: 'museum', escape: 'locks' }[r.format] || 'locks'; }
+  function writeTask(r) { var t = null; r.stages.forEach(function (s) { s.puzzles.forEach(function (p) { if (p.type === 'write') t = p; }); }); return t; }
+  var FRAME_INFO = {
+    RACE: ['RACE response', [['R', 'Restate the question'], ['A', 'Answer it'], ['C', 'Cite evidence in quotation marks'], ['E', 'Explain how the evidence proves the answer']]],
+    CER: ['Claim, Evidence, Reasoning', [['C', 'Claim that answers the question'], ['E', 'Evidence: data or a quote'], ['R', 'Reasoning that uses a science idea']]],
+    SOURCE: ['Historian\'s claim', [['C', 'Claim'], ['E', 'Evidence from the sources'], ['S', 'Source check: who made it, when, why, and can we trust it?'], ['X', 'Explain why the evidence proves the claim']]],
+    MATH: ['Solve, Show, Explain', [['A', 'Correct final answer'], ['S', 'Work with numbers and operations'], ['E', 'Explanation of the strategy with math words']]]
+  };
+  function gameSection(r) {
+    var g = GAME_INFO[gameOf(r)], t = writeTask(r), f = t && FRAME_INFO[t.frame];
+    var h = '<section class="sec" id="s-game"><h2>Game, levels &amp; supports</h2>' +
+      '<p><b>Game style: ' + esc(g[0]) + (r.boss ? ' vs. ' + esc(r.boss) : '') + '.</b> ' + esc(g[1]) + ' In every room, students earn XP (a bonus for first-try streaks), a rank, and up to 8 badges.</p>' +
+      '<h3>Differentiated mission levels</h3><table class="tbl"><thead><tr><th>Level</th><th>What changes</th></tr></thead><tbody>' +
+      '<tr><td><b>Explorer</b> (extra support)</td><td>Sentence starters are pre-filled, hints are free, unlimited "remove 2 wrong answers" power-ups, a calculator (including in math), 5 hearts in boss battles, and writing minimums are about 40% shorter.</td></tr>' +
+      '<tr><td><b>Agent</b> (on level)</td><td>3 power-ups, hints cost 30 XP, standard writing requirements.</td></tr>' +
+      '<tr><td><b>Legend</b> (extra challenge)</td><td>No power-ups, hints cost 60 XP, and writing needs about 40% more words and <b>two</b> pieces of evidence. Earns 1.5× XP.</td></tr></tbody></table>' +
+      '<p>Students choose a level on the start screen. To assign a level (for IEPs, 504 plans, or ELL students), add <code>?level=explorer</code>, <code>?level=agent</code>, or <code>?level=legend</code> to the room link. The level appears on the student\'s turn-in.</p>' +
+      '<h3>Supports toolbar (every student, every level)</h3><ul><li><b>Read aloud:</b> a Listen button on every clue card and challenge, plus "tap any sentence to hear it" (uses the device\'s built-in voice).</li><li><b>Bigger text, easy-read spacing, high contrast,</b> and a <b>reading ruler</b> that follows the pointer.</li><li><b>Word bank</b> with this standard\'s vocabulary.</li><li><b>Scratch pad</b> that saves notes, and a <b>calculator</b> (math rooms: Explorer level only).</li></ul>';
+    if (t) {
+      h += '<h3>Written evidence task: ' + esc(f[0]) + '</h3><p>' + esc(t.q) + '</p><p>Students cannot unlock the final code until every checklist item is met. The game checks word count, words from the question, quotation marks or data, linking words (because, this shows...), and key vocabulary' + (t.frame === 'MATH' ? ', plus a correct final answer' : '') + '. After submitting, students compare their answer with a model answer.</p>' +
+        '<table class="tbl"><thead><tr><th>Part</th><th>4: Exceeds</th><th>3: Meets</th><th>2: Approaching</th><th>1: Beginning</th></tr></thead><tbody>' +
+        f[1].map(function (pt) { return '<tr><td><b>' + pt[0] + '</b>: ' + esc(pt[1]) + '</td><td>Precise and complete, goes beyond</td><td>Clear and accurate</td><td>Partly accurate or vague</td><td>Missing or inaccurate</td></tr>'; }).join('') + '</tbody></table>' +
+        '<details><summary>Model answer</summary>' + Object.keys(t.exemplar).map(function (k) { return '<p><b>' + esc(k) + ':</b> ' + esc(t.exemplar[k]) + '</p>'; }).join('') + (t.answer ? '<p><b>Answer:</b> ' + esc([].concat(t.answer)[0]) + ' ' + esc(t.unit || '') + '</p>' : '') + '</details>';
+    }
+    h += '<h3>What students turn in</h3><p>The final screen builds a turn-in block with: name, mission level, completion code, time, XP, first-try accuracy, hints used, badges' + (t ? ', and their full written ' + esc(f[0]) : '') + '. Students tap <b>Copy my work</b> and paste it into a Canvas <b>Text Entry</b> submission. Grade the writing with the rubric above' + (t ? '' : ' (this room has no written task, so the code and stats show completion)') + '.</p></section>';
+    return h;
   }
   function answerLines(r) {
     var out = [], code = finalCode(r);
@@ -142,7 +177,8 @@
     return {
       id: r.id, title: r.title, grade: r.grade, subject: r.subject, standard: r.standard, format: r.format,
       minutes: r.minutes, story: r.story, code: r.code, stages: r.stages, finale: r.finale,
-      finalTitle: r.finalTitle, finalPrompt: r.finalPrompt, hubTitle: r.hubTitle, theme: r.theme, startHead: r.startHead
+      finalTitle: r.finalTitle, finalPrompt: r.finalPrompt, hubTitle: r.hubTitle, theme: r.theme, startHead: r.startHead, boss: r.boss, game: r.game,
+      vocab: ((STD[r.std] || {}).lesson || {}).vocab
     };
   }
   function standaloneHTML(r) {
@@ -215,7 +251,7 @@
       '<div class="card-actions"><a class="btn grow" href="#room-' + r.id + '">Teacher guide</a><a class="btn primary grow" href="#play-' + r.id + '">' + ICONS.play + 'Play as student</a></div></article>';
   }
   var HANDS_ON = { sort: 1, order: 1, match: 1, numberline: 1, plot: 1, highlight: 1, shade: 1, build: 1, coins: 1, assemble: 1, maya: 1, balance: 1, tap: 1, frac: 1 };
-  var TYPE_NAMES = { sort: 'drag-and-drop sort', order: 'drag-to-order', match: 'tap-to-connect matching', numberline: 'number line', plot: 'coordinate plotting', highlight: 'tap-the-evidence passage', shade: 'shade-the-model', build: 'prism builder', coins: 'money tray', assemble: 'tile builder', maya: 'Maya numeral builder', balance: 'balance-scale equation', tap: 'tap-the-diagram', frac: 'fraction entry' };
+  var TYPE_NAMES = { sort: 'drag-and-drop sort', order: 'drag-to-order', match: 'tap-to-connect matching', numberline: 'number line', plot: 'coordinate plotting', highlight: 'tap-the-evidence passage', shade: 'shade-the-model', build: 'prism builder', coins: 'money tray', assemble: 'tile builder', maya: 'Maya numeral builder', balance: 'balance-scale equation', tap: 'tap-the-diagram', frac: 'fraction entry', write: 'written evidence task' };
   var SIM_NAMES = { particles: 'particle temperature simulation', mix: 'sealed vs. open mass scale', moonphase: 'Moon phase orbit simulator', shadow: 'sundial shadow simulator', orbit: 'Newton\'s cannon orbit simulator', coaster: 'roller coaster energy simulator', populations: 'food web population simulator', diffusion: 'hot vs. cold diffusion simulator' };
   function handsOnList(r) {
     var seen = {}, out = [];
@@ -284,7 +320,7 @@
       '<button class="btn" data-do="guide">' + ICONS.down + 'Facilitation guide PDF</button>' +
       '<button class="btn star' + (on ? ' on' : '') + '" data-pick="' + r.id + '" aria-pressed="' + on + '">' + (on ? ICONS.star : ICONS.starOff) + (on ? 'In My Picks' : 'Add to My Picks') + '</button></div>' +
       '<textarea class="code" id="copybox" hidden readonly aria-label="Room HTML"></textarea>' +
-      '<div class="layout"><nav class="toc" aria-label="On this page"><a href="#s-glance" data-jump>At a glance</a><a href="#s-lesson" data-jump>Mini-lesson</a><a href="#s-run" data-jump>Running the activity</a><a href="#s-key" data-jump>Answer key</a><a href="#s-exit" data-jump>Exit ticket</a><a href="#s-res" data-jump>Teacher resources</a><a href="#s-canvas" data-jump>Add to Canvas</a></nav><div>';
+      '<div class="layout"><nav class="toc" aria-label="On this page"><a href="#s-glance" data-jump>At a glance</a><a href="#s-game" data-jump>Game, levels &amp; supports</a><a href="#s-lesson" data-jump>Mini-lesson</a><a href="#s-run" data-jump>Running the activity</a><a href="#s-key" data-jump>Answer key</a><a href="#s-exit" data-jump>Exit ticket</a><a href="#s-res" data-jump>Teacher resources</a><a href="#s-canvas" data-jump>Add to Canvas</a></nav><div>';
 
     // At a glance
     html += '<section class="sec" id="s-glance"><h2>At a glance</h2><dl class="glance">' +
@@ -296,6 +332,8 @@
       '<div><span class="when">0:00–0:12</span><h3>Mini-lesson</h3><p>Hook, teach, model, and a quick check (below).</p></div>' +
       '<div><span class="when">0:12–0:42</span><h3>' + esc(r.formatLabel) + '</h3><p>Students play ' + esc(r.title) + ' and earn a completion code.</p></div>' +
       '<div><span class="when">0:42–0:50</span><h3>Debrief and exit ticket</h3><p>Discuss 2 debrief questions, then students complete the exit ticket.</p></div></div></section>';
+
+    html += gameSection(r);
 
     // Lesson
     html += '<section class="sec" id="s-lesson"><h2>Mini-lesson: teach this first</h2><p class="lede">About 10–12 minutes. Project this page or the guide PDF. No materials needed beyond your board.</p>' +
