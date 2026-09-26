@@ -2,12 +2,16 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ctx = { window: {} }; vm.createContext(ctx);
 const dir = path.join(__dirname, '..', 'data');
-const files = ['standards.js', ...fs.readdirSync(dir).filter(f => f !== 'standards.js' && f.endsWith('.js')).sort()];
+// Same order as index.html: standards, base rooms, fx upgrades, then apply-fx merges them.
+const all = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
+const files = ['standards.js', ...all.filter(f => /^g\d-/.test(f)), ...all.filter(f => /^fx-/.test(f)), 'apply-fx.js'];
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(dir, f), 'utf8'), ctx, { filename: f });
+for (const f of ['themes.js', 'kit.js', 'player.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', f), 'utf8'), ctx, { filename: f });
 const STD = {}; ctx.window.CX_STANDARDS.forEach(s => STD[s.id] = s);
 const rooms = ctx.window.CX_ROOMS;
 const errs = [], ids = new Set();
 const FORMATS = ['escape', 'gallery', 'fieldtrip', 'mystery', 'quest'];
+const INTERACTIVE = ['frac', 'numberline', 'plot', 'highlight', 'shade', 'build', 'coins', 'assemble', 'maya', 'balance', 'tap'];
 function err(r, m) { errs.push(`${r.id || '?'}: ${m}`); }
 for (const r of rooms) {
   if (ids.has(r.id)) err(r, 'duplicate id'); ids.add(r.id);
@@ -30,10 +34,14 @@ for (const r of rooms) {
       else if (p.type === 'sort') { if (!p.buckets || !p.items || p.items.some(it => !(it[1] >= 0 && it[1] < p.buckets.length))) err(r, at + ' bad sort'); }
       else if (p.type === 'order') { if (!p.items || p.items.length < 3) err(r, at + ' bad order'); if (new Set(p.items).size !== p.items.length) err(r, at + ' duplicate order items'); }
       else if (p.type === 'match') { if (!p.pairs || p.pairs.length < 2) err(r, at + ' bad match'); if (new Set(p.pairs.map(x => x[1])).size !== p.pairs.length) err(r, at + ' duplicate match answers'); }
-      else err(r, at + ' unknown type ' + p.type);
+      else if (!INTERACTIVE.includes(p.type)) err(r, at + ' unknown type ' + p.type);
     });
   });
   if (n < 10) err(r, `only ${n} puzzles (need 10+ for 25-30 min)`);
+  // Runs every answer key through the player's own checker (catches keys that can never be marked right).
+  const problems = vm.runInContext('EscapePlayer', ctx)(null, r, { selfTest: true });
+  problems.forEach(m => err(r, 'self-test ' + m));
+  if (!r.theme) err(r, 'no theme');
   if (!r.exit || r.exit.length < 3) err(r, 'exit ticket needs 3+ questions');
   (r.exit || []).forEach((q, k) => { if (q.choices && !(q.answer >= 0 && q.answer < q.choices.length)) err(r, 'exit ' + k + ' bad answer'); if (!q.choices && typeof q.answer !== 'string') err(r, 'exit ' + k + ' needs answer text'); });
 }

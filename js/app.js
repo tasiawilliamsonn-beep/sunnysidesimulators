@@ -82,15 +82,35 @@
     return f.node + ' ' + (r.format === 'gallery' ? 'ABCDEFGH'[i] : r.format === 'mystery' ? '#' + (i + 1) : i + 1);
   }
   function cleanTitle(t) { return t.replace(/^(Stop|Lock|Level|Evidence File|Door|Container|Panel|Chapter)\s*#?\d+:\s*/i, ''); }
+  function fmtNum(v) { return String(Math.round(v * 1e6) / 1e6).replace('-', '−'); }
+  function tapLabel(p) {
+    var ans = [].concat(p.answer)[0], vis = [].concat(p.visual)[0] || {};
+    if (vis.kind === 'scene') { var sh = (vis.shapes || []).filter(function (h) { return h.id === ans; })[0]; if (sh) return sh.label || ans; }
+    if (vis.kind === 'chart') { var bi = +String(ans).slice(1); if (vis.type === 'line') return (vis.segLabels && vis.segLabels[bi]) || ('segment ' + (bi + 1)); return vis.data[bi] ? vis.data[bi][0] : ans; }
+    if (vis.kind === 'pyramid') return vis.levels[+String(ans).slice(1)] || ans;
+    if (vis.kind === 'orbit8') return 'position ' + String.fromCharCode(65 + +String(ans).slice(1));
+    return ans;
+  }
   function answerText(p) {
     if (p.type === 'mc') return strip(p.choices[p.answer]);
     if (p.type === 'tf') return p.answer ? 'True' : 'False';
     if (p.type === 'input') return strip([].concat(p.answer)[0]) + (p.unit ? ' ' + p.unit : '');
+    if (p.type === 'frac') return String(p.answer);
     if (p.type === 'order') return p.items.map(strip).join(' → ');
     if (p.type === 'match') return p.pairs.map(function (pr) { return strip(pr[0]) + ' = ' + strip(pr[1]); }).join('; ');
     if (p.type === 'sort') return p.buckets.map(function (b, bi) {
       return strip(b) + ': ' + p.items.filter(function (it) { return it[1] === bi; }).map(function (it) { return strip(it[0]); }).join(', ');
     }).join(' | ');
+    if (p.type === 'numberline') return 'Point at ' + fmtNum(p.answer);
+    if (p.type === 'plot') return 'Point at (' + fmtNum(p.answer[0]) + ', ' + fmtNum(p.answer[1]) + ')';
+    if (p.type === 'highlight') return p.answer.map(function (i) { return '“' + strip(p.segments[i]) + '”'; }).join(' + ');
+    if (p.type === 'shade') return 'Shade ' + p.answer + (p.model === 'grid100' ? ' of the 100-square grid' : ' of the model');
+    if (p.type === 'build') return p.target.dims ? 'Prism ' + p.target.dims.join(' × ') : 'Any prism with volume ' + p.target.volume + (p.target.base ? ' and base ' + p.target.base : '');
+    if (p.type === 'coins') return '$' + p.answer.toFixed(2);
+    if (p.type === 'assemble') return p.answer.map(strip).join(' ');
+    if (p.type === 'maya') return p.answer + ' (' + Math.floor(p.answer / 5) + ' bar' + (Math.floor(p.answer / 5) === 1 ? '' : 's') + ', ' + (p.answer % 5) + ' dot' + (p.answer % 5 === 1 ? '' : 's') + ')';
+    if (p.type === 'balance') return 'x = ' + p.answer;
+    if (p.type === 'tap') return 'Tap ' + tapLabel(p);
     return '';
   }
   function answerLines(r) {
@@ -122,7 +142,7 @@
     return {
       id: r.id, title: r.title, grade: r.grade, subject: r.subject, standard: r.standard, format: r.format,
       minutes: r.minutes, story: r.story, code: r.code, stages: r.stages, finale: r.finale,
-      finalTitle: r.finalTitle, finalPrompt: r.finalPrompt, hubTitle: r.hubTitle
+      finalTitle: r.finalTitle, finalPrompt: r.finalPrompt, hubTitle: r.hubTitle, theme: r.theme, startHead: r.startHead
     };
   }
   function standaloneHTML(r) {
@@ -130,9 +150,9 @@
     return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
       '<title>' + esc(r.title) + ' | ' + esc(r.formatLabel) + '</title>\n' +
       '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
-      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@700;800&display=swap">\n' +
-      '<style>html,body{margin:0;min-height:100%;background:#101a30}</style>\n</head>\n<body>\n<div id="app"></div>\n<script>\n' +
-      EscapePlayer.toString() + '\nEscapePlayer(document.getElementById("app"), ' + data + ');\n</' + 'script>\n</body>\n</html>\n';
+      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">\n' +
+      '<style>html,body{margin:0;min-height:100%}</style>\n</head>\n<body>\n<div id="app"></div>\n<script>\n' +
+      EscapeThemes.toString() + '\n' + EscapeKit.toString() + '\n' + EscapePlayer.toString() + '\nEscapePlayer(document.getElementById("app"), ' + data + ');\n</' + 'script>\n</body>\n</html>\n';
   }
   function slug(r) { return 'grade' + r.grade + '-' + r.subject + '-' + r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   function download(name, data, type) {
@@ -175,13 +195,39 @@
     return true;
   }
 
+  var themeCache = {};
+  function themeOf(r) { return themeCache[r.id] || (themeCache[r.id] = EscapePlayer(null, r, { themeInfo: true })); }
+  function coverHTML(r, big) {
+    var t = themeOf(r), v = t.v;
+    var fonts = document.getElementById('cx-font-' + t.id);
+    if (!fonts) { var lk = document.createElement('link'); lk.id = 'cx-font-' + t.id; lk.rel = 'stylesheet'; lk.href = 'https://fonts.googleapis.com/css2?family=' + t.gf + '&display=swap'; document.head.appendChild(lk); }
+    return '<div class="cover' + (big ? ' big' : '') + '" style="background-color:' + v.bg + ';background-image:' + (v['bg-img'] || 'none') + ';background-size:' + (v['bg-size'] || 'auto') + '">' +
+      '<div class="cover-band" style="background:' + v.band + ';border-bottom:3px solid ' + v['band-edge'] + '"></div>' +
+      '<div class="cover-body"><svg class="cover-emblem" viewBox="0 0 64 64" aria-hidden="true">' + t.emblem + '</svg>' +
+      '<span class="cover-title" style="font-family:\'' + t.font + '\',system-ui,sans-serif;color:' + v.sign + ';text-shadow:2px 2px 0 ' + v['sign-shadow'] + '">' + esc(big ? t.name + ' theme' : r.title) + '</span>' + (big ? '<span style="color:' + v.muted + ';font-weight:700;font-size:.9rem">What students see</span>' : '') + '</div></div>';
+  }
   function card(r) {
     var on = picks.indexOf(r.id) >= 0;
-    return '<article class="card subj-' + r.subject + '"><div class="card-strip"></div><div class="card-top"><span class="fmt">' + ICONS[r.format] + esc(r.formatLabel) + '</span>' +
+    return '<article class="card subj-' + r.subject + '">' + coverHTML(r) + '<div class="card-top"><span class="fmt">' + ICONS[r.format] + esc(r.formatLabel) + '</span>' +
       '<button class="star' + (on ? ' on' : '') + '" data-pick="' + r.id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Remove from' : 'Add to') + ' My Picks">' + (on ? ICONS.star : ICONS.starOff) + '</button></div>' +
       '<div class="card-body"><h3><a href="#room-' + r.id + '">' + esc(r.title) + '</a></h3><p>' + esc(r.tagline) + '</p>' +
-      '<div class="meta"><span>' + esc(r.minutes) + ' min</span><span>' + r.stages.length + ' ' + (FORMATS[r.format].node.toLowerCase()) + 's</span><span>' + puzzleCount(r) + ' puzzles</span><span>No prep</span></div></div>' +
+      '<div class="meta"><span>' + esc(r.minutes) + ' min</span><span>' + r.stages.length + ' ' + (FORMATS[r.format].node.toLowerCase()) + 's</span><span>' + puzzleCount(r) + ' puzzles</span><span>' + interactiveCount(r) + ' hands-on</span></div></div>' +
       '<div class="card-actions"><a class="btn grow" href="#room-' + r.id + '">Teacher guide</a><a class="btn primary grow" href="#play-' + r.id + '">' + ICONS.play + 'Play as student</a></div></article>';
+  }
+  var HANDS_ON = { sort: 1, order: 1, match: 1, numberline: 1, plot: 1, highlight: 1, shade: 1, build: 1, coins: 1, assemble: 1, maya: 1, balance: 1, tap: 1, frac: 1 };
+  var TYPE_NAMES = { sort: 'drag-and-drop sort', order: 'drag-to-order', match: 'tap-to-connect matching', numberline: 'number line', plot: 'coordinate plotting', highlight: 'tap-the-evidence passage', shade: 'shade-the-model', build: 'prism builder', coins: 'money tray', assemble: 'tile builder', maya: 'Maya numeral builder', balance: 'balance-scale equation', tap: 'tap-the-diagram', frac: 'fraction entry' };
+  var SIM_NAMES = { particles: 'particle temperature simulation', mix: 'sealed vs. open mass scale', moonphase: 'Moon phase orbit simulator', shadow: 'sundial shadow simulator', orbit: 'Newton\'s cannon orbit simulator', coaster: 'roller coaster energy simulator', populations: 'food web population simulator', diffusion: 'hot vs. cold diffusion simulator' };
+  function handsOnList(r) {
+    var seen = {}, out = [];
+    r.stages.forEach(function (s) {
+      if (s.sim && !seen['s' + s.sim.kind]) { seen['s' + s.sim.kind] = 1; out.push(SIM_NAMES[s.sim.kind] || s.sim.kind); }
+      if (s.cards && !seen.cards) { seen.cards = 1; out.push('flip cards'); }
+      s.puzzles.forEach(function (p) { if (TYPE_NAMES[p.type] && !seen[p.type]) { seen[p.type] = 1; out.push(TYPE_NAMES[p.type]); } });
+    });
+    return out.length ? '<p><b>Interactive elements:</b> ' + esc(out.join(', ')) + '.</p>' : '';
+  }
+  function interactiveCount(r) {
+    return r.stages.reduce(function (n, s) { return n + (s.sim ? 1 : 0) + (s.cards ? 1 : 0) + s.puzzles.filter(function (p) { return HANDS_ON[p.type]; }).length; }, 0);
   }
 
   function chips(name, opts, cur) {
@@ -228,9 +274,9 @@
     var embed = playURL(r);
     var html = '<div class="subj-' + r.subject + '"><div class="wrap">' +
       '<div class="crumbs"><a href="#">← All rooms</a></div>' +
-      '<header class="room-head"><div class="kick"><span>Grade ' + r.grade + '</span><span>' + esc(SUBJECTS[r.subject]) + '</span><span>' + esc(r.formatLabel) + '</span></div>' +
+      '<header class="room-head"><div class="room-head-grid"><div class="room-head-text"><div class="kick"><span>Grade ' + r.grade + '</span><span>' + esc(SUBJECTS[r.subject]) + '</span><span>' + esc(r.formatLabel) + '</span></div>' +
       '<h1>' + esc(r.title) + '</h1><p class="tag">' + esc(r.tagline) + '</p>' +
-      '<div class="std-box"><span class="std-code" style="background:var(--' + r.subject + ')">' + esc(s.code) + '</span><p><b>' + esc(s.title) + '.</b> ' + esc(s.text) + '</p></div></header>' +
+      '<div class="std-box"><span class="std-code" style="background:var(--' + r.subject + ')">' + esc(s.code) + '</span><p><b>' + esc(s.title) + '.</b> ' + esc(s.text) + '</p></div></div>' + coverHTML(r, true) + '</div></header>' +
       '<div class="actions"><a class="btn primary" href="#play-' + r.id + '">' + ICONS.play + 'View as student</a>' +
       '<button class="btn" data-do="html">' + ICONS.down + 'Download for Canvas (.html)</button>' +
       '<button class="btn" data-do="copy">' + ICONS.copy + 'Copy HTML</button>' +
@@ -244,7 +290,7 @@
     html += '<section class="sec" id="s-glance"><h2>At a glance</h2><dl class="glance">' +
       '<div><dt>Format</dt><dd>' + esc(r.formatLabel) + '</dd></div><div><dt>Student time</dt><dd>' + esc(r.minutes) + ' minutes</dd></div>' +
       '<div><dt>Structure</dt><dd>' + r.stages.length + ' ' + FORMATS[r.format].node.toLowerCase() + 's · ' + puzzleCount(r) + ' puzzles</dd></div><div><dt>Prep</dt><dd>None. Devices only.</dd></div>' +
-      '<div><dt>Final code</dt><dd class="codebig">' + esc(code) + '</dd></div><div><dt>Grouping</dt><dd>Solo or pairs</dd></div></dl>' +
+      '<div><dt>Final code</dt><dd class="codebig">' + esc(code) + '</dd></div><div><dt>Theme</dt><dd>' + esc(themeOf(r).name) + '</dd></div><div><dt>Hands-on pieces</dt><dd>' + interactiveCount(r) + ' interactive items</dd></div><div><dt>Grouping</dt><dd>Solo or pairs</dd></div><div><dt>Standard</dt><dd>' + esc(s.code) + '</dd></div></dl>' + handsOnList(r) +
       '<p><b>Learning target:</b> ' + esc(L.target) + '</p>' +
       '<div class="timeline">' +
       '<div><span class="when">0:00–0:12</span><h3>Mini-lesson</h3><p>Hook, teach, model, and a quick check (below).</p></div>' +

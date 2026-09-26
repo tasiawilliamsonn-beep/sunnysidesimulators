@@ -4,7 +4,7 @@
 
 Each room includes:
 
-- **A student activity** with 5 stages and 10–14 interactive puzzles (multiple choice, typed answers, sorting, ordering, and matching). It also has hints, a timer, saved progress, a final code lock, and a completion certificate.
+- **A student activity** with its own visual theme (35 themes, from a pizzeria to a castle or a submarine) and 5 stages of hands-on puzzles. Puzzle types include tap-the-map and tap-the-diagram, highlight-the-evidence, drag-to-sort, ordering, matching, number lines, coordinate grids, fraction and percent shading, balance-scale equations, volume builders, coins, word and expression tiles, and Maya numerals. Some stages also have flip cards or live simulations (particles, Moon phases, shadows, orbits, roller coasters, food-web populations, and diffusion). Every room also has hints, a timer, saved progress, a final keypad lock, and a completion certificate.
 - **A facilitation guide** with a 10–12 minute mini-lesson to teach beforehand (vocabulary, hook, teach, model, check for understanding), common misconceptions, running tips, differentiation, and debrief questions. You can view it on the page or download it as a PDF.
 - **A full answer key**, including the final code.
 - **A downloadable exit ticket PDF**. Page 1 is for students and page 2 is the teacher key.
@@ -185,15 +185,19 @@ The standards shown are the Indiana Academic Standards for grades 5 and 6 that a
 ```
 index.html        Teacher site
 play.html         Student-only player (play.html#room-id), used for iframe embeds
-js/player.js      Game engine (self-contained; it is copied into every exported room)
+js/themes.js      35 visual themes (colors, fonts, patterns, emblems)
+js/kit.js         Drawings, diagrams, and simulations used by the puzzles
+js/player.js      Game engine (themes.js, kit.js, and player.js are copied into every exported room)
 js/app.js         Teacher site: catalog, guides, Canvas export
 js/pdf.js         Dependency-free PDF writer for exit tickets and guides
 css/site.css      Teacher site styles
 data/standards.js Standards, mini-lessons, resources
 data/g5-*.js, data/g6-*.js   Room content (9 rooms per file)
-tests/validate.js Data checks: node tests/validate.js
+data/fx-*.js      Per-room themes and interactive puzzles layered onto the base rooms
+data/apply-fx.js  Merges the fx files into the rooms at load time
+tests/validate.js Data checks plus an answer-key self-test: node tests/validate.js
 ```
 
-To add a room, add an object to one of the `data/*.js` files and run `node tests/validate.js`. Every room needs at least 4 stages, at least 10 puzzles, and at least 3 exit ticket questions.
+To add a room, add an object to one of the `data/*.js` files and run `node tests/validate.js`. Every room needs at least 4 stages, at least 10 puzzles, and at least 3 exit ticket questions. The validator also runs every answer key through the game's own checker.
 
 Privacy: nothing is sent anywhere. Student names and progress stay in the student's own browser.
