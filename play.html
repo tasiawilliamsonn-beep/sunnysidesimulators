@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crossroads Escapes · Student</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@700;800&display=swap">
+<style>html,body{margin:0;min-height:100%;background:#101a30;color:#e9eefb;font-family:"Atkinson Hyperlegible",system-ui,sans-serif}.missing{padding:40px 16px;text-align:center}</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="js/player.js"></script>
+<script src="data/standards.js"></script>
+<script src="data/g5-science.js"></script>
+<script src="data/g5-social.js"></script>
+<script src="data/g5-ela.js"></script>
+<script src="data/g5-math.js"></script>
+<script src="data/g6-science.js"></script>
+<script src="data/g6-social.js"></script>
+<script src="data/g6-ela.js"></script>
+<script src="data/g6-math.js"></script>
+<script>
+(function () {
+  var id = location.hash.replace(/^#/, '');
+  var std = {};
+  (window.CX_STANDARDS || []).forEach(function (s) { std[s.id] = s; });
+  var room = (window.CX_ROOMS || []).filter(function (r) { return r.id === id; })[0];
+  var app = document.getElementById('app');
+  if (!room) { app.innerHTML = '<p class="missing">This room link is missing its room name. Ask your teacher for a new link.</p>'; return; }
+  var s = std[room.std] || {};
+  room.grade = s.grade; room.subject = s.subject; room.standard = s.code;
+  document.title = room.title;
+  EscapePlayer(app, room);
+})();
+</script>
+</body>
+</html>
