@@ -411,6 +411,6 @@
   function measureTop() { var t = document.querySelector('.top'); if (t) document.documentElement.style.setProperty('--toph', t.offsetHeight + 'px'); }
   window.addEventListener('resize', measureTop); measureTop();
 
-  window.CX = { ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode };
+  window.CX = { ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode, runTips: runTips };
   route();
 })();
