@@ -1061,3 +1061,270 @@ SUNNY_MODELS.ecoCam = function (M) {
   show();
   return { auto: function (st) { var c = st.goal.check || {}; CLIPS.forEach(function (cl, k) { if (c.right || c.tagged || c['tag_' + cl.id]) { i = k; tag(cl.role); } if (c.watchedCount) { i = k; show(); } }); } };
 };
+
+/* ================================================================== */
+/*                     GRADE 6 SCIENCE MODELS                          */
+/* ================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* Particle Box: heat or cool a substance and watch its particles       */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.particleBox = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var SUB = { water: { name: 'Water', mp: 0, bp: 100, col: '#339af0' }, oxygen: { name: 'Oxygen', mp: -218, bp: -183, col: '#ff8787' }, iron: { name: 'Iron', mp: 1538, bp: 2862, col: '#868e96' } };
+  var sub = 'water', T = -20, heatRate = 0, N = 48, parts = [];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.5fr 1fr;gap:10px"></div>');
+  var cv = document.createElement('canvas'); cv.width = 520; cv.height = 360; cv.className = 'sn-svg'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Particles in a closed box');
+  var side = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var reads = K.el('<div class="sn-reads"></div>'), rT = K.readout('Temperature', '°C', true), rS = K.readout('State', ''), rV = K.readout('Average particle speed', '');
+  [rT, rS, rV].forEach(function (r) { reads.appendChild(r.el); });
+  var therm = K.svgEl('svg', { viewBox: '0 0 200 60', class: 'sn-svg', 'aria-hidden': 'true' });
+  side.appendChild(reads); side.appendChild(therm);
+  row.appendChild(cv); row.appendChild(side); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var hS = K.slider({ label: '🔥 Add or ❄ remove heat', min: -3, max: 3, step: 1, value: 0, fmt: function (v) { return v > 0 ? 'heat +' + v : v < 0 ? 'cool ' + v : 'off'; }, onInput: function (v) { heatRate = v; if (v > 0) M.set('heated', true); if (v < 0) M.set('cooled', true); } });
+  var subS = K.seg([['water', '💧 Water'], ['oxygen', '🫧 Oxygen'], ['iron', '⛓ Iron']], sub, function (v) { sub = v; Hc = 2 / 3; T = SUB[v].mp - 20; init(); M.set({ substance: v }); });
+  ctr.appendChild(hS.el); ctr.appendChild(subS.el); M.el.appendChild(ctr);
+  // Heat content Hc (normalized): 0-1 solid warming, 1-1.6 melting, 1.6-2.6 liquid warming, 2.6-3.6 boiling, 3.6-4.2 gas warming.
+  var Hc = 2 / 3;
+  function tempOf(h) { var s = SUB[sub]; if (h < 1) return s.mp - 60 + h * 60; if (h < 1.6) return s.mp; if (h < 2.6) return s.mp + (h - 1.6) * (s.bp - s.mp); if (h < 3.6) return s.bp; return s.bp + (h - 3.6) / 0.6 * 120; }
+  function phaseOf(h) { return h < 1 ? 'solid' : h < 1.6 ? 'melting' : h < 2.6 ? 'liquid' : h < 3.6 ? 'boiling' : 'gas'; }
+  function state() { var p = phaseOf(Hc); return p === 'melting' ? 'solid' : p === 'boiling' ? 'liquid' : p; }
+  function freeFrac() { return Hc < 1 ? 0 : Hc < 1.6 ? (Hc - 1) / 0.6 : 1; }
+  function gasFrac() { return Hc < 2.6 ? 0 : Hc < 3.6 ? (Hc - 2.6) : 1; }
+  function init() { parts = []; var cols = 8; for (var i = 0; i < N; i++) { var gx = i % cols, gy = Math.floor(i / cols); parts.push({ hx: 150 + gx * 28, hy: 330 - gy * 28, x: 150 + gx * 28, y: 330 - gy * 28, vx: 0, vy: 0 }); } }
+  function speed() { return Math.sqrt(Math.max(1, T - SUB[sub].mp + 60)) * 18; }
+  var ctx = cv.getContext('2d');
+  M.loop(function (dt) {
+    var s = SUB[sub];
+    Hc = K.clamp(Hc + heatRate * dt * 0.11, 0, 4.2); T = tempOf(Hc);
+    var ph = phaseOf(Hc), st = state(), ff = freeFrac(), gf = gasFrac();
+    var sp = speed(), W = cv.width, H = cv.height;
+    parts.forEach(function (p, i) {
+      var order = (i * 37) % N / N; // which particles break free first
+      if (order >= ff) { var a = 1 + (T - s.mp + 60) / 30; p.x += (p.hx - p.x) * 0.3 + (Math.random() - 0.5) * a; p.y += (p.hy - p.y) * 0.3 + (Math.random() - 0.5) * a; p.vx = 0; p.vy = 0; return; }
+      var gas = order < gf;
+      p.vx += (Math.random() - 0.5) * sp * 0.4; p.vy += (Math.random() - 0.5) * sp * 0.4 + (gas ? 0 : 20);
+      var v = Math.sqrt(p.vx * p.vx + p.vy * p.vy), want = gas ? sp * 1.6 : sp * 0.55; if (v > 0) { p.vx *= want / v; p.vy *= want / v; }
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      var top = gas ? 14 : Math.max(14, H - 14 - Math.ceil(N / 10) * 30);
+      if (p.x < 14) { p.x = 14; p.vx = Math.abs(p.vx); } if (p.x > W - 14) { p.x = W - 14; p.vx = -Math.abs(p.vx); }
+      if (p.y > H - 14) { p.y = H - 14; p.vy = -Math.abs(p.vy); } if (p.y < top) { p.y = top; p.vy = Math.abs(p.vy); }
+    });
+    // draw
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#10212b'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#6c8a99'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, W - 6, H - 6);
+    parts.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 11, 0, 7); ctx.fillStyle = s.col; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.stroke(); });
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.fillText(s.name + ' particles (zoomed in 100 million times)', 14, 26);
+    rT.set(Math.round(T)); rS.set(ph === 'solid' ? '🧊 SOLID' : ph === 'melting' ? '🧊→💧 MELTING' : ph === 'liquid' ? '💧 LIQUID' : ph === 'boiling' ? '💧→💨 BOILING' : '💨 GAS'); rV.set(ph === 'solid' ? 'vibrating' : Math.round(sp) + ' (relative)');
+    var tf = K.clamp((T - (s.mp - 60)) / (s.bp + 120 - (s.mp - 60)), 0, 1);
+    therm.innerHTML = '<rect x="10" y="22" width="180" height="16" rx="8" fill="#fff" stroke="#495057" stroke-width="2"/><rect x="12" y="24" width="' + (176 * tf) + '" height="12" rx="6" fill="#e03131"/><text x="10" y="16" font-size="10" fill="#495057">' + (s.mp - 60) + '°</text><text x="190" y="16" font-size="10" fill="#495057" text-anchor="end">' + (s.bp + 120) + '°</text><line x1="' + (10 + 180 * (60 / (s.bp - s.mp + 180))) + '" x2="' + (10 + 180 * (60 / (s.bp - s.mp + 180))) + '" y1="18" y2="44" stroke="#1971c2" stroke-width="2"/><text x="' + (10 + 180 * (60 / (s.bp - s.mp + 180))) + '" y="56" font-size="9" text-anchor="middle" fill="#1971c2">melts ' + s.mp + '°</text><line x1="' + (10 + 180 * ((s.bp - s.mp + 60) / (s.bp - s.mp + 180))) + '" x2="' + (10 + 180 * ((s.bp - s.mp + 60) / (s.bp - s.mp + 180))) + '" y1="18" y2="44" stroke="#e8590c" stroke-width="2"/><text x="' + (10 + 180 * ((s.bp - s.mp + 60) / (s.bp - s.mp + 180))) + '" y="56" font-size="9" text-anchor="middle" fill="#e8590c">boils ' + s.bp + '°</text>';
+    var ns = { temp: Math.round(T), phase: st, phaseNow: ph, substance: sub, pausedAt: ph === 'melting' || ph === 'boiling' ? Math.round(T) : null };
+    if (st === 'liquid') ns['was_liquid_' + sub] = true; if (st === 'gas') ns['was_gas_' + sub] = true; if (st === 'solid' && S['was_liquid_' + sub]) ns['refroze_' + sub] = true;
+    if (ns.pausedAt != null) ns['paused_' + sub + '_' + ns.pausedAt] = true;
+    if (ns.temp !== S.temp || ns.phase !== S.phase || ns.pausedAt !== S.pausedAt) M.set(ns);
+  });
+  init(); M.set({ temp: T, phase: 'solid', substance: sub });
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.substance) { sub = c.substance; subS.set(sub); init(); } var S2 = SUB[sub]; var o = { heated: true, cooled: !!c.cooled, substance: sub }; for (var k in c) { var mm = k.match(/^(was_liquid|was_gas|refroze|paused)_(\w+?)(?:_(-?\d+))?$/); if (mm) { o[k] = true; if (mm[1] === 'was_gas') T = S2.bp + 10; if (mm[1] === 'was_liquid') T = (S2.mp + S2.bp) / 2; if (mm[1] === 'refroze') T = S2.mp - 10; } } if (c.phase) { var ph = c.phase.eq || c.phase; T = ph === 'solid' ? S2.mp - 10 : ph === 'liquid' ? (S2.mp + S2.bp) / 2 : S2.bp + 10; } if (c.temp) T = c.temp.gte != null ? c.temp.gte + 1 : c.temp.lte != null ? c.temp.lte - 1 : T; Hc = T < S2.mp ? (T - S2.mp + 60) / 60 : T < S2.bp ? 1.6 + (T - S2.mp) / (S2.bp - S2.mp) : 3.6 + (T - S2.bp) / 200; o.temp = Math.round(T); o.phase = state(); M.set(o); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Heating Curve: steady heat on ice → water → steam                   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.heatCurve = function (M) {
+  var K = M.kit, S = M.state;
+  var t = 0, T = -30, ice = 100, water = 0, steam = 0, power = 1, on = false, acc = 0;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 260 300', class: 'sn-svg', role: 'img', 'aria-label': 'Beaker of ice on a burner' });
+  var g = K.graph({ title: 'Heating curve', xLabel: 'Time (minutes)', yLabel: 'Temperature (°C)', xMax: 30, yMax: 140, yMin: -40, grow: true, series: [{ name: 'Temperature', color: '#e03131' }] });
+  row.appendChild(svg); row.appendChild(g.el); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rt = K.readout('Time', 'min'), rT = K.readout('Temperature', '°C', true), rI = K.readout('Ice', '%'), rW = K.readout('Liquid water', '%'), rS = K.readout('Steam', '%');
+  [rt, rT, rI, rW, rS].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var go = K.btn('🔥 Turn on the burner', function () { on = !on; go.textContent = on ? '⏸ Turn off' : '🔥 Turn on the burner'; M.set('started', true); }, 'primary');
+  var pw = K.seg([['1', 'Low flame'], ['2', 'High flame']], '1', function (v) { power = +v; M.set('power', power); });
+  var rs = K.btn('↺ New ice', function () { t = 0; T = -30; ice = 100; water = 0; steam = 0; on = false; go.textContent = '🔥 Turn on the burner'; g.clear(); g.range(30, 140, -40); M.set({ time: 0, done: false, meltStart: null, meltEnd: null, boilStart: null }); draw(); }, 'ghost');
+  [go, pw.el, rs].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function tick() {
+    t += 0.25; var q = power * 0.25 * 16; // energy per step
+    if (ice > 0 && T < 0) T = Math.min(0, T + q / 2);
+    else if (ice > 0) { if (S.meltStart == null) M.set('meltStart', K.round(t, 1)); ice = Math.max(0, ice - q / 3.2); water = 100 - ice; if (ice === 0) M.set('meltEnd', K.round(t, 1)); }
+    else if (T < 100) T = Math.min(100, T + q / 4);
+    else if (water > 0) { if (S.boilStart == null) M.set('boilStart', K.round(t, 1)); water = Math.max(0, water - q / 22); steam = 100 - water; if (water === 0) M.set('boilEnd', K.round(t, 1)); }
+    else T = Math.min(140, T + q / 2);
+    g.add(0, t, T);
+    M.set({ time: K.round(t, 2), temp: Math.round(T), ice: Math.round(ice), water: Math.round(water), steam: Math.round(steam), done: steam >= 100 });
+  }
+  function draw() {
+    var h = '<rect width="260" height="300" fill="#eef4f6"/><path d="M70 60 v170 q0 8 8 8 h104 q8 0 8 -8 v-170" fill="rgba(230,245,255,.5)" stroke="#6c8a99" stroke-width="3"/>';
+    var wl = water * 1.4; if (wl > 0) h += '<rect x="73" y="' + (234 - wl) + '" width="114" height="' + wl + '" rx="5" fill="#74c0fc" opacity=".8"/>';
+    for (var i = 0; i < Math.ceil(ice / 12); i++) h += '<rect x="' + (80 + (i % 4) * 26) + '" y="' + (212 - Math.floor(i / 4) * 24 - wl * 0.5) + '" width="22" height="22" rx="4" fill="#e7f5ff" stroke="#74c0fc" stroke-width="2"/>';
+    if (T >= 100 && water > 0) for (var b = 0; b < 8; b++) h += '<circle cx="' + (85 + Math.random() * 90) + '" cy="' + (234 - Math.random() * wl) + '" r="3" fill="none" stroke="#fff" stroke-width="1.5"/>';
+    if (steam > 0) h += '<path d="M100 50 q10 -20 0 -40 M130 50 q10 -20 0 -40 M160 50 q10 -20 0 -40" stroke="#ced4da" stroke-width="' + (2 + steam / 25) + '" fill="none"/>';
+    h += '<rect x="90" y="246" width="80" height="12" rx="3" fill="#343a40"/>' + (on ? '<path d="M110 246 q10 -18 20 0 M130 246 q10 -' + (12 + power * 6) + ' 20 0" fill="#ff922b"/>' : '') + '<rect x="100" y="258" width="60" height="30" fill="#495057"/>';
+    svg.innerHTML = h;
+    rt.set(K.fmt(t, 1)); rT.set(Math.round(T)); rI.set(Math.round(ice)); rW.set(Math.round(water)); rS.set(Math.round(steam));
+  }
+  M.loop(function (dt) { if (!on || S.done) { draw(); return; } acc += dt; while (acc > 0.08) { acc -= 0.08; tick(); } draw(); });
+  M.set({ time: 0, temp: -30, done: false, power: 1 }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.power) { power = c.power; pw.set(String(power)); } var guard = 0; while (!S.done && guard++ < 2000) { tick(); if (c.temp && c.temp.gte != null && T >= c.temp.gte && !c.done) break; } draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Diffusion: food coloring in cold vs hot water                       */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.diffusion = function (M) {
+  var K = M.kit, S = M.state;
+  var tA = 10, tB = 70, dye = [], t = 0, running = false;
+  M.el.innerHTML = '';
+  var cv = document.createElement('canvas'); cv.width = 640; cv.height = 300; cv.className = 'sn-svg'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Two beakers with food coloring spreading');
+  M.el.appendChild(cv);
+  var reads = K.el('<div class="sn-reads"></div>'), rt = K.readout('Time', 's'), rA = K.readout('Beaker A mixed', '%', true), rB = K.readout('Beaker B mixed', '%', true);
+  [rt, rA, rB].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sA = K.slider({ label: 'Beaker A temp', min: 5, max: 90, step: 5, value: tA, unit: '°C', onInput: function (v) { if (running) { sA.set(tA, true); M.toast('Reset to change temperatures.'); return; } tA = v; M.set('tA', v); } });
+  var sB = K.slider({ label: 'Beaker B temp', min: 5, max: 90, step: 5, value: tB, unit: '°C', onInput: function (v) { if (running) { sB.set(tB, true); M.toast('Reset to change temperatures.'); return; } tB = v; M.set('tB', v); } });
+  var drop = K.btn('💧 Add a drop of food coloring to both', function () { if (running) return; dye = []; for (var i = 0; i < 300; i++) dye.push({ b: i % 2, x: 0, y: 0 }); t = 0; running = true; M.set({ dropped: true, doneA: null, doneB: null, trialA: tA, trialB: tB }); }, 'primary');
+  var rs = K.btn('↺ Reset', function () { running = false; dye = []; t = 0; M.set({ dropped: false }); }, 'ghost');
+  ctr.appendChild(sA.el); ctr.appendChild(sB.el); var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(drop); r2.appendChild(rs); ctr.appendChild(r2); M.el.appendChild(ctr);
+  var ctx = cv.getContext('2d');
+  function mixed(b) { var arr = dye.filter(function (d) { return d.b === b; }); if (!arr.length) return 0; var cells = {}; arr.forEach(function (d) { cells[Math.floor((d.x + 110) / 44) + ',' + Math.floor((d.y + 80) / 40)] = 1; }); return Math.min(100, Math.round(Object.keys(cells).length / 20 * 100)); }
+  M.loop(function (dt) {
+    if (running) {
+      t += dt * 5;
+      dye.forEach(function (d) { var T = d.b ? tB : tA, s = Math.sqrt(T + 273) * 0.07 * Math.pow(1.03, T - 20) * 2.6; for (var k = 0; k < 5; k++) { d.x += (Math.random() - 0.5) * s; d.y += (Math.random() - 0.5) * s; } d.x = K.clamp(d.x, -108, 108); d.y = K.clamp(d.y, -78, 78); });
+      var a = mixed(0), b = mixed(1), st = { time: Math.round(t), mixA: a, mixB: b };
+      if (a >= 95 && S.doneA == null) st.doneA = Math.round(t); if (b >= 95 && S.doneB == null) st.doneB = Math.round(t);
+      if ((S.doneA != null || st.doneA != null) && (S.doneB != null || st.doneB != null)) { running = false; st.finished = true; var key = 'time_' + tA; st[key] = S.doneA != null ? S.doneA : st.doneA; st['time_' + tB] = S.doneB != null ? S.doneB : st.doneB; }
+      M.set(st);
+    }
+    ctx.clearRect(0, 0, 640, 300); ctx.fillStyle = '#eef4f6'; ctx.fillRect(0, 0, 640, 300);
+    [[170, tA, 'A'], [470, tB, 'B']].forEach(function (bk, bi) {
+      var cx = bk[0], cy = 150, warm = K.clamp((bk[1] - 5) / 85, 0, 1);
+      ctx.fillStyle = 'rgba(' + Math.round(116 + 120 * warm) + ',' + Math.round(192 - 60 * warm) + ',' + Math.round(252 - 150 * warm) + ',.35)'; ctx.fillRect(cx - 115, cy - 85, 230, 170);
+      ctx.strokeStyle = '#6c8a99'; ctx.lineWidth = 4; ctx.strokeRect(cx - 115, cy - 85, 230, 170);
+      dye.forEach(function (d) { if (d.b !== bi) return; ctx.fillStyle = 'rgba(214,51,108,.55)'; ctx.beginPath(); ctx.arc(cx + d.x, cy + d.y, 5, 0, 7); ctx.fill(); });
+      ctx.fillStyle = '#1d2433'; ctx.font = 'bold 14px sans-serif'; ctx.fillText('Beaker ' + bk[2] + ' · ' + bk[1] + ' °C', cx - 60, cy + 110);
+    });
+    rt.set(Math.round(t)); rA.set(mixed(0)); rB.set(mixed(1));
+  });
+  M.set({ tA: tA, tB: tB, dropped: false });
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.tA != null) { tA = c.tA.eq || c.tA; sA.set(tA, true); } if (c.tB != null) { tB = c.tB.eq || c.tB; sB.set(tB, true); } var o = { dropped: true, finished: true, trialA: tA, trialB: tB }; var ta = Math.round(900 / Math.pow(1.03, tA)), tb = Math.round(900 / Math.pow(1.03, tB)); o.doneA = ta; o.doneB = tb; o['time_' + tA] = ta; o['time_' + tB] = tb; for (var k in c) { var mm = k.match(/^time_(\d+)$/); if (mm) o[k] = Math.round(900 / Math.pow(1.03, +mm[1])); } M.set(o); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Gas Piston: temperature, volume, and particle collisions (pressure) */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.piston = function (M) {
+  var K = M.kit, S = M.state;
+  var T = 300, V = 1, n = 30, parts = [], hits = 0, hitT = 0, pressure = 0;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px"></div>');
+  var cv = document.createElement('canvas'); cv.width = 440; cv.height = 340; cv.className = 'sn-svg'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Gas particles in a cylinder with a movable piston');
+  var side = K.el('<div class="sn-reads" style="align-content:start"></div>'), rT = K.readout('Temperature', 'K'), rV = K.readout('Volume', 'L'), rN = K.readout('Particles', ''), rP = K.readout('Pressure gauge', 'kPa', true);
+  [rT, rV, rN, rP].forEach(function (r) { side.appendChild(r.el); });
+  row.appendChild(cv); row.appendChild(side); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sT = K.slider({ label: '🌡 Temperature', min: 150, max: 600, step: 50, value: T, unit: 'K', onInput: function (v) { T = v; M.set('T', v); } });
+  var sV = K.slider({ label: '⬇ Push the piston (volume)', min: 0.5, max: 1, step: 0.25, value: V, unit: 'L', onInput: function (v) { V = v; M.set('V', v); } });
+  var add = K.btn('+10 particles', function () { addN(10); }), rem = K.btn('−10 particles', function () { if (n <= 10) return; n -= 10; parts.splice(0, 10); M.set('n', n); });
+  ctr.appendChild(sT.el); ctr.appendChild(sV.el); var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(add); r2.appendChild(rem); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function addN(k) { for (var i = 0; i < k; i++) { var a = Math.random() * 6.28; parts.push({ x: 60 + Math.random() * 300, y: 280 - Math.random() * 100, vx: Math.cos(a), vy: Math.sin(a) }); } n = parts.length; M.set('n', n); }
+  addN(30);
+  var ctx = cv.getContext('2d');
+  M.loop(function (dt) {
+    var top = 340 - 300 * V, sp = Math.sqrt(T) * 9;
+    parts.forEach(function (p) {
+      var v = Math.sqrt(p.vx * p.vx + p.vy * p.vy) || 1; p.vx = p.vx / v * sp; p.vy = p.vy / v * sp;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.x < 30) { p.x = 30; p.vx = Math.abs(p.vx); hits++; } if (p.x > 410) { p.x = 410; p.vx = -Math.abs(p.vx); hits++; }
+      if (p.y > 325) { p.y = 325; p.vy = -Math.abs(p.vy); hits++; } if (p.y < top + 20) { p.y = top + 20; p.vy = Math.abs(p.vy); hits++; }
+    });
+    hitT += dt;
+    var target = Math.round(n * T / V / 90); // ideal gas: P ∝ nT/V
+    pressure += (target - pressure) * Math.min(1, dt * 3);
+    ctx.clearRect(0, 0, 440, 340); ctx.fillStyle = '#10212b'; ctx.fillRect(0, 0, 440, 340);
+    ctx.fillStyle = '#495057'; ctx.fillRect(15, top, 410, 16); ctx.fillRect(205, 0, 30, top);
+    ctx.strokeStyle = '#adb5bd'; ctx.lineWidth = 6; ctx.strokeRect(18, 3, 404, 334);
+    var warm = K.clamp((T - 150) / 450, 0, 1);
+    parts.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, 7); ctx.fillStyle = 'rgb(' + Math.round(80 + 175 * warm) + ',' + Math.round(160 - 60 * warm) + ',' + Math.round(255 - 180 * warm) + ')'; ctx.fill(); });
+    if (hitT > 0.5) { var hr = Math.round(hits / hitT); hits = 0; hitT = 0; M.set({ hitsPerSec: hr }); }
+    var P = Math.round(pressure); rT.set(T); rV.set(V); rN.set(n); rP.set(P);
+    if (Math.abs(P - (S.P || 0)) >= 1 && Math.abs(P - target) <= 1) { var st = { P: target, T: T, V: V, n: n }; st['p_' + T + '_' + V + '_' + n] = target; M.set(st); }
+  });
+  M.set({ T: T, V: V, n: n, P: Math.round(n * T / V / 90) });
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.T) { T = c.T.eq || c.T; sT.set(T, true); } if (c.V) { V = c.V.eq || c.V; sV.set(V, true); } if (c.n) { var want = c.n.eq || c.n; while (n < want) addN(10); while (n > want) { n -= 10; parts.splice(0, 10); } } var s2 = { T: T, V: V, n: n, P: Math.round(n * T / V / 90) }; s2['p_' + T + '_' + V + '_' + n] = s2.P; for (var k in c) { var mm = k.match(/^p_(\d+)_([\d.]+)_(\d+)$/); if (mm) s2[k] = Math.round(+mm[3] * +mm[1] / +mm[2] / 90); } pressure = s2.P; M.set(s2); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Thermal Expansion: thermometer column and balloon on a bottle       */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.expansion = function (M) {
+  var K = M.kit, S = M.state;
+  var bath = 20, mode = 'thermo', marks = {};
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 320', class: 'sn-svg', role: 'img', 'aria-label': 'Homemade thermometer and a balloon on a bottle in a water bath' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rB = K.readout('Water bath', '°C', true), rC = K.readout('Liquid column height', 'mm'), rBl = K.readout('Balloon width', 'cm');
+  [rB, rC, rBl].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sB = K.slider({ label: '🌡 Water bath temperature', min: 0, max: 80, step: 10, value: bath, unit: '°C', onInput: function (v) { bath = v; draw(); } });
+  var mk = K.btn('✏️ Mark the column on the tube', function () { marks[bath] = col(); M.set('marks', Object.keys(marks).length); var o = {}; o['mark_' + bath] = col(); M.set(o); draw(); });
+  ctr.appendChild(sB.el); ctr.appendChild(mk); M.el.appendChild(ctr);
+  function col() { return Math.round(40 + bath * 1.5); } // mm
+  function balloon() { return K.round(6 + bath * 0.07, 1); }
+  function draw() {
+    var warm = K.clamp(bath / 80, 0, 1), wc = 'rgb(' + Math.round(116 + 130 * warm) + ',' + Math.round(192 - 70 * warm) + ',' + Math.round(252 - 160 * warm) + ')';
+    var h = '<rect width="640" height="320" fill="#f1f3f5"/><rect x="40" y="170" width="560" height="120" rx="10" fill="' + wc + '" opacity=".55" stroke="#6c8a99" stroke-width="3"/><text x="320" y="310" text-anchor="middle" font-size="12" fill="#495057">Water bath: ' + bath + ' °C</text>';
+    // thermometer bottle
+    h += '<path d="M130 290 v-80 q0 -20 20 -20 h40 q20 0 20 20 v80 z" fill="rgba(255,255,255,.6)" stroke="#495057" stroke-width="3"/><rect x="134" y="230" width="72" height="56" fill="#e03131" opacity=".75"/>';
+    h += '<rect x="162" y="30" width="16" height="200" rx="4" fill="#fff" stroke="#495057" stroke-width="2"/><rect x="165" y="' + (228 - col()) + '" width="10" height="' + col() + '" fill="#e03131"/>';
+    Object.keys(marks).forEach(function (k) { var y = 228 - marks[k]; h += '<line x1="178" x2="196" y1="' + y + '" y2="' + y + '" stroke="#1d2433" stroke-width="2"/><text x="200" y="' + (y + 4) + '" font-size="11" fill="#1d2433" font-weight="700">' + k + '°</text>'; });
+    h += '<text x="170" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1d2433">Homemade thermometer</text>';
+    // balloon bottle
+    var bw = balloon() * 8;
+    h += '<path d="M430 290 v-70 q0 -20 16 -30 v-30 h28 v30 q16 10 16 30 v70 z" fill="rgba(255,255,255,.6)" stroke="#495057" stroke-width="3"/><ellipse cx="460" cy="' + (158 - bw * 0.9) + '" rx="' + bw * 0.8 + '" ry="' + bw + '" fill="#f06595" stroke="#c2255c" stroke-width="2"/><text x="460" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#1d2433">Balloon on an empty bottle</text>';
+    svg.innerHTML = h;
+    rB.set(bath); rC.set(col()); rBl.set(K.fmt(balloon(), 1));
+    var st = { bath: bath, column: col(), balloon: balloon() }; st['b_' + bath] = balloon(); if (bath >= 60) st.hot = true; if (bath <= 10) st.cold = true; M.set(st);
+  }
+  draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.bath != null) { bath = c.bath.eq != null ? c.bath.eq : c.bath; sB.set(bath, true); } if (c.hot) { bath = 70; draw(); } if (c.cold) { bath = 0; draw(); } for (var k in c) { var mm = k.match(/^mark_(\d+)$/); if (mm) { bath = +mm[1]; draw(); mk.click(); } } if (c.marks) [0, 20, 40, 60, 80].forEach(function (b) { bath = b; draw(); mk.click(); }); sB.set(bath, true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* States Chart: which substances are solid, liquid, gas at a temperature */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.stateChart = function (M) {
+  var K = M.kit, S = M.state;
+  var SUBS = [['Oxygen', -218, -183, '🫧'], ['Ethanol', -114, 78, '🧪'], ['Mercury', -39, 357, '🌡'], ['Water', 0, 100, '💧'], ['Candle wax', 60, 370, '🕯'], ['Tin', 232, 2602, '🥫'], ['Iron', 1538, 2862, '⛓']];
+  var T = 20;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 340', class: 'sn-svg', role: 'img', 'aria-label': 'Chart of melting and boiling points' });
+  M.el.appendChild(svg);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sT = K.slider({ label: '🌡 Lab temperature', min: -250, max: 3000, step: 1, value: T, unit: '°C', onInput: function (v) { T = v; draw(); } });
+  var quick = K.el('<div class="sn-row"><b class="sn-note">Jump to:</b></div>');
+  [[-200, 'Deep space freezer −200°'], [-50, 'Antarctic winter −50°'], [20, 'Room 20°'], [100, 'Boiling water 100°'], [500, 'Oven-hot 500°'], [2000, 'Furnace 2,000°']].forEach(function (q) { quick.appendChild(K.btn(q[1], function () { T = q[0]; sT.set(T, true); draw(); }, 'sm')); });
+  ctr.appendChild(sT.el); ctr.appendChild(quick); M.el.appendChild(ctr);
+  function X(t) { var s = Math.sign(t) * Math.log10(1 + Math.abs(t)); return 90 + (s + 2.45) / (3.5 + 2.45) * 590; }
+  function state(s) { return T < s[1] ? 'solid' : T < s[2] ? 'liquid' : 'gas'; }
+  function draw() {
+    var h = '<rect width="700" height="340" fill="#fff"/>';
+    SUBS.forEach(function (s, i) {
+      var y = 30 + i * 40, x1 = X(s[1]), x2 = X(s[2]);
+      h += '<text x="10" y="' + (y + 20) + '" font-size="13" font-weight="800" fill="#1d2433">' + s[3] + ' ' + s[0] + '</text>';
+      h += '<rect x="90" y="' + (y + 6) + '" width="' + (x1 - 90) + '" height="20" fill="#a5d8ff"/><rect x="' + x1 + '" y="' + (y + 6) + '" width="' + (x2 - x1) + '" height="20" fill="#74c0fc"/><rect x="' + x2 + '" y="' + (y + 6) + '" width="' + (680 - x2) + '" height="20" fill="#ffd8a8"/>';
+      var st = state(s); h += '<text x="686" y="' + (y + 21) + '" font-size="11" font-weight="800" fill="' + (st === 'gas' ? '#e8590c' : st === 'liquid' ? '#1971c2' : '#495057') + '" text-anchor="end">' + st.toUpperCase() + '</text>';
+    });
+    [-200, -100, -10, 0, 10, 100, 1000].forEach(function (t) { h += '<text x="' + X(t) + '" y="320" font-size="10" text-anchor="middle" fill="#495057">' + t + '°</text><line x1="' + X(t) + '" x2="' + X(t) + '" y1="305" y2="310" stroke="#495057"/>'; });
+    h += '<line x1="' + X(T) + '" x2="' + X(T) + '" y1="20" y2="305" stroke="#e03131" stroke-width="3"/><text x="' + X(T) + '" y="16" font-size="12" font-weight="800" fill="#e03131" text-anchor="middle">' + T + ' °C</text>';
+    h += '<text x="200" y="336" font-size="11" fill="#495057">Key: light blue = solid, blue = liquid, orange = gas. The scale squeezes very big numbers.</text>';
+    svg.innerHTML = h;
+    var st = { T: T }; SUBS.forEach(function (s) { st['s_' + s[0].split(' ')[0].toLowerCase()] = state(s); }); st.liquids = SUBS.filter(function (s) { return state(s) === 'liquid'; }).length; st.gases = SUBS.filter(function (s) { return state(s) === 'gas'; }).length; M.set(st);
+  }
+  draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.T != null) T = c.T.eq != null ? c.T.eq : c.T.gte != null ? c.T.gte : c.T.lte != null ? c.T.lte : c.T; if (typeof st.goal.check === 'function') { for (var t = -250; t <= 3000; t++) { T = t; draw(); if (st.goal.check(M.state)) break; } } sT.set(T, true); draw(); } };
+};
