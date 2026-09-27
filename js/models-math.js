@@ -588,3 +588,505 @@ SUNNY_MODELS.dimensions = function (M) {
   report(); draw();
   return { auto: function (st) { var c = st.goal.check || {}; var A = all(); var need = c.foundAll ? A.length : c.found ? (c.found.gte || c.found) : 1; A.slice(0, need).forEach(function (k2) { if (found.indexOf(k2) < 0) found.push(k2); }); var p = A[0].split('×').map(Number); l = p[0]; w = p[1]; h = p[2]; report(); draw(); } };
 };
+
+/* ================================================================== */
+/*                       GRADE 6 MATH MODELS                           */
+/* ================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* Smoothie Mixer: equivalent ratios by taste and color               */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.smoothie = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var R = cfg.ratio || [2, 3], NAMES = cfg.names || ['strawberry', 'yogurt'], COL = [[231, 49, 49], [248, 244, 232]];
+  var a = 0, b = 0, made = [], dnl = false;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1.2fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 300 300', class: 'sn-svg', role: 'img', 'aria-label': 'Blender with a smoothie' });
+  var side = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var tbl = K.el('<div class="sn-panel"></div>'), line = K.svgEl('svg', { viewBox: '0 0 400 120', class: 'sn-svg', role: 'img', 'aria-label': 'Double number line' });
+  side.appendChild(tbl); side.appendChild(line);
+  row.appendChild(svg); row.appendChild(side); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var aB = K.btn('🍓 +1 cup ' + NAMES[0], function () { a++; report(); draw(); }, 'sm'), bB = K.btn('🥛 +1 cup ' + NAMES[1], function () { b++; report(); draw(); }, 'sm');
+  var taste = K.btn('😋 Taste test & save', function () { if (!a || !b) { M.toast('Add both ingredients first.', true); return; } var ok = a * R[1] === b * R[0]; M.toast(ok ? '✓ Tastes exactly like the recipe!' : '✗ Too much ' + (a * R[1] > b * R[0] ? NAMES[0] : NAMES[1]) + '. It doesn\'t match.', !ok); if (ok && !made.some(function (m) { return m[0] === a; })) made.push([a, b]); made.sort(function (p, q) { return p[0] - q[0]; }); report(); draw(); }, 'primary');
+  var dump = K.btn('Pour out', function () { a = 0; b = 0; report(); draw(); }, 'ghost sm');
+  var dT = K.toggle('Show double number line', false, function (v) { dnl = v; M.set('usedDNL', v ? true : S.usedDNL); draw(); });
+  [aB, bB, taste, dump, dT.el].forEach(function (x) { ctr.appendChild(x); }); M.el.appendChild(ctr);
+  function report() { var st = { a: a, b: b, match: a > 0 && a * R[1] === b * R[0], saved: made.length, savedList: made.map(function (m) { return m.join(':'); }).join(', ') }; made.forEach(function (m) { st['ok_' + m[0] + '_' + m[1]] = true; }); M.set(st); }
+  function draw() {
+    var t = a + b, f = t ? a / t : 0, c = COL[0].map(function (v, i) { return Math.round(v * f + COL[1][i] * (1 - f)); }), tf = R[0] / (R[0] + R[1]), tc = COL[0].map(function (v, i) { return Math.round(v * tf + COL[1][i] * (1 - tf)); });
+    var h = '<rect width="300" height="300" fill="#fff0f6"/><path d="M90 40 h120 l-15 170 h-90 z" fill="rgba(255,255,255,.7)" stroke="#495057" stroke-width="3"/>';
+    var lvl = Math.min(160, t * 10); if (t) h += '<path d="M' + (105 - lvl * 0.02) + ' ' + (208 - lvl) + ' h' + (90 + lvl * 0.04) + ' l-' + (lvl * 0.09) + ' ' + lvl + ' h-' + (90 - lvl * 0.14) + ' z" fill="rgb(' + c.join(',') + ')"/>';
+    h += '<rect x="80" y="210" width="140" height="50" rx="8" fill="#495057"/><circle cx="150" cy="235" r="10" fill="#ced4da"/><text x="150" y="30" text-anchor="middle" font-size="12" font-weight="800">' + a + ' cups ' + NAMES[0] + ' : ' + b + ' cups ' + NAMES[1] + '</text>';
+    h += '<circle cx="255" cy="80" r="26" fill="rgb(' + tc.join(',') + ')" stroke="#495057" stroke-width="2"/><text x="255" y="122" text-anchor="middle" font-size="10">recipe color</text><circle cx="255" cy="170" r="26" fill="rgb(' + c.join(',') + ')" stroke="#495057" stroke-width="2"/><text x="255" y="212" text-anchor="middle" font-size="10">your color</text>';
+    svg.innerHTML = h;
+    tbl.innerHTML = '<h3>📜 Recipe: ' + R[0] + ' cups ' + NAMES[0] + ' for every ' + R[1] + ' cups ' + NAMES[1] + '</h3><div class="sn-tblw"><table class="sn-tbl"><thead><tr><th>Batch</th><th>' + NAMES[0] + '</th><th>' + NAMES[1] + '</th></tr></thead><tbody>' + (made.length ? made.map(function (m, i) { return '<tr><td>' + (i + 1) + '</td><td>' + m[0] + '</td><td>' + m[1] + '</td></tr>'; }).join('') : '<tr><td colspan="3" class="sn-note">Saved batches that taste right appear here.</td></tr>') + '</tbody></table></div>';
+    line.style.display = dnl ? '' : 'none';
+    if (dnl) { var L = '<rect width="400" height="120" fill="#fff"/><line x1="20" x2="380" y1="40" y2="40" stroke="#1d2433" stroke-width="2"/><line x1="20" x2="380" y1="90" y2="90" stroke="#1d2433" stroke-width="2"/><text x="6" y="26" font-size="11" font-weight="800">' + NAMES[0] + '</text><text x="6" y="112" font-size="11" font-weight="800">' + NAMES[1] + '</text>'; for (var k = 0; k <= 5; k++) { var x = 20 + k * 72; L += '<line x1="' + x + '" x2="' + x + '" y1="34" y2="46" stroke="#1d2433"/><line x1="' + x + '" x2="' + x + '" y1="84" y2="96" stroke="#1d2433"/><text x="' + x + '" y="30" text-anchor="middle" font-size="12" font-weight="800">' + (R[0] * k) + '</text><text x="' + x + '" y="110" text-anchor="middle" font-size="12" font-weight="800">' + (R[1] * k) + '</text>'; } line.innerHTML = L; }
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var want = c.saved ? (c.saved.gte || c.saved) : 1; for (var kk in c) { var mm = kk.match(/^ok_(\d+)_(\d+)$/); if (mm) { a = +mm[1]; b = +mm[2]; if (!made.some(function (m) { return m[0] === a; })) made.push([a, b]); } } for (var i = 1; made.length < want; i++) { if (!made.some(function (m) { return m[0] === R[0] * i; })) made.push([R[0] * i, R[1] * i]); } made.sort(function (p, q) { return p[0] - q[0]; }); if (c.usedDNL) { dnl = true; dT.set(true); M.set('usedDNL', true); } if (c.match) { a = R[0] * 2; b = R[1] * 2; } report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Race Track Rates: unit rates from distance and time                 */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.raceRates = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var RC = cfg.racers || [['🐆', 'Cheetah', 150, 5], ['🐎', 'Horse', 84, 6], ['🐇', 'Rabbit', 72, 4], ['🧒', 'Sixth grader', 42, 7]];
+  var t = 0, T = 10, running = false, seen = {};
+  M.el.innerHTML = '';
+  var info = K.el('<div class="sn-panel"></div>'); M.el.appendChild(info);
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 250', class: 'sn-svg', role: 'img', 'aria-label': 'Race track with four racers' }); M.el.appendChild(svg);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var dS = K.slider({ label: '⏱ Race length', min: 1, max: 10, step: 1, value: T, unit: 'seconds', onInput: function (v) { T = v; t = 0; running = false; draw(); } });
+  var go = K.btn('🏁 Start race', function () { t = 0; running = true; }, 'primary');
+  ctr.appendChild(dS.el); ctr.appendChild(go); M.el.appendChild(ctr);
+  function rate(r) { return r[2] / r[3]; }
+  function draw() {
+    info.innerHTML = '<b>🏟 Speed data from the nature center:</b> ' + RC.map(function (r) { return r[0] + ' ' + r[1] + ' ran <b>' + r[2] + ' m in ' + r[3] + ' s</b>'; }).join(' · ');
+    var h = '<rect width="700" height="250" fill="#8ce99a"/>', max = 320;
+    RC.forEach(function (r, i) { var y = 20 + i * 55, d = rate(r) * Math.min(t, T); h += '<rect x="0" y="' + y + '" width="700" height="46" fill="' + (i % 2 ? '#e8590c' : '#f76707') + '" opacity=".75"/>'; for (var m = 0; m <= max; m += 40) h += '<line x1="' + (50 + m * 2) + '" x2="' + (50 + m * 2) + '" y1="' + y + '" y2="' + (y + 46) + '" stroke="#fff" stroke-width="1" opacity=".6"/>' + (i === 0 ? '<text x="' + (50 + m * 2) + '" y="248" font-size="10" text-anchor="middle">' + m + ' m</text>' : ''); h += '<text x="' + Math.min(680, 50 + d * 2) + '" y="' + (y + 34) + '" font-size="28" text-anchor="middle">' + r[0] + '</text><text x="6" y="' + (y + 28) + '" font-size="11" font-weight="800" fill="#fff">' + r[1] + '</text>' + (t >= T || !running && t > 0 ? '<text x="' + Math.min(690, 50 + d * 2 + 26) + '" y="' + (y + 20) + '" font-size="12" font-weight="800" fill="#fff">' + K.fmt(d, 1) + ' m</text>' : ''); });
+    svg.innerHTML = h;
+  }
+  M.loop(function (dt) { if (!running) return; t += dt * 2; if (t >= T) { t = T; running = false; var st = { raced: true, lastT: T }; RC.forEach(function (r) { st['d_' + r[1].split(' ')[0].toLowerCase() + '_' + T] = K.round(rate(r) * T, 1); }); seen[T] = true; st.times = Object.keys(seen).length; M.set(st); } draw(); });
+  M.set({ raced: false }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var Ts = []; for (var k in c) { var mm = k.match(/^d_\w+_(\d+)$/); if (mm) Ts.push(+mm[1]); } if (c.lastT) Ts.push(c.lastT.eq || c.lastT); if (!Ts.length) Ts.push(T); if (c.times) Ts = Ts.concat([1, 3, 10]); Ts.forEach(function (x) { T = x; var st2 = { raced: true, lastT: T }; RC.forEach(function (r) { st2['d_' + r[1].split(' ')[0].toLowerCase() + '_' + T] = K.round(rate(r) * T, 1); }); seen[T] = true; st2.times = Object.keys(seen).length; M.set(st2); }); t = T; dS.set(T, true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Sale Day: percent of a quantity with a percent bar                 */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.percentStore = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var ITEMS = cfg.items || [['👟', 'Sneakers', 60, 25], ['🧥', 'Jacket', 80, 30], ['🎒', 'Backpack', 45, 20], ['🎧', 'Headphones', 120, 15]];
+  var k = 0, pct = 50;
+  M.el.innerHTML = '';
+  var ticket = K.el('<div class="sn-panel"></div>'); M.el.appendChild(ticket);
+  var svg = K.svgEl('svg', { viewBox: '0 0 680 230', class: 'sn-svg', role: 'img', 'aria-label': 'Percent bar model for a price tag' }); M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rP = K.readout('Marker at', '%', true), rD = K.readout('Dollar amount at marker', ''); reads.appendChild(rP.el); reads.appendChild(rD.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag the ▼ marker along the percent bar. It snaps to every 5%.</span></div>');
+  var iS = K.seg(ITEMS.map(function (it, i) { return [String(i), it[0] + ' ' + it[1]]; }), '0', function (v) { k = +v; pct = 50; report(); draw(); });
+  ctr.appendChild(iS.el); M.el.appendChild(ctr);
+  var X0 = 40, W = 600;
+  function price() { return ITEMS[k][2]; }
+  function report() { var it = ITEMS[k], st = { item: k, pct: pct, amount: K.round(price() * pct / 100, 2) }; st['at_' + k + '_' + pct] = true; if (pct === it[3]) st['off_' + k] = true; if (pct === 100 - it[3]) st['pay_' + k] = true; M.set(st); rP.set(pct); rD.set(K.money(price() * pct / 100)); }
+  function draw() {
+    var it = ITEMS[k];
+    ticket.innerHTML = '<b>' + it[0] + ' ' + it[1] + '</b> · Original price <b>' + K.money(it[2]) + '</b> · 🏷 SALE: <b>' + it[3] + '% OFF</b>. How much do you save, and what do you pay?';
+    var h = '<rect width="680" height="230" fill="#fff9db"/>';
+    h += '<rect x="' + X0 + '" y="70" width="' + W + '" height="44" fill="#fff" stroke="#1d2433" stroke-width="2"/>';
+    for (var p = 10; p < 100; p += 10) h += '<line x1="' + (X0 + p / 100 * W) + '" x2="' + (X0 + p / 100 * W) + '" y1="70" y2="114" stroke="#adb5bd"/>';
+    h += '<rect x="' + X0 + '" y="70" width="' + (pct / 100 * W) + '" height="44" fill="#ffa94d" opacity=".75"/>';
+    for (var q = 0; q <= 100; q += 10) { var x = X0 + q / 100 * W; h += '<text x="' + x + '" y="60" text-anchor="middle" font-size="11" font-weight="700">' + q + '%</text><text x="' + x + '" y="134" text-anchor="middle" font-size="11" fill="#495057">' + K.money(it[2] * q / 100).replace('.00', '') + '</text>'; }
+    var mx = X0 + pct / 100 * W; h += '<g class="ps-m" role="slider" aria-valuenow="' + pct + '" aria-label="Percent marker" tabindex="0"><path d="M' + (mx - 11) + ' 150 h22 l-11 -16 z" fill="#e03131"/><line x1="' + mx + '" x2="' + mx + '" y1="66" y2="150" stroke="#e03131" stroke-width="3"/><text x="' + mx + '" y="174" text-anchor="middle" font-size="14" font-weight="800" fill="#e03131">' + pct + '% = ' + K.money(it[2] * pct / 100) + '</text><rect x="' + (mx - 20) + '" y="60" width="40" height="120" fill="transparent"/></g>';
+    h += '<text x="' + X0 + '" y="210" font-size="12" fill="#495057">The whole bar is 100% = ' + K.money(it[2]) + '. Each 10% section is ' + K.money(it[2] / 10) + '.</text>';
+    svg.innerHTML = h;
+    K.drag(svg.querySelector('.ps-m'), { svg: svg, pos: function () { return [mx, 100]; }, move: function (x) { var np = K.clamp(Math.round((x - X0) / W * 20) * 5, 0, 100); if (np !== pct) { pct = np; report(); draw(); } }, keyStep: W / 20 });
+  }
+  report(); draw();
+  return { setup: function (o) { if (o.item != null) { k = o.item; iS.set(String(k)); pct = 50; report(); draw(); } }, auto: function (st) { var c = st.goal.check || {}; if (c.item != null) { k = c.item; iS.set(String(k)); } for (var kk in c) { var mm = kk.match(/^(off|pay)_(\d)$/); if (mm) { k = +mm[2]; pct = mm[1] === 'off' ? ITEMS[k][3] : 100 - ITEMS[k][3]; report(); } var m2 = kk.match(/^at_(\d)_(\d+)$/); if (m2) { k = +m2[1]; pct = +m2[2]; report(); } } if (c.pct != null) pct = c.pct.eq != null ? c.pct.eq : c.pct; report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Road Trip Map Scale: measure with a ruler, convert with a ratio    */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.mapScale = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var TOWNS = cfg.towns || [['Sunnyside', 80, 250], ['Maple Falls', 380, 250], ['Oak Ridge', 380, 90], ['Pine Lake', 620, 90], ['Cedar Point', 620, 290]];
+  var SC = cfg.scale || 10, PX = 20; // 1 cm = 10 miles; 1 cm = 20 px on screen
+  var a = null, b = null, ruler = { x1: 80, y1: 310, x2: 280, y2: 310 };
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 340', class: 'sn-svg', role: 'img', 'aria-label': 'Road map of towns with a scale bar and ruler' }); M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rR = K.readout('Ruler reads', 'cm', true), rT = K.readout('Trip', ''); reads.appendChild(rR.el); reads.appendChild(rT.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Tap two towns to lay the ruler between them. You can also drag the ruler\'s ends.</span></div>'); M.el.appendChild(ctr);
+  function cm() { var dx = ruler.x2 - ruler.x1, dy = ruler.y2 - ruler.y1; return K.round(Math.sqrt(dx * dx + dy * dy) / PX, 1); }
+  function report() { var st = { cm: cm(), from: a, to: b }; if (a != null && b != null) { var key = [TOWNS[a][0], TOWNS[b][0]].sort().join('|'); st['m_' + key.replace(/\s/g, '')] = cm(); var ms = (S.measures || []).slice(); if (ms.indexOf(key) < 0) ms.push(key); st.measures = ms; st.measured = ms.length; } M.set(st); rR.set(cm()); rT.set(a != null && b != null ? TOWNS[a][0] + ' → ' + TOWNS[b][0] : '—'); }
+  function draw() {
+    var h = '<rect width="700" height="340" fill="#e6fcf5"/><path d="M0 200 Q200 170 350 210 T700 190" stroke="#74c0fc" stroke-width="18" fill="none" opacity=".6"/>';
+    [[0, 1], [1, 2], [2, 3], [1, 4], [3, 4]].forEach(function (e) { var p = TOWNS[e[0]], q = TOWNS[e[1]]; h += '<line x1="' + p[1] + '" y1="' + p[2] + '" x2="' + q[1] + '" y2="' + q[2] + '" stroke="#adb5bd" stroke-width="8" stroke-linecap="round"/><line x1="' + p[1] + '" y1="' + p[2] + '" x2="' + q[1] + '" y2="' + q[2] + '" stroke="#fff" stroke-width="2" stroke-dasharray="8 8"/>'; });
+    TOWNS.forEach(function (t, i) { h += '<g class="ms-t" data-i="' + i + '" role="button" tabindex="0"><circle cx="' + t[1] + '" cy="' + t[2] + '" r="10" fill="' + (i === a || i === b ? '#e8590c' : '#1971c2') + '" stroke="#fff" stroke-width="3"/><text x="' + t[1] + '" y="' + (t[2] - 16) + '" text-anchor="middle" font-size="13" font-weight="800">' + t[0] + '</text><circle cx="' + t[1] + '" cy="' + t[2] + '" r="22" fill="transparent"/></g>'; });
+    h += '<g><rect x="520" y="16" width="160" height="40" rx="6" fill="#fff" stroke="#495057"/><line x1="530" x2="' + (530 + PX) + '" y1="44" y2="44" stroke="#1d2433" stroke-width="4"/><text x="' + (536 + PX) + '" y="48" font-size="12" font-weight="800">1 cm = ' + SC + ' miles</text><text x="530" y="32" font-size="10" fill="#495057">MAP SCALE</text></g>';
+    var dx = ruler.x2 - ruler.x1, dy = ruler.y2 - ruler.y1, L = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    h += '<g transform="translate(' + ruler.x1 + ' ' + ruler.y1 + ') rotate(' + ang + ')"><rect x="0" y="-9" width="' + L + '" height="18" fill="#ffe066" opacity=".85" stroke="#e0b400"/>';
+    for (var c = 0; c * PX <= L; c++) h += '<line x1="' + c * PX + '" x2="' + c * PX + '" y1="-9" y2="' + (c % 5 ? -2 : 4) + '" stroke="#1d2433"/>' + (c % 5 === 0 ? '<text x="' + c * PX + '" y="8" font-size="8" text-anchor="middle">' + c + '</text>' : '');
+    h += '</g><circle class="ms-e1" cx="' + ruler.x1 + '" cy="' + ruler.y1 + '" r="9" fill="#f08c00"/><circle class="ms-e2" cx="' + ruler.x2 + '" cy="' + ruler.y2 + '" r="9" fill="#f08c00"/>';
+    svg.innerHTML = h;
+    svg.querySelectorAll('.ms-t').forEach(function (g) { g.addEventListener('click', function () { var i = +g.getAttribute('data-i'); if (a == null || (a != null && b != null)) { a = i; b = null; } else if (i !== a) { b = i; var p1 = TOWNS[a], p2 = TOWNS[b]; if (p2[1] < p1[1] || (p2[1] === p1[1] && p2[2] < p1[2])) { var tmp = p1; p1 = p2; p2 = tmp; } ruler = { x1: p1[1], y1: p1[2], x2: p2[1], y2: p2[2] }; } report(); draw(); }); });
+    [['ms-e1', 'x1', 'y1'], ['ms-e2', 'x2', 'y2']].forEach(function (e) { K.drag(svg.querySelector('.' + e[0]), { svg: svg, pos: function () { return [ruler[e[1]], ruler[e[2]]]; }, move: function (x, y) { ruler[e[1]] = K.clamp(x, 0, 700); ruler[e[2]] = K.clamp(y, 0, 340); a = null; b = null; draw(); report(); } }); });
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var pairs = []; for (var k in c) { var mm = k.match(/^m_(\w+)\|(\w+)$/); if (mm) pairs.push([mm[1], mm[2]]); } if (c.measured) pairs = [['MapleFalls', 'Sunnyside'], ['MapleFalls', 'OakRidge'], ['OakRidge', 'PineLake']]; pairs.forEach(function (p) { var i = TOWNS.map(function (t) { return t[0].replace(/\s/g, ''); }).indexOf(p[0]), j = TOWNS.map(function (t) { return t[0].replace(/\s/g, ''); }).indexOf(p[1]); a = i; b = j; ruler = { x1: TOWNS[a][1], y1: TOWNS[a][2], x2: TOWNS[b][1], y2: TOWNS[b][2] }; report(); }); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Paint Mixer: part-to-part and part-to-whole ratios                 */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.paintMix = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var TARGETS = cfg.targets || [{ name: 'Sunnyside Green', b: 1, y: 3 }, { name: 'Ocean Teal', b: 3, y: 2 }, { name: 'Spring Lime', b: 1, y: 4 }];
+  var ti = 0, blue = 0, yellow = 0, saved = [];
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 260', class: 'sn-svg', role: 'img', 'aria-label': 'Paint cans and a mixing bucket' }); M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rR = K.readout('Blue : Yellow', '', true), rW = K.readout('Blue part of whole', ''); reads.appendChild(rR.el); reads.appendChild(rW.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var tS = K.seg(TARGETS.map(function (t, i) { return [String(i), t.name]; }), '0', function (v) { ti = +v; blue = 0; yellow = 0; report(); draw(); });
+  var bB = K.btn('🔵 +1 blue', function () { blue++; report(); draw(); }, 'sm'), yB = K.btn('🟡 +1 yellow', function () { yellow++; report(); draw(); }, 'sm'), dm = K.btn('Empty bucket', function () { blue = 0; yellow = 0; report(); draw(); }, 'ghost sm');
+  ctr.appendChild(tS.el); var r2 = K.el('<div class="sn-row"></div>'); [bB, yB, dm].forEach(function (x) { r2.appendChild(x); }); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function mix(b, y) { var t = b + y; if (!t) return [240, 240, 240]; var fb = b / t; return [Math.round(30 * fb + 250 * (1 - fb)), Math.round(110 * fb + 210 * (1 - fb)), Math.round(220 * fb + 20 * (1 - fb))]; }
+  function report() { var T = TARGETS[ti], st = { target: ti, blue: blue, yellow: yellow, match: blue > 0 && blue * T.y === yellow * T.b, total: blue + yellow }; if (st.match) { st['match_' + ti + '_' + (blue + yellow)] = true; } M.set(st); rR.set(blue + ' : ' + yellow); rW.set(blue + yellow ? blue + '/' + (blue + yellow) : '—'); }
+  function draw() {
+    var T = TARGETS[ti], tc = mix(T.b, T.y), mc = mix(blue, yellow);
+    var h = '<rect width="640" height="260" fill="#f8f9fa"/><rect x="30" y="60" width="90" height="120" rx="8" fill="#1c7ed6"/><text x="75" y="200" text-anchor="middle" font-size="12" font-weight="800">BLUE</text><rect x="140" y="60" width="90" height="120" rx="8" fill="#fcc419"/><text x="185" y="200" text-anchor="middle" font-size="12" font-weight="800">YELLOW</text>';
+    h += '<path d="M300 80 h140 l-12 150 h-116 z" fill="#dee2e6" stroke="#495057" stroke-width="3"/>'; var lv = Math.min(140, (blue + yellow) * 7); if (lv) h += '<path d="M' + (312 + (140 - lv) * 0) + ' ' + (228 - lv) + ' h116 l-' + (lv * 0.08) + ' ' + lv + ' h-' + (116 - lv * 0.16) + ' z" fill="rgb(' + mc.join(',') + ')"/>';
+    h += '<text x="370" y="70" text-anchor="middle" font-size="12" font-weight="800">' + blue + ' blue + ' + yellow + ' yellow</text>';
+    h += '<rect x="480" y="60" width="130" height="80" rx="8" fill="rgb(' + tc.join(',') + ')" stroke="#495057" stroke-width="2"/><text x="545" y="160" text-anchor="middle" font-size="12" font-weight="800">' + T.name + '</text><text x="545" y="176" text-anchor="middle" font-size="11">recipe ' + T.b + ' blue : ' + T.y + ' yellow</text><text x="545" y="200" text-anchor="middle" font-size="12" font-weight="800" fill="' + (blue && blue * T.y === yellow * T.b ? '#2b8a3e' : '#c92a2a') + '">' + (blue + yellow ? (blue * T.y === yellow * T.b ? '✓ exact match' : '✗ not a match') : '') + '</text>';
+    svg.innerHTML = h;
+  }
+  report(); draw();
+  return { setup: function (o) { if (o.target != null) { ti = o.target; tS.set(String(ti)); blue = 0; yellow = 0; report(); draw(); } }, auto: function (st) { var c = st.goal.check || {}; if (c.target != null) ti = c.target; var T = TARGETS[ti], n = 1; for (var kk in c) { var mm = kk.match(/^match_(\d)_(\d+)$/); if (mm) { ti = +mm[1]; T = TARGETS[ti]; n = +mm[2] / (T.b + T.y); } } if (c.total) n = Math.ceil((c.total.gte || c.total) / (T.b + T.y)); blue = T.b * n; yellow = T.y * n; tS.set(String(ti)); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Balance Scale: keep it balanced while solving equations             */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.balance = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var EQ = cfg.equations || [{ lx: 1, lu: 3, ru: 8, x: 5 }, { lx: 3, lu: 0, ru: 12, x: 4 }, { lx: 2, lu: 5, ru: 17, x: 6 }, { lx: 4, lu: 2, ru: 22, x: 5 }];
+  var e = 0, lx, lu, ru, rx, tilt = 0, moves = 0, unbal = false;
+  M.el.innerHTML = '';
+  var eqBox = K.el('<div class="sn-panel" style="font-size:1.4em;text-align:center;font-weight:800" aria-live="polite"></div>'); M.el.appendChild(eqBox);
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 280', class: 'sn-svg', role: 'img', 'aria-label': 'Pan balance with mystery bags and blocks' }); M.el.appendChild(svg);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var b1 = K.btn('➖ Take 1 block off BOTH sides', function () { if (lu < 1 || ru < 1) { M.toast('Both sides need a block to take off.', true); return; } lu--; ru--; moves++; report(); draw(); }, 'primary');
+  var b2 = K.btn('➖ Take 1 block off the LEFT only', function () { if (lu < 1) return; lu--; unbal = true; moves++; report(); draw(); }, 'ghost');
+  var sp = K.btn('➗ Split both sides into equal groups', function () { if (lx < 2) { M.toast('There is only one bag on the left.'); return; } if (lu % lx || ru % lx) { M.toast('The blocks can\'t be split into ' + lx + ' equal groups yet. Remove blocks first.', true); return; } lu /= lx; ru /= lx; lx = 1; moves++; report(); draw(); });
+  var rs = K.btn('↺ Reset scale', function () { load(e); }, 'ghost sm');
+  var nx = K.btn('Next equation ▶', function () { load((e + 1) % EQ.length); }, 'ghost sm');
+  [b1, b2, sp, rs, nx].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function load(i) { e = i; var q = EQ[e]; lx = q.lx; lu = q.lu; ru = q.ru; rx = 0; unbal = false; moves = 0; report(); draw(); }
+  function side(n) { return n; }
+  function report() { var q = EQ[e], L = lx * q.x + lu, R = ru, bal = L === R; tilt = bal ? 0 : L > R ? 1 : -1; var st = { eq: e, lx: lx, lu: lu, ru: ru, balanced: bal, solved: bal && lx === 1 && lu === 0, moves: moves, unbalanced: unbal || S.unbalanced }; if (st.solved) st['solved_' + e] = ru; M.set(st); }
+  function draw() {
+    var q = EQ[e];
+    eqBox.innerHTML = (lx ? (lx > 1 ? lx : '') + 'x' : '') + (lu ? ' + ' + lu : '') + ' = ' + ru + (tilt ? ' <span style="color:#c92a2a;font-size:.6em">⚠ NOT BALANCED</span>' : '');
+    var ang = tilt * 8, h = '<rect width="640" height="280" fill="#f3f0ff"/><polygon points="300,250 340,250 320,150" fill="#5f3dc4"/><rect x="200" y="250" width="240" height="14" rx="4" fill="#5f3dc4"/>';
+    h += '<g transform="rotate(' + ang + ' 320 150)"><rect x="80" y="144" width="480" height="10" rx="4" fill="#7048e8"/>';
+    function pan(cx, bags, blocks) { var o = '<path d="M' + (cx - 100) + ' 150 L' + (cx - 80) + ' 210 H' + (cx + 80) + ' L' + (cx + 100) + ' 150" fill="none" stroke="#7048e8" stroke-width="3"/><rect x="' + (cx - 90) + '" y="210" width="180" height="10" rx="4" fill="#9775fa"/>'; var items = []; for (var i = 0; i < bags; i++) items.push('bag'); for (var j = 0; j < blocks; j++) items.push('blk'); items.forEach(function (t, k) { var col = k % 8, row = Math.floor(k / 8), x = cx - 84 + col * 21, y = 190 - row * 22; o += t === 'bag' ? '<path d="M' + x + ' ' + (y + 18) + ' q-2 -14 9 -16 q11 2 9 16 z" fill="#e8590c" stroke="#862e0a"/><text x="' + (x + 9) + '" y="' + (y + 15) + '" font-size="10" text-anchor="middle" fill="#fff" font-weight="800">x</text>' : '<rect x="' + x + '" y="' + (y + 2) + '" width="18" height="18" rx="3" fill="#fcc419" stroke="#e67700"/>'; }); return o; }
+    h += pan(170, lx, lu) + pan(470, rx, ru) + '</g>';
+    h += '<text x="170" y="275" text-anchor="middle" font-size="12" font-weight="800">LEFT</text><text x="470" y="275" text-anchor="middle" font-size="12" font-weight="800">RIGHT</text><text x="320" y="30" text-anchor="middle" font-size="12" fill="#495057">Each 🟧 bag holds the same unknown number of blocks (x). Each 🟨 = 1 block.</text>';
+    svg.innerHTML = h;
+  }
+  load(0);
+  return { setup: function (o) { if (o.eq != null) load(o.eq); }, auto: function (st) { var c = st.goal.check || {}; if (c.eq != null) e = c.eq; for (var k in c) { var mm = k.match(/^solved_(\d)$/); if (mm) e = +mm[1]; } if (c.unbalanced) { M.set('unbalanced', true); } var q = EQ[e]; lx = 1; lu = 0; ru = q.x; moves = 3; report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Function Machine: discover the rule and write it as an expression   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.funcMachine = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var RULES = cfg.rules || ['n + 4', '3n', '2n + 1', '5n - 3', 'n/2 + 1'];
+  var r = 0, log = [], guess = '';
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 380 260', class: 'sn-svg', role: 'img', 'aria-label': 'Function machine' });
+  var tb = K.el('<div class="sn-panel"></div>');
+  row.appendChild(svg); row.appendChild(tb); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var nIn = K.el('<label class="sn-slider" style="flex:0 0 auto;min-width:0">Input n <input type="number" min="0" max="20" value="1" style="width:5em;font:inherit;padding:3px 6px;border:2px solid var(--sn-line);border-radius:6px"></label>');
+  var feed = K.btn('▶ Feed the machine', function () { var n = +nIn.querySelector('input').value; if (isNaN(n)) return; run(n); }, 'primary');
+  var gIn = K.el('<label class="sn-slider" style="flex:1;min-width:220px">My rule: output = <input type="text" placeholder="like 2n + 3" style="flex:1;font:inherit;padding:3px 6px;border:2px solid var(--sn-line);border-radius:6px"></label>');
+  var test = K.btn('🧪 Test my rule', function () { testRule(gIn.querySelector('input').value); });
+  var nx = K.btn('Next machine ▶', function () { r = (r + 1) % RULES.length; log = []; report(); draw(); }, 'ghost sm');
+  [nIn, feed, gIn, test, nx].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function compile(expr) { var e = String(expr).toLowerCase().replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/(\d)(n|\()/g, '$1*$2').replace(/n(\d|\()/g, 'n*$1').replace(/\)(n|\d|\()/g, ')*$1'); if (!/^[\dn+\-*/().]+$/.test(e)) return null; try { var f = new Function('n', 'return (' + e + ');'); f(1); return f; } catch (x) { return null; } }
+  function rule(n) { return compile(RULES[r])(n); }
+  function run(n) { var out = K.round(rule(n), 3); if (!log.some(function (p) { return p[0] === n; })) log.push([n, out]); log.sort(function (a, b) { return a[0] - b[0]; }); report(); draw(n, out); }
+  function testRule(g) { var f = compile(g); if (!f) { M.toast('I can\'t read that rule. Use n, numbers, +, −, ×, ÷.', true); return; } var ok = true; for (var n = 0; n <= 12; n++) if (Math.abs(f(n) - rule(n)) > 1e-9) ok = false; M.toast(ok ? '✓ Your rule matches the machine for every input!' : '✗ Your rule doesn\'t match every input. Test more inputs.', !ok); var st = { lastGuess: g, tries: (S.tries || 0) + 1 }; if (ok) { st['rule_' + r] = true; st.ruleOK = true; } else st.ruleOK = false; M.set(st); }
+  function report() { var st = { machine: r, inputs: log.length, ruleOK: false }; M.set(st); }
+  function draw(n, out) {
+    var h = '<rect width="380" height="260" fill="#f8f9fa"/><rect x="110" y="60" width="160" height="120" rx="14" fill="#7048e8"/><circle cx="150" cy="100" r="10" fill="#ffe066"/><circle cx="230" cy="100" r="10" fill="#ffe066"/><rect x="150" y="130" width="80" height="24" rx="6" fill="#5f3dc4"/><text x="190" y="147" text-anchor="middle" font-size="14" fill="#fff" font-weight="800">RULE: ???</text><text x="190" y="50" text-anchor="middle" font-size="13" font-weight="800">Machine ' + (r + 1) + '</text>';
+    h += '<path d="M30 120 H110" stroke="#495057" stroke-width="4"/><path d="M270 120 H350" stroke="#495057" stroke-width="4"/>';
+    if (n != null) h += '<rect x="30" y="92" width="54" height="26" rx="6" fill="#fff" stroke="#495057"/><text x="57" y="111" text-anchor="middle" font-size="15" font-weight="800">' + n + '</text><rect x="296" y="92" width="64" height="26" rx="6" fill="#fff" stroke="#495057"/><text x="328" y="111" text-anchor="middle" font-size="15" font-weight="800">' + out + '</text>';
+    h += '<text x="57" y="150" text-anchor="middle" font-size="11">IN</text><text x="328" y="150" text-anchor="middle" font-size="11">OUT</text>';
+    svg.innerHTML = h;
+    tb.innerHTML = '<h3>Input / output table</h3><div class="sn-tblw"><table class="sn-tbl"><thead><tr><th>n (in)</th><th>out</th></tr></thead><tbody>' + (log.length ? log.map(function (p) { return '<tr><td>' + p[0] + '</td><td>' + p[1] + '</td></tr>'; }).join('') : '<tr><td colspan="2" class="sn-note">Feed the machine some inputs.</td></tr>') + '</tbody></table></div><p class="sn-note">Tip: try inputs in order (0, 1, 2, 3) and look at how the output changes.</p>';
+  }
+  report(); draw();
+  return { setup: function (o) { if (o.machine != null) { r = o.machine; log = []; report(); draw(); } }, auto: function (st) { var c = st.goal.check || {}; if (c.machine != null) r = c.machine; for (var k in c) { var mm = k.match(/^rule_(\d)$/); if (mm) r = +mm[1]; } [0, 1, 2, 3].forEach(run); if (c.inputs) [4, 5].forEach(run); testRule(RULES[r]); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Algebra Tiles: equivalent expressions and the distributive property */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.algebraTiles = function (M) {
+  var K = M.kit, S = M.state;
+  var gx = 0, gu = 0, copies = 1, sorted = false, mess = null;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 680 300', class: 'sn-svg', role: 'img', 'aria-label': 'Algebra tile workspace' }); M.el.appendChild(svg);
+  var eqBox = K.el('<div class="sn-panel" style="font-size:1.25em;font-weight:800;text-align:center" aria-live="polite"></div>'); M.el.appendChild(eqBox);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var r1 = K.el('<div class="sn-row"><b class="sn-note">Build one group:</b></div>');
+  r1.appendChild(K.btn('+ x tile', function () { gx++; sorted = false; mess = null; report(); draw(); }, 'sm')); r1.appendChild(K.btn('+ 1 tile', function () { gu++; sorted = false; mess = null; report(); draw(); }, 'sm')); r1.appendChild(K.btn('Clear', function () { gx = 0; gu = 0; copies = 1; sorted = false; mess = null; report(); draw(); }, 'ghost sm'));
+  var cS = K.slider({ label: 'Number of groups', min: 1, max: 5, step: 1, value: 1, onInput: function (v) { copies = v; sorted = false; report(); draw(); } });
+  var so = K.btn('🧹 Sort like tiles together', function () { sorted = true; report(); draw(); }, 'primary');
+  var ms = K.btn('🎲 Messy pile: 2x + 3 + x + 1 + 2x', function () { mess = [2, 3, 1, 1, 2]; gx = 0; gu = 0; copies = 1; sorted = false; report(); draw(); }, 'sm');
+  ctr.appendChild(r1); ctr.appendChild(cS.el); var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(so); r2.appendChild(ms); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function totals() { if (mess) return [5, 4]; return [gx * copies, gu * copies]; }
+  function report() { var t = totals(), st = { gx: gx, gu: gu, copies: copies, sorted: sorted, tx: t[0], tu: t[1], mess: !!mess }; st['g_' + copies + '_' + gx + '_' + gu] = true; if (sorted) st['s_' + t[0] + '_' + t[1]] = true; M.set(st); }
+  function xt(x, y) { return '<rect x="' + x + '" y="' + y + '" width="16" height="64" rx="3" fill="#40c057" stroke="#2b8a3e"/><text x="' + (x + 8) + '" y="' + (y + 36) + '" font-size="11" font-weight="800" text-anchor="middle" fill="#fff">x</text>'; }
+  function ut(x, y) { return '<rect x="' + x + '" y="' + y + '" width="16" height="16" rx="3" fill="#fcc419" stroke="#e67700"/>'; }
+  function draw() {
+    var h = '<rect width="680" height="300" fill="#f8f9fa"/>', t = totals();
+    if (mess && !sorted) { var parts = [['x', 2], ['u', 3], ['x', 1], ['u', 1], ['x', 2]], x = 20; parts.forEach(function (p) { for (var i = 0; i < p[1]; i++) { h += p[0] === 'x' ? xt(x, 60) : ut(x, 108); x += 20; } x += 26; }); }
+    else if (!sorted) { for (var g = 0; g < copies; g++) { var ox = 16 + g * 132; h += '<rect x="' + ox + '" y="30" width="122" height="160" rx="10" fill="none" stroke="#7048e8" stroke-width="2" stroke-dasharray="6 4"/><text x="' + (ox + 61) + '" y="24" font-size="11" text-anchor="middle" fill="#7048e8" font-weight="800">group ' + (g + 1) + '</text>'; for (var i2 = 0; i2 < gx; i2++) h += xt(ox + 8 + i2 * 20, 44); for (var j = 0; j < gu; j++) h += ut(ox + 8 + (j % 6) * 18, 124 + Math.floor(j / 6) * 20); } }
+    else { for (var a = 0; a < t[0]; a++) h += xt(20 + a * 20, 50); for (var b = 0; b < t[1]; b++) h += ut(20 + (b % 20) * 20, 140 + Math.floor(b / 20) * 20); h += '<text x="20" y="40" font-size="12" font-weight="800" fill="#2b8a3e">' + t[0] + ' x tiles</text><text x="20" y="132" font-size="12" font-weight="800" fill="#e67700">' + t[1] + ' unit tiles</text>'; }
+    h += '<text x="20" y="286" font-size="11" fill="#495057">Green bar = x (unknown). Yellow square = 1.</text>';
+    svg.innerHTML = h;
+    var one = (gx ? (gx > 1 ? gx : '') + 'x' : '') + (gx && gu ? ' + ' : '') + (gu ? gu : '');
+    eqBox.textContent = mess ? (sorted ? '2x + 3 + x + 1 + 2x  =  5x + 4' : '2x + 3 + x + 1 + 2x') : (!gx && !gu ? 'Build a group of tiles' : (copies > 1 ? copies + '(' + one + ')' : one) + (sorted ? '  =  ' + (t[0] ? t[0] + 'x' : '') + (t[0] && t[1] ? ' + ' : '') + (t[1] || '') : ''));
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^g_(\d)_(\d)_(\d)$/); if (mm) { copies = +mm[1]; gx = +mm[2]; gu = +mm[3]; cS.set(copies, true); } var m2 = k.match(/^s_(\d+)_(\d+)$/); if (m2 && !mess) { sorted = true; } } if (c.mess) { mess = [2, 3, 1, 1, 2]; } if (c.sorted) sorted = true; report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Arcade Tokens: write and evaluate expressions from a situation      */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.arcade = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var START = cfg.start || 50, COST = cfg.cost || 4, WIN = cfg.win || 12, BONUS = cfg.bonus || 5;
+  var g = 0, log = {};
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 660 250', class: 'sn-svg', role: 'img', 'aria-label': 'Arcade token counter and ticket machine' }); M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rG = K.readout('Games played (g)', '', true), rT = K.readout('Tokens left', ''), rK = K.readout('Tickets won', ''); [rG, rT, rK].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var p1 = K.btn('🕹 Play one game', function () { if (START - COST * (g + 1) < 0) { M.toast('Not enough tokens!', true); return; } g++; log[g] = true; report(); draw(); }, 'primary');
+  var rs = K.btn('↺ New visit', function () { g = 0; report(); draw(); }, 'ghost sm');
+  ctr.appendChild(p1); ctr.appendChild(rs); M.el.appendChild(ctr);
+  function report() { var st = { games: g, tokens: START - COST * g, tickets: g ? WIN * g + BONUS : 0, maxGames: Math.floor(START / COST) }; st['g_' + g] = true; M.set(st); rG.set(g); rT.set(START - COST * g); rK.set(g ? WIN * g + BONUS : 0); }
+  function draw() {
+    var tk = START - COST * g, h = '<rect width="660" height="250" fill="#2b2340"/><text x="20" y="28" fill="#ffd43b" font-size="14" font-weight="800">🎟 SUNNYSIDE ARCADE</text><text x="20" y="50" fill="#dee2e6" font-size="12">You start with ' + START + ' tokens. Each game costs ' + COST + ' tokens. Each game wins ' + WIN + ' tickets, plus a one-time ' + BONUS + '-ticket welcome bonus when you play.</text>';
+    for (var i = 0; i < tk; i++) h += '<circle cx="' + (30 + (i % 25) * 14) + '" cy="' + (90 + Math.floor(i / 25) * 16) + '" r="6" fill="#fcc419" stroke="#e67700"/>';
+    h += '<text x="30" y="140" fill="#fff" font-size="12">tokens left: ' + tk + '</text>';
+    var tix = g ? WIN * g + BONUS : 0; for (var j = 0; j < Math.min(tix, 120); j++) h += '<rect x="' + (400 + (j % 12) * 20) + '" y="' + (80 + Math.floor(j / 12) * 14) + '" width="16" height="10" rx="2" fill="#ff8787"/>';
+    h += '<text x="400" y="240" fill="#fff" font-size="12">tickets: ' + tix + '</text>';
+    svg.innerHTML = h;
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var want = c.games != null ? (c.games.eq != null ? c.games.eq : c.games.gte != null ? c.games.gte : c.games) : g; for (var k in c) { var mm = k.match(/^g_(\d+)$/); if (mm) { g = +mm[1]; report(); } } if (c.tokens != null) want = (START - (c.tokens.eq != null ? c.tokens.eq : c.tokens)) / COST; g = want; report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Ride Height Check: inequalities on a number line                   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.inequality = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var RIDES = cfg.rides || [{ name: 'Thunder Coaster', rule: '≥', v: 48, txt: 'Riders must be AT LEAST 48 inches tall.' }, { name: 'Kiddie Carousel', rule: '≤', v: 42, txt: 'Riders must be 42 inches tall OR SHORTER.' }, { name: 'Bumper Boats', rule: '>', v: 44, txt: 'Riders must be TALLER THAN 44 inches.' }];
+  var KIDS = [['Ava', 50], ['Ben', 48], ['Cam', 41], ['Dee', 44], ['Eli', 46], ['Fay', 42]];
+  var ri = 0, pt = 45, closed = true, dir = 'right', tested = {};
+  M.el.innerHTML = '';
+  var info = K.el('<div class="sn-panel"></div>'); M.el.appendChild(info);
+  var svg = K.svgEl('svg', { viewBox: '0 0 680 220', class: 'sn-svg', role: 'img', 'aria-label': 'Number line of heights with a ride sign' }); M.el.appendChild(svg);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var pS = K.slider({ label: 'Circle at', min: 38, max: 54, step: 1, value: pt, unit: 'in.', onInput: function (v) { pt = v; report(); draw(); } });
+  var cS = K.seg([['closed', '● Closed (included)'], ['open', '○ Open (not included)']], 'closed', function (v) { closed = v === 'closed'; report(); draw(); });
+  var dS = K.seg([['left', '← Shade left'], ['right', 'Shade right →']], dir, function (v) { dir = v; report(); draw(); });
+  var nx = K.btn('Next ride ▶', function () { ri = (ri + 1) % RIDES.length; tested = {}; report(); draw(); }, 'ghost sm');
+  ctr.appendChild(pS.el); var r2 = K.el('<div class="sn-row"></div>'); [cS.el, dS.el, nx].forEach(function (b) { r2.appendChild(b); }); ctr.appendChild(r2);
+  var kidRow = K.el('<div class="sn-row"><b class="sn-note">Check a rider:</b></div>'); KIDS.forEach(function (k) { kidRow.appendChild(K.btn(k[0] + ' ' + k[1] + '"', function () { var R = RIDES[ri], ok = allowed(k[1], R); tested[k[0]] = ok; M.toast(k[0] + ' (' + k[1] + ' in.) ' + (ok ? 'CAN ride ✓' : 'can NOT ride ✗')); report(); draw(); }, 'sm')); }); ctr.appendChild(kidRow);
+  M.el.appendChild(ctr);
+  function allowed(h, R) { return R.rule === '≥' ? h >= R.v : R.rule === '≤' ? h <= R.v : R.rule === '>' ? h > R.v : h < R.v; }
+  function graphOK() { var R = RIDES[ri]; return pt === R.v && closed === (R.rule === '≥' || R.rule === '≤') && dir === (R.rule === '≥' || R.rule === '>' ? 'right' : 'left'); }
+  function report() { var st = { ride: ri, graphOK: graphOK(), tested: Object.keys(tested).length }; if (graphOK()) st['graph_' + ri] = true; M.set(st); }
+  function X(v) { return 40 + (v - 36) / 20 * 600; }
+  function draw() {
+    var R = RIDES[ri]; info.innerHTML = '<b>🎢 ' + R.name + ':</b> ' + R.txt + ' Graph the heights that CAN ride.';
+    var h = '<rect width="680" height="220" fill="#fff4e6"/><line x1="30" x2="650" y1="120" y2="120" stroke="#1d2433" stroke-width="3"/>';
+    for (var v = 36; v <= 56; v++) h += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="112" y2="128" stroke="#1d2433"/>' + (v % 2 === 0 ? '<text x="' + X(v) + '" y="148" text-anchor="middle" font-size="12">' + v + '</text>' : '');
+    var x = X(pt); h += '<line x1="' + x + '" x2="' + (dir === 'right' ? 650 : 30) + '" y1="120" y2="120" stroke="#e8590c" stroke-width="8" stroke-linecap="round"/><polygon points="' + (dir === 'right' ? '660,120 644,110 644,130' : '20,120 36,110 36,130') + '" fill="#e8590c"/><circle cx="' + x + '" cy="120" r="10" fill="' + (closed ? '#e8590c' : '#fff') + '" stroke="#e8590c" stroke-width="4"/>';
+    KIDS.forEach(function (k, i) { if (!(k[0] in tested)) return; h += '<text x="' + X(k[1]) + '" y="' + (80 - (i % 2) * 24) + '" text-anchor="middle" font-size="18">' + (tested[k[0]] ? '🙂' : '🙁') + '</text><text x="' + X(k[1]) + '" y="' + (96 - (i % 2) * 24) + '" text-anchor="middle" font-size="10" font-weight="800">' + k[0] + '</text>'; });
+    h += '<text x="340" y="190" text-anchor="middle" font-size="14" font-weight="800">h ' + R.rule + ' ' + R.v + (graphOK() ? '  ✓ your graph matches' : '') + '</text>';
+    svg.innerHTML = h;
+  }
+  report(); draw();
+  return { setup: function (o) { if (o.ride != null) { ri = o.ride; tested = {}; report(); draw(); } }, auto: function (st) { var c = st.goal.check || {}; if (c.ride != null) ri = c.ride; for (var k in c) { var mm = k.match(/^graph_(\d)$/); if (mm) ri = +mm[1]; } var R = RIDES[ri]; pt = R.v; closed = R.rule === '≥' || R.rule === '≤'; dir = R.rule === '≥' || R.rule === '>' ? 'right' : 'left'; pS.set(pt, true); cS.set(closed ? 'closed' : 'open'); dS.set(dir); if (c.tested) KIDS.forEach(function (kd) { tested[kd[0]] = allowed(kd[1], R); }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Sea Levels: elevations above and below sea level with a submarine   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.seaLevels = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var THINGS = cfg.things || [['gull', '🐦', 'Seagull', 25, 470], ['cliff', '🏔', 'Cliff top', 35, 90], ['boat', '⛵', 'Boat', 0, 380], ['turtle', '🐢', 'Sea turtle', -8, 520], ['diver', '🤿', 'Diver', -15, 300], ['shark', '🦈', 'Shark', -30, 460], ['wreck', '🚢', 'Shipwreck', -60, 380], ['angler', '🐟', 'Anglerfish', -90, 500]];
+  var y = 0, target = null, visited = {};
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.6fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 600 440', class: 'sn-svg', role: 'img', 'aria-label': 'Ocean scene from sky to deep sea with a submarine' });
+  var side = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var reads = K.el('<div class="sn-reads"></div>'), rE = K.readout('Sub elevation', 'm', true), rS = K.readout('Sonar distance', 'm');
+  reads.appendChild(rE.el); reads.appendChild(rS.el); side.appendChild(reads);
+  var list = K.el('<div class="sn-panel"></div>'); side.appendChild(list);
+  row.appendChild(svg); row.appendChild(side); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  [['⬆ Up 10 m', 10], ['⬆ Up 1 m', 1], ['⬇ Down 1 m', -1], ['⬇ Down 10 m', -10]].forEach(function (b) { ctr.appendChild(K.btn(b[0], function () { move(b[1]); }, 'sm')); });
+  M.el.appendChild(ctr);
+  function Y(e) { return 120 - e * 3.2; }
+  function move(d) { var ny = K.clamp(y + d, -100, 0); if (ny === y && d > 0) M.toast('A submarine can\'t fly above sea level!', true); y = ny; report(); draw(); }
+  function report() { var st = { sub: y }; st['at_' + (y < 0 ? 'n' + (-y) : y)] = true; visited[y] = true; st.depthsVisited = Object.keys(visited).length; if (target) { var t = THINGS.filter(function (x) { return x[0] === target; })[0]; st.sonar = Math.abs(y - t[3]); st['d_' + target + '_' + (y < 0 ? 'n' + (-y) : y)] = Math.abs(y - t[3]); st.target = target; } M.set(st); }
+  function draw() {
+    var h = '<defs><linearGradient id="slSea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4dabf7"/><stop offset=".45" stop-color="#1864ab"/><stop offset="1" stop-color="#0b1026"/></linearGradient></defs><rect width="600" height="120" fill="#d0ebff"/><rect y="120" width="600" height="320" fill="url(#slSea)"/>';
+    h += '<path d="M0 120 L0 0 L120 0 L150 ' + Y(35) + ' L170 120 Z" fill="#8d6e63"/><path d="M0 440 L0 ' + Y(-70) + ' Q120 ' + Y(-95) + ' 250 ' + Y(-98) + ' T600 ' + Y(-92) + ' L600 440 Z" fill="#5c3a1a" opacity=".8"/>';
+    h += '<text x="596" y="' + (Y(-5) + 4) + '" text-anchor="end" font-size="10" fill="#e7f5ff">SUNLIGHT ZONE</text><text x="596" y="' + (Y(-45)) + '" text-anchor="end" font-size="10" fill="#a5d8ff">TWILIGHT ZONE</text><text x="596" y="' + (Y(-85)) + '" text-anchor="end" font-size="10" fill="#748ffc">MIDNIGHT ZONE</text>';
+    for (var e = 40; e >= -100; e -= 10) h += '<line x1="30" x2="' + (e === 0 ? 600 : 44) + '" y1="' + Y(e) + '" y2="' + Y(e) + '" stroke="' + (e === 0 ? '#fff' : '#ced4da') + '" stroke-width="' + (e === 0 ? 2 : 1) + '"/><text x="48" y="' + (Y(e) + 4) + '" font-size="10" fill="' + (e < 0 ? '#e7f5ff' : '#1d2433') + '" font-weight="700">' + e + ' m</text>';
+    h += '<text x="300" y="' + (Y(0) - 4) + '" font-size="11" fill="#1864ab" font-weight="800">sea level (0 m)</text>';
+    THINGS.forEach(function (t) { h += '<g class="sl-t" data-t="' + t[0] + '" role="button" tabindex="0" aria-label="' + t[2] + '"><text x="' + t[4] + '" y="' + (Y(t[3]) + 8) + '" font-size="24" text-anchor="middle">' + t[1] + '</text>' + (target === t[0] ? '<circle cx="' + t[4] + '" cy="' + Y(t[3]) + '" r="20" fill="none" stroke="#ffe066" stroke-width="3"/>' : '') + '<rect x="' + (t[4] - 20) + '" y="' + (Y(t[3]) - 18) + '" width="40" height="36" fill="transparent"/></g>'; });
+    var sx = 200, sy = Y(y); h += '<g><ellipse cx="' + sx + '" cy="' + sy + '" rx="34" ry="14" fill="#fcc419" stroke="#e67700" stroke-width="2"/><rect x="' + (sx - 8) + '" y="' + (sy - 24) + '" width="16" height="12" rx="3" fill="#fcc419" stroke="#e67700"/><circle cx="' + (sx + 14) + '" cy="' + sy + '" r="5" fill="#74c0fc" stroke="#1864ab"/><text x="' + (sx - 44) + '" y="' + (sy + 4) + '" text-anchor="end" font-size="12" font-weight="800" fill="#fff">SUB ' + y + ' m</text></g>';
+    if (target) { var t2 = THINGS.filter(function (x) { return x[0] === target; })[0]; h += '<line x1="' + (sx + 36) + '" y1="' + sy + '" x2="' + (t2[4] - 18) + '" y2="' + Y(t2[3]) + '" stroke="#ffe066" stroke-width="2" stroke-dasharray="6 4"/>'; }
+    svg.innerHTML = h;
+    svg.querySelectorAll('.sl-t').forEach(function (g) { g.addEventListener('click', function () { target = g.getAttribute('data-t'); report(); draw(); }); });
+    rE.set(y); rS.set(target ? Math.abs(y - THINGS.filter(function (x) { return x[0] === target; })[0][3]) : '—');
+    list.innerHTML = '<h3>📋 Elevation chart</h3><p class="sn-note">Tap a creature or object to aim the sonar at it.</p>' + THINGS.map(function (t) { return '<div>' + t[1] + ' ' + t[2] + ': ' + (visited._seen && visited._seen[t[0]] ? '<b>' + t[3] + ' m</b>' : '<b>' + t[3] + ' m</b>') + '</div>'; }).join('');
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.sub != null) y = c.sub.eq != null ? c.sub.eq : c.sub.lte != null ? c.sub.lte : c.sub; for (var k in c) { var mm = k.match(/^at_(n?)(\d+)$/); if (mm) { y = (mm[1] ? -1 : 1) * +mm[2]; report(); } var m2 = k.match(/^d_(\w+)_(n?)(\d+)$/); if (m2) { target = m2[1]; y = (m2[2] ? -1 : 1) * +m2[3]; report(); } } if (c.target) target = c.target; if (c.depthsVisited) [-10, -20, -30, -40].forEach(function (d) { y = d; report(); }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Weather Station: compare, order, and find changes in temperatures   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.weatherStation = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var CITIES = cfg.cities || [['Fort Wayne', -6, -2, 3], ['Anchorage', -12, -15, -9], ['Minneapolis', -9, -4, -11], ['Indianapolis', -3, 1, 4], ['Miami', 22, 24, 23]];
+  var DAYS = ['Monday', 'Tuesday', 'Wednesday'], d = 0, sel = 0;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.5fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 460 340', class: 'sn-svg', role: 'img', 'aria-label': 'Weather board with city temperatures on a thermometer number line' });
+  var th = K.svgEl('svg', { viewBox: '0 0 160 340', class: 'sn-svg', role: 'img', 'aria-label': 'Big thermometer' });
+  row.appendChild(svg); row.appendChild(th); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var dS = K.seg(DAYS.map(function (x, i) { return [String(i), x]; }), '0', function (v) { d = +v; report(); draw(); });
+  var cS = K.seg(CITIES.map(function (c, i) { return [String(i), c[0]]; }), '0', function (v) { sel = +v; report(); draw(); });
+  ctr.appendChild(dS.el); ctr.appendChild(cS.el); M.el.appendChild(ctr);
+  function T(i, day) { return CITIES[i][1 + (day == null ? d : day)]; }
+  function report() { var st = { day: d, city: sel, temp: T(sel) }; st['t_' + sel + '_' + d] = T(sel); var seen = (S.seen || []).slice(); if (seen.indexOf(sel + '_' + d) < 0) seen.push(sel + '_' + d); st.seen = seen; st.seenCount = seen.length; M.set(st); }
+  function Y(t) { return 170 - t * 5.5; }
+  function draw() {
+    var h = '<rect width="460" height="340" fill="#e7f5ff"/><text x="10" y="20" font-size="13" font-weight="800">Temperatures (°F) · ' + DAYS[d] + '</text>';
+    h += '<line x1="60" x2="60" y1="' + Y(26) + '" y2="' + Y(-18) + '" stroke="#1d2433" stroke-width="2"/>';
+    for (var t = -15; t <= 25; t += 5) h += '<line x1="54" x2="66" y1="' + Y(t) + '" y2="' + Y(t) + '" stroke="#1d2433"/><text x="48" y="' + (Y(t) + 4) + '" text-anchor="end" font-size="11" font-weight="' + (t === 0 ? 800 : 400) + '">' + t + '°</text>';
+    h += '<line x1="60" x2="450" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="#1971c2" stroke-dasharray="4 4"/><text x="446" y="' + (Y(0) - 4) + '" text-anchor="end" font-size="10" fill="#1971c2">0 °F</text>';
+    CITIES.forEach(function (c, i) { var x = 100 + i * 72, tt = T(i); h += '<circle cx="' + x + '" cy="' + Y(tt) + '" r="' + (i === sel ? 9 : 6) + '" fill="' + (tt < 0 ? '#1971c2' : '#e8590c') + '" stroke="#fff" stroke-width="2"/><text x="' + x + '" y="' + (Y(tt) - 12) + '" text-anchor="middle" font-size="12" font-weight="800">' + tt + '°</text><text x="' + x + '" y="330" text-anchor="middle" font-size="10" font-weight="' + (i === sel ? 800 : 400) + '">' + c[0] + '</text>'; });
+    svg.innerHTML = h;
+    var tt = T(sel), f = K.clamp((tt + 20) / 50, 0, 1), g = '<rect width="160" height="340" fill="#fff"/><rect x="66" y="30" width="28" height="250" rx="14" fill="#f1f3f5" stroke="#495057" stroke-width="2"/><rect x="72" y="' + (276 - 240 * f) + '" width="16" height="' + 240 * f + '" rx="8" fill="#e03131"/><circle cx="80" cy="292" r="22" fill="#e03131" stroke="#495057" stroke-width="2"/>';
+    for (var q = -20; q <= 30; q += 10) g += '<line x1="94" x2="106" y1="' + (276 - (q + 20) / 50 * 240) + '" y2="' + (276 - (q + 20) / 50 * 240) + '" stroke="#495057"/><text x="110" y="' + (280 - (q + 20) / 50 * 240) + '" font-size="11">' + q + '°</text>';
+    g += '<text x="80" y="20" text-anchor="middle" font-size="12" font-weight="800">' + CITIES[sel][0] + '</text><text x="80" y="330" text-anchor="middle" font-size="16" font-weight="800">' + tt + ' °F</text>';
+    th.innerHTML = g;
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.day != null) d = c.day; if (c.city != null) sel = c.city; for (var k in c) { var mm = k.match(/^t_(\d)_(\d)$/); if (mm) { sel = +mm[1]; d = +mm[2]; report(); } } if (c.seenCount) CITIES.forEach(function (x, i) { sel = i; report(); }); dS.set(String(d)); cS.set(String(sel)); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Bank Account: positive balances, debt, and absolute value           */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.bankAccount = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var TX = cfg.tx || [['💵 Allowance', 15], ['🎂 Birthday money', 20], ['🚲 Bike helmet', -40], ['📚 Book fair', -12], ['🐶 Dog walking', 18], ['🎮 Video game', -30]];
+  var start = cfg.start || 25, hist = [];
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 680 200', class: 'sn-svg', role: 'img', 'aria-label': 'Bank balance on a number line' }); M.el.appendChild(svg);
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var reads = K.el('<div class="sn-reads" style="align-content:start"></div>'), rB = K.readout('Balance', '$', true), rS = K.readout('Status', ''); reads.appendChild(rB.el); reads.appendChild(rS.el);
+  var led = K.el('<div class="sn-panel"></div>'); row.appendChild(reads); row.appendChild(led); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  TX.forEach(function (t, i) { ctr.appendChild(K.btn(t[0] + ' ' + (t[1] > 0 ? '+' : '−') + '$' + Math.abs(t[1]), function () { hist.push(i); report(); draw(); }, 'sm')); });
+  ctr.appendChild(K.btn('↺ Start over', function () { hist = []; report(); draw(); }, 'ghost sm')); M.el.appendChild(ctr);
+  function bal() { return hist.reduce(function (a, i) { return a + TX[i][1]; }, start); }
+  function report() { var b = bal(), st = { balance: b, debt: b < 0 ? -b : 0, inDebt: b < 0, count: hist.length, minBal: Math.min.apply(0, [start].concat(hist.map(function (_, k) { return hist.slice(0, k + 1).reduce(function (a, i) { return a + TX[i][1]; }, start); }))) }; hist.forEach(function (i) { st['used_' + i] = true; }); M.set(st); rB.set(b < 0 ? '−' + Math.abs(b) : b); rS.set(b < 0 ? 'owes $' + Math.abs(b) : b === 0 ? 'even' : 'has $' + b); }
+  function X(v) { return 40 + (v + 60) / 120 * 600; }
+  function draw() {
+    var b = bal(), h = '<rect width="680" height="200" fill="#ebfbee"/><line x1="30" x2="650" y1="110" y2="110" stroke="#1d2433" stroke-width="3"/>';
+    for (var v = -60; v <= 60; v += 10) h += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="102" y2="118" stroke="#1d2433"/><text x="' + X(v) + '" y="138" text-anchor="middle" font-size="12" font-weight="' + (v === 0 ? 800 : 400) + '" fill="' + (v < 0 ? '#c92a2a' : '#1d2433') + '">' + (v < 0 ? '−' : '') + '$' + Math.abs(v) + '</text>';
+    h += '<rect x="' + Math.min(X(0), X(b)) + '" y="96" width="' + Math.abs(X(b) - X(0)) + '" height="8" fill="' + (b < 0 ? '#ff8787' : '#69db7c') + '"/><text x="' + ((X(0) + X(b)) / 2) + '" y="88" text-anchor="middle" font-size="12" font-weight="800">|' + b + '| = ' + Math.abs(b) + '</text>';
+    h += '<circle cx="' + X(K.clamp(b, -60, 60)) + '" cy="110" r="11" fill="' + (b < 0 ? '#c92a2a' : '#2b8a3e') + '" stroke="#fff" stroke-width="3"/><text x="' + X(K.clamp(b, -60, 60)) + '" y="70" text-anchor="middle" font-size="22">' + (b < 0 ? '😬' : '😀') + '</text>';
+    h += '<text x="' + X(-30) + '" y="180" text-anchor="middle" font-size="12" fill="#c92a2a" font-weight="800">OWES MONEY (debt)</text><text x="' + X(30) + '" y="180" text-anchor="middle" font-size="12" fill="#2b8a3e" font-weight="800">HAS MONEY</text>';
+    svg.innerHTML = h;
+    var run = start; led.innerHTML = '<h3>🧾 Account ledger</h3><div class="sn-tblw"><table class="sn-tbl"><thead><tr><th>Event</th><th>Change</th><th>Balance</th></tr></thead><tbody><tr><td>Start</td><td></td><td>$' + start + '</td></tr>' + hist.map(function (i) { run += TX[i][1]; return '<tr><td>' + TX[i][0] + '</td><td>' + (TX[i][1] > 0 ? '+' : '−') + Math.abs(TX[i][1]) + '</td><td>' + (run < 0 ? '−$' + (-run) : '$' + run) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^used_(\d)$/); if (mm && hist.indexOf(+mm[1]) < 0) hist.push(+mm[1]); } if (c.inDebt && bal() >= 0) { hist.push(2); if (bal() >= 0) hist.push(5); } if (c.balance != null) { var want = c.balance.eq != null ? c.balance.eq : c.balance; hist = []; var combos = [[2], [5], [3], [2, 3], [2, 5], [0, 2], [1, 2], [2, 3, 5]]; combos.some(function (cb) { if (cb.reduce(function (a, i) { return a + TX[i][1]; }, start) === want) { hist = cb.slice(); return true; } return false; }); } report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Treasure Map: the four-quadrant coordinate plane                    */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.coordMap = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var SPOTS = cfg.spots || [['skull', '💀', 'Skull Rock', 4, 6], ['palm', '🌴', 'Palm Grove', -5, 3], ['cave', '🕳', 'Bat Cave', -6, -4], ['dock', '⚓', 'Old Dock', 7, -2], ['volcano', '🌋', 'Volcano', 0, 7]];
+  var sx = 0, sy = 0, visited = {}, digs = [];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 440 440', class: 'sn-svg', role: 'img', 'aria-label': 'Treasure map on a coordinate grid' });
+  var side = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var reads = K.el('<div class="sn-reads"></div>'), rP = K.readout('Ship at', '', true), rQ = K.readout('Quadrant', ''); reads.appendChild(rP.el); reads.appendChild(rQ.el); side.appendChild(reads);
+  var legend = K.el('<div class="sn-panel"></div>'); side.appendChild(legend);
+  row.appendChild(svg); row.appendChild(side); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Tap the grid to sail there, or type coordinates.</span></div>');
+  var cin = K.el('<label class="sn-slider" style="flex:0 0 auto;min-width:0">Sail to ( <input type="text" aria-label="x" style="width:3em;font:inherit;padding:2px 4px;border:2px solid var(--sn-line);border-radius:6px"> , <input type="text" aria-label="y" style="width:3em;font:inherit;padding:2px 4px;border:2px solid var(--sn-line);border-radius:6px"> )</label>');
+  var go = K.btn('⛵ Sail', function () { var ins = cin.querySelectorAll('input'), x = K.parseNum(ins[0].value), y = K.parseNum(ins[1].value); if (isNaN(x) || isNaN(y) || Math.abs(x) > 9 || Math.abs(y) > 9) { M.toast('Use whole numbers from −9 to 9.', true); return; } sail(x, y); }, 'primary');
+  var dig = K.btn('⛏ Dig here', function () { digs.push([sx, sy]); var st = {}; st['dig_' + sx + '_' + sy] = true; st.digs = digs.length; M.set(st); M.toast('You dug at (' + sx + ', ' + sy + ').'); draw(); });
+  [cin, go, dig].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function P(x, y) { return [220 + x * 22, 220 - y * 22]; }
+  function quad(x, y) { return x > 0 && y > 0 ? 'I' : x < 0 && y > 0 ? 'II' : x < 0 && y < 0 ? 'III' : x > 0 && y < 0 ? 'IV' : 'on an axis'; }
+  function sail(x, y) { sx = x; sy = y; var st = { x: x, y: y, quad: quad(x, y) }; st['at_' + x + '_' + y] = true; SPOTS.forEach(function (s) { if (s[3] === x && s[4] === y) st['visit_' + s[0]] = true; }); M.set(st); draw(); }
+  function draw() {
+    var h = '<rect width="440" height="440" fill="#a5d8ff"/><ellipse cx="220" cy="220" rx="190" ry="175" fill="#ffe8a1"/><ellipse cx="220" cy="220" rx="170" ry="155" fill="#b2f2bb"/>';
+    for (var i = -9; i <= 9; i++) { var p = P(i, 0), q = P(0, i); h += '<line x1="' + p[0] + '" x2="' + p[0] + '" y1="22" y2="418" stroke="#1d2433" stroke-opacity=".15"/><line y1="' + q[1] + '" y2="' + q[1] + '" x1="22" x2="418" stroke="#1d2433" stroke-opacity=".15"/>'; if (i && i % 2 === 0) h += '<text x="' + p[0] + '" y="' + (p[1] + 14) + '" font-size="9" text-anchor="middle">' + i + '</text><text x="' + (q[0] - 8) + '" y="' + (q[1] + 3) + '" font-size="9" text-anchor="end">' + i + '</text>'; }
+    h += '<line x1="22" x2="418" y1="220" y2="220" stroke="#1d2433" stroke-width="2"/><line x1="220" x2="220" y1="22" y2="418" stroke="#1d2433" stroke-width="2"/><text x="412" y="212" font-size="12" font-weight="800">x</text><text x="228" y="30" font-size="12" font-weight="800">y</text>';
+    [['I', 320, 110], ['II', 110, 110], ['III', 110, 330], ['IV', 320, 330]].forEach(function (qq) { h += '<text x="' + qq[1] + '" y="' + qq[2] + '" font-size="26" font-weight="800" fill="#1d2433" opacity=".12" text-anchor="middle">' + qq[0] + '</text>'; });
+    SPOTS.forEach(function (s) { var p = P(s[3], s[4]); h += '<text x="' + p[0] + '" y="' + (p[1] + 8) + '" font-size="20" text-anchor="middle">' + s[1] + '</text>'; });
+    digs.forEach(function (d) { var p = P(d[0], d[1]); h += '<text x="' + p[0] + '" y="' + (p[1] + 6) + '" font-size="14" text-anchor="middle">✖</text>'; });
+    var s = P(sx, sy); h += '<text x="' + s[0] + '" y="' + (s[1] + 8) + '" font-size="22" text-anchor="middle">⛵</text><rect class="cm-hit" x="11" y="11" width="418" height="418" fill="transparent"/>';
+    svg.innerHTML = h;
+    svg.querySelector('.cm-hit').addEventListener('click', function (ev) { var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var q2 = pt.matrixTransform(svg.getScreenCTM().inverse()); sail(K.clamp(Math.round((q2.x - 220) / 22), -9, 9), K.clamp(Math.round((220 - q2.y) / 22), -9, 9)); });
+    rP.set('(' + sx + ', ' + sy + ')'); rQ.set(quad(sx, sy));
+    legend.innerHTML = '<h3>🗺 Map legend</h3>' + SPOTS.map(function (sp) { return '<div>' + sp[1] + ' ' + sp[2] + '</div>'; }).join('') + '<p class="sn-note">Find each place\'s coordinates by sailing to it.</p>';
+  }
+  sail(0, 0);
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^(at|dig)_(-?\d+)_(-?\d+)$/); if (mm) { sail(+mm[2], +mm[3]); if (mm[1] === 'dig') dig.click(); } var m2 = k.match(/^visit_(\w+)$/); if (m2) { var sp = SPOTS.filter(function (x) { return x[0] === m2[1]; })[0]; sail(sp[3], sp[4]); } } if (c.quad) { var qq = { I: [3, 3], II: [-3, 3], III: [-3, -3], IV: [3, -3] }[c.quad]; sail(qq[0], qq[1]); } } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Elevator Tower: integers as floors above and below ground           */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.elevator = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var LO = -6, HI = 12, floor = 0, target = 0, pos = 0, trips = [], total = 0;
+  var LABEL = { 12: '🌇 Rooftop garden', 8: '🏢 Offices', 4: '🍕 Food court', 1: '🛍 Shops', 0: '🚪 Lobby (ground)', '-1': '🏋 Gym', '-3': '🅿 Parking P3', '-6': '🔧 Boiler room' };
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 320 460', class: 'sn-svg', role: 'img', 'aria-label': 'Tall building with an elevator and basement floors' });
+  var side = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var reads = K.el('<div class="sn-reads"></div>'), rF = K.readout('Floor', '', true), rL = K.readout('Last trip', 'floors'), rT = K.readout('Total distance', 'floors'); [rF, rL, rT].forEach(function (r) { reads.appendChild(r.el); }); side.appendChild(reads);
+  var pad = K.el('<div class="sn-panel"><h3>Elevator buttons</h3><div class="ev-pad" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px"></div></div>'); side.appendChild(pad);
+  var logBox = K.el('<div class="sn-panel"></div>'); side.appendChild(logBox);
+  row.appendChild(svg); row.appendChild(side); M.el.appendChild(row);
+  for (var f = HI; f >= LO; f--) (function (ff) { var b = K.btn(String(ff), function () { call(ff); }, 'sm'); pad.querySelector('.ev-pad').appendChild(b); })(f);
+  var rs = K.btn('↺ Reset trips', function () { trips = []; total = 0; report(); draw(); }, 'ghost sm'); side.appendChild(rs);
+  function call(f) { if (f === floor) return; var d = Math.abs(f - floor); trips.push([floor, f, d]); total += d; target = f; var st = { from: floor, to: f, last: d, total: total, trips: trips.length }; st['trip_' + floor + '_' + f] = d; floor = f; st.floor = f; M.set(st); report(); }
+  function report() { rF.set(floor); rL.set(trips.length ? trips[trips.length - 1][2] : '—'); rT.set(total); logBox.innerHTML = '<h3>Trip log</h3>' + (trips.length ? trips.slice(-5).map(function (t) { return '<div>' + t[0] + ' → ' + t[1] + ': |' + t[1] + ' − ' + (t[0] < 0 ? '(' + t[0] + ')' : t[0]) + '| = ' + t[2] + ' floors</div>'; }).join('') : '<p class="sn-note">No trips yet.</p>'); }
+  function Y(f) { return 30 + (HI - f) * 22; }
+  function draw() {
+    var h = '<rect width="320" height="460" fill="#d0ebff"/><rect y="' + (Y(0) + 11) + '" width="320" height="' + (460 - Y(0) - 11) + '" fill="#8d6e63"/>';
+    for (var f2 = HI; f2 >= LO; f2--) { var y = Y(f2); h += '<rect x="60" y="' + y + '" width="200" height="22" fill="' + (f2 < 0 ? '#a1887f' : '#f8f9fa') + '" stroke="#adb5bd"/><text x="54" y="' + (y + 15) + '" text-anchor="end" font-size="11" font-weight="800">' + f2 + '</text>' + (LABEL[f2] ? '<text x="116" y="' + (y + 15) + '" font-size="10">' + LABEL[f2] + '</text>' : ''); }
+    h += '<rect x="62" y="' + (Y(pos) + 1) + '" width="46" height="20" rx="3" fill="#fcc419" stroke="#e67700" stroke-width="2"/><text x="85" y="' + (Y(pos) + 15) + '" text-anchor="middle" font-size="10" font-weight="800">🛗</text>';
+    h += '<text x="300" y="' + (Y(0) + 26) + '" text-anchor="end" font-size="11" fill="#fff" font-weight="800">GROUND LEVEL (0)</text>';
+    svg.innerHTML = h;
+  }
+  M.loop(function (dt) { if (Math.abs(pos - target) < 0.01) { if (pos !== target) { pos = target; draw(); } return; } pos += Math.sign(target - pos) * Math.min(Math.abs(target - pos), dt * 8); draw(); });
+  M.set({ floor: 0, total: 0, trips: 0 }); report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^trip_(-?\d+)_(-?\d+)$/); if (mm) { if (floor !== +mm[1]) call(+mm[1]); call(+mm[2]); } } if (c.floor != null) { var f = c.floor.eq != null ? c.floor.eq : c.floor.lte != null ? c.floor.lte : c.floor; call(f); } if (c.trips) { call(5); call(-3); call(8); } pos = floor; draw(); } };
+};
