@@ -585,6 +585,7 @@ function SunnySim() {
               if (c.given) return;
               var want = typeof c.value === 'function' ? c.value(M.state, r) : r.values ? r.values[ci] : M.state[c.key], got = ((vals[ri] || {})[ci] || '').trim();
               if (typeof want === 'number') { var g = parseNum(got); if (isNaN(g) || Math.abs(g - want) > (c.tol == null ? 0.051 : c.tol)) bad.push(c.label); }
+              else if (typeof c.accept === 'function') { if (!got || !c.accept(got, r)) bad.push(c.label); }
               else if (norm(got) !== norm(want) && !(c.accept && c.accept.some(function (a) { return norm(a) === norm(got); }))) bad.push(c.label);
             });
             if (!bad.length) { okRows[ri] = true; S.answers[st.key] = okRows; save(); fb.innerHTML = fbBox(true, 'Row recorded. Copy it onto your lab sheet.'); paint(); if (Object.keys(okRows).length === q.rows.length) afterRight(st, fb, q.yes || 'Data table complete!'); }
