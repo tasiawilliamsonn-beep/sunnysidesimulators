@@ -115,7 +115,7 @@
     return '';
   }
   var GAME_INFO = {
-    locks: ['Padlock escape', 'Each lock on the board opens and shows its code digit when students clear it.'],
+    locks: ['Padlock escape', 'Each padlock on the screen opens and shows its code digit when students clear it.'],
     boss: ['Boss battle', 'Every correct answer damages the boss\'s health bar. Wrong answers cost a heart; losing all hearts triggers a "Regroup" with an automatic hint, so there is no dead end.'],
     board: ['Board-game route', 'Students move a game piece along a winding route and collect passport stamps at each stop.'],
     'case': ['Cork-board case file', 'Solved evidence files are stamped SOLVED and pinned with red string to the verdict card.'],
@@ -169,7 +169,7 @@
     var X = lessonOf(r);
     var html = '<section class="sec" id="s-lesson"><h2><span class="step">2</span>Mini-lesson <span class="when">0:08–0:20 · 12 min</span></h2>' +
       '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
-      '<div class="callout"><b>Hook (1 min):</b> ' + esc(r.hook || L.hook) + '</div>' +
+      (X && X.hook ? '<div class="callout"><b>Hook (1 min), shown on the slide:</b> ' + esc(X.hook.q) + ' <span class="lede">Class vote: ' + esc(X.hook.options.join(' / ')) + '</span></div>' : '') +
       '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>';
     if (X) html += '<div class="steps">' + X.steps.map(function (st, i) {
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LETTERS[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
@@ -179,7 +179,7 @@
         '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
     }).join('') + '</div>';
     else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
-    html += '<h3>I do: model it</h3><p>' + esc(L.model) + '</p>' +
+    html += '<h3>I do: worked example</h3>' + (X && X.model ? '<ol>' + X.model.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' : '') + '<p class="lede">What to say for every slide is in the <button class="linkbtn" data-do="script">presenter script PDF</button>.</p>' +
       (X && X.wedo ? '<h3>We do: guided practice</h3><p><b>' + esc(X.wedo.q) + '</b></p><ol>' + X.wedo.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol><p><span class="ans">Answer: ' + esc(X.wedo.a) + '</span></p>' : '') +
       (X && X.youdo ? '<h3>You do: independent check</h3><p>' + esc(X.youdo.q) + ' <span class="ans">' + esc(X.youdo.choices ? LETTERS[X.youdo.answer] + ') ' + X.youdo.choices[X.youdo.answer] : X.youdo.answer[0]) + '</span></p><p class="lede">Students who miss it get a 3-minute reteach, then start the room at the Explorer level.</p>' : '') +
       '<div class="callout warn"><h3 style="margin:0">Watch for these misconceptions</h3><ul>' + L.misconceptions.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></section>';
