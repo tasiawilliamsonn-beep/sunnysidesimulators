@@ -422,3 +422,166 @@ SUNNY_SIMS.push({
       { label: 'Reasoning', starter: 'This shows that', min: 10, need: [{ words: ['far', 'distance', 'away'], label: 'Connects distance to how bright it looks' }, { words: ['rigel', 'sirius', 'other stars', 'stars'], label: 'Compares to other stars' }] }] } }
   ]
 });
+
+/* ======================= 5.LS: Ecosystems ======================= */
+SUNNY_SIMS.push({
+  id: 'g5-sci-food-web', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.1–5.LS.3',
+  title: 'Food Web Builder', model: 'foodWeb', minutes: 25, icon: '🕸️',
+  place: 'Sunnyside Nature Preserve · Meadow Station',
+  mission: 'The nature preserve needs a food web poster for visitors. Draw the energy arrows between the meadow organisms, label their roles, and trace where the hawk\'s energy really comes from.',
+  question: 'How does energy flow through a food web?',
+  takeaway: 'Energy starts with the Sun. Producers (plants) capture it to make food, consumers get energy by eating other organisms, and decomposers get energy by breaking down dead things. Arrows in a food web point from the food to the eater: the direction energy moves.',
+  vocab: [['Producer', 'Makes its own food using sunlight (plants, algae).'], ['Consumer', 'Gets energy by eating other organisms.'], ['Decomposer', 'Breaks down dead plants and animals (fungi, bacteria, worms).'], ['Food chain', 'One path of energy from the Sun through organisms.'], ['Food web', 'Many food chains connected together.']],
+  warmup: { style: 'Which one doesn\'t belong?', prompt: 'Circle the odd one out and explain.', items: [['Grass · oak tree · rabbit · algae', 'Rabbit: it is a consumer; the rest are producers.'], ['Mushroom · worm · bacteria · hawk', 'Hawk: the others are decomposers.'], ['An arrow from grass → rabbit means...', 'Energy moves from the grass to the rabbit (the rabbit eats grass).']] },
+  steps: [
+    { tag: 'explore', title: 'Your first arrow', text: 'Arrows point from the food TO the eater, showing where the energy goes.', goal: { text: 'Draw the arrow **Sun → Grass**.', check: { a_sun_grass: true } } },
+    { tag: 'test', title: 'Build a food chain', sheet: 1, goal: { text: 'Draw a chain from the **Sun** to the **Hawk** that is at least 5 arrows long.', check: { chainToHawk: { gte: 5 } }, hint: 'Try Sun → Grass → Grasshopper → Frog → Snake → Hawk.' },
+      q: { type: 'order', q: 'Put your food chain in order, from where the energy starts.', items: ['Sun', 'Grass', 'Grasshopper', 'Frog', 'Snake', 'Hawk'] } },
+    { tag: 'test', title: 'Grow the web', sheet: 2, goal: { text: 'Draw at least **12 correct arrows** in total.', check: { good: { gte: 12 } } },
+      q: { type: 'mc', q: 'The mouse has arrows going to the snake, the fox, AND the hawk. What does that tell you?', choices: ['Three different predators get energy from mice', 'The mouse eats all three', 'The mouse is a producer'], answer: 0 } },
+    { tag: 'sort', title: 'Label the roles', sheet: 3, goal: { text: 'Switch to **Label roles** and label every organism correctly.', check: function (s) { return s.rolesRight === s.rolesTotal; } },
+      q: { type: 'mc', q: 'Why is the mushroom a decomposer and not a consumer like the fox?', choices: ['It gets energy by breaking down dead organisms', 'It is not alive', 'It makes food from sunlight', 'It is eaten by animals'], answer: 0 } },
+    { tag: 'reason', title: 'Energy detective', sheet: 4, q: { type: 'mc', q: 'The hawk never eats grass. Where did the hawk\'s energy ORIGINALLY come from?', choices: ['The Sun, through producers and other animals', 'The snake only', 'The soil', 'The hawk makes its own energy'], answer: 0, why: 'Every chain starts with the Sun. Grass captured the Sun\'s energy; it moved from animal to animal until it reached the hawk.' } },
+    { tag: 'predict', title: 'What if...?', sheet: 5, q: { type: 'predict', q: 'A disease wipes out all the grasshoppers. What will happen to the frogs?', choices: ['Frogs will decrease: they lose a food source', 'Frogs will increase', 'Nothing will change'] } },
+    { tag: 'reason', title: 'Ripple effects', sheet: 5, q: { type: 'multi', q: 'Use your web. If grasshoppers disappeared, which could happen? Choose all that make sense.', choices: ['Frogs decrease because they lose food', 'Snakes may eat more mice instead', 'Grass may grow more because fewer grasshoppers eat it', 'The Sun gets dimmer'], answer: [0, 1, 2] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: missing decomposers', sheet: 6, q: { type: 'text', q: 'What would happen to the meadow if all decomposers disappeared? Explain the effect on the plants.', min: 12, need: [{ words: ['dead', 'pile', 'build up'], label: 'Dead things would pile up' }, { words: ['nutrient', 'soil', 'matter'], label: 'Nutrients would not return to the soil' }, { words: ['plant', 'grass', 'grow'], label: 'Explains the effect on plants' }] } },
+    { tag: 'write', title: 'Poster caption (CER)', sheet: 7, q: { type: 'write', q: 'How does energy flow through the meadow food web?', parts: [
+      { label: 'Claim', starter: 'Energy flows from', min: 6, need: [{ words: ['sun'], label: 'Starts with the Sun' }] },
+      { label: 'Evidence', starter: 'For example,', min: 12, need: [{ words: ['grass', 'clover', 'producer'], label: 'Names a producer' }, { words: ['rabbit', 'mouse', 'frog', 'snake', 'hawk', 'fox', 'grasshopper'], label: 'Names consumers from your web' }] },
+      { label: 'Reasoning', starter: 'The arrows show', min: 10, need: [{ words: ['eat', 'eaten', 'food'], label: 'Explains arrows show who eats whom' }, { words: ['decompos', 'mushroom'], label: 'Includes decomposers' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-meadow-populations', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.3',
+  title: 'Meadow Population Simulator', model: 'ecoPop', minutes: 25, icon: '🐇',
+  place: 'Sunnyside Nature Preserve · Wildlife Office',
+  mission: 'Farmers near the preserve want to remove the foxes because foxes sometimes take chickens. Before they decide, run the meadow forward in time and predict what would happen to the rabbits and the grass.',
+  question: 'How does a change to one population affect the rest of the ecosystem?',
+  takeaway: 'Populations in a food web depend on each other. Removing foxes lets rabbits boom, then the rabbits eat too much grass and crash. A drought reduces the grass, so rabbits and then foxes decline. Every change ripples through the web.',
+  vocab: [['Population', 'All the organisms of one kind living in an area.'], ['Predator', 'An animal that hunts other animals for food.'], ['Prey', 'An animal that is hunted and eaten.'], ['Balance', 'When populations stay fairly steady over time.'], ['Drought', 'A long time with little rain.']],
+  warmup: { style: 'Predict the graph', prompt: 'Sketch a quick line to show what you think will happen, then explain.', items: [['A garden has lots of aphids and ladybugs eat aphids. Draw the ladybug population if the aphids disappear.', 'Ladybugs decrease: they lose their food.'], ['A lake stops getting sunlight for algae. What happens to fish that eat the algae?', 'Fish decrease.'], ['Is it always good to remove a predator?', 'No. The prey can overpopulate and harm the ecosystem.']] },
+  steps: [
+    { tag: 'explore', title: 'Run the healthy meadow', goal: { text: 'Press **Run time** and let the meadow run for at least 24 months.', check: { month: { gte: 24 } } },
+      q: { type: 'mc', q: 'In the healthy meadow, what do the three populations do over time?', choices: ['They stay fairly steady (balanced)', 'Rabbits grow forever', 'Everything dies out', 'Foxes take over'], answer: 0 } },
+    { tag: 'predict', title: 'The farmers\' plan', sheet: 1, q: { type: 'predict', q: 'If all the foxes are removed, what will happen to the RABBITS over the next few years?', choices: ['Rabbits will increase and stay high forever', 'Rabbits will increase, then crash', 'Rabbits will decrease right away'] } },
+    { tag: 'test', title: 'Remove the foxes', sheet: 1, text: 'Press ↺ New meadow, run 12 months, then remove all foxes and keep running.', goal: { text: 'Remove the foxes and run at least **30 more months**.', check: { foxesRemoved: true, sinceRemove: { gte: 30 } } },
+      q: { type: 'num', q: 'What was the HIGHEST number of rabbits after the foxes were removed?', unit: 'rabbits', answer: function (s) { return s.peakAfterRemove; }, tol: 6, hint: 'Look at the gray line on the graph, or watch the Rabbits readout.' } },
+    { tag: 'observe', title: 'What happened to the grass?', sheet: 2, q: { type: 'mc', q: 'When the rabbits boomed, what happened to the grass, and then to the rabbits?', choices: ['Grass was eaten down, so rabbits ran out of food and crashed', 'Grass grew more, so rabbits kept growing', 'Grass stayed the same'], answer: 0, why: 'Without predators, too many rabbits ate the grass faster than it could grow. With little food left, many rabbits starved.' } },
+    { tag: 'record', title: 'Record the data', sheet: 2, q: { type: 'table', q: 'Record the populations at these moments (read the readouts).', rowHead: 'Moment', cols: [{ label: 'Rabbits', value: function (s, r) { return s['rab_' + r.k]; }, tol: 1.1 }],
+      rows: [{ label: 'The month you removed foxes', k: 'rm', when: function (s) { if (s.foxesRemoved && s.rab_rm == null) s.rab_rm = s.rabbitsAtRemove; return s.foxesRemoved; } }, { label: 'The highest rabbit number', k: 'pk', when: function (s) { if (s.foxesRemoved) s.rab_pk = s.peakAfterRemove; return s.foxesRemoved; } }] } },
+    { tag: 'test', title: 'A drought', sheet: 3, text: 'Start a new meadow, run 12 months, then start a drought.', goal: { text: 'Run a drought for at least **24 months** (keep the foxes).', check: { drought: true, sinceDrought: { gte: 24 } } },
+      q: { type: 'mc', q: 'During the drought, what happened to the foxes, and why?', choices: ['They decreased, because less grass meant fewer rabbits to eat', 'They increased because it was sunny', 'Nothing, foxes don\'t eat grass'], answer: 0, fb: [null, 'Check the orange line.', 'Foxes don\'t eat grass, but their food (rabbits) does. The change rippled up the web.'] } },
+    { tag: 'reason', title: 'Cause and effect chain', sheet: 4, q: { type: 'order', q: 'Put the drought\'s chain of effects in order.', items: ['Less rain falls', 'Less grass grows', 'Rabbits have less food and decrease', 'Foxes have fewer rabbits to eat and decrease'] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: bring them back', sheet: 5, goal: { text: 'Remove the foxes, wait for the rabbit boom, then add foxes back.', check: { foxesRemoved: true, foxesAdded: true, sinceAdd: { gte: 12 } } }, q: { type: 'mc', q: 'After foxes returned, what happened to the rabbits and grass?', choices: ['Rabbits were controlled and the grass recovered', 'The rabbits disappeared forever', 'The grass died out'], answer: 0 } },
+    { tag: 'write', title: 'Advice to the farmers (CER)', sheet: 6, q: { type: 'write', q: 'Should the farmers remove the foxes? Use your data.', parts: [
+      { label: 'Claim', starter: 'The farmers should not', min: 6, need: [{ words: ['not', 'no', 'should not', "shouldn't"], label: 'Makes a clear claim' }] },
+      { label: 'Evidence', starter: 'When I removed the foxes, the rabbits', min: 14, number: true, need: [{ words: ['rabbit'], label: 'Uses the rabbit data' }, { words: ['grass'], label: 'Uses the grass data' }] },
+      { label: 'Reasoning', starter: 'This happens because', min: 12, need: [{ words: ['predator', 'fox', 'eat'], label: 'Explains the fox-rabbit relationship' }, { words: ['food', 'grass', 'starve', 'crash'], label: 'Explains why rabbits crashed' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-decomposer-lab', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  title: 'Decomposer Garden Lab', model: 'decompLab', minutes: 25, icon: '🍄',
+  place: 'Sunnyside School Garden · Compost Corner',
+  mission: 'The school garden wants to know if compost is worth it. Compare two sealed garden boxes of fallen leaves: one with decomposers and one without. Then plant seeds and see which soil grows better beans.',
+  question: 'How do decomposers help matter cycle back to plants?',
+  takeaway: 'Decomposers (worms, fungi, bacteria) break down dead plants and animals. This returns nutrients to the soil, which plants use to grow. Without decomposers, dead material piles up and nutrients stay locked away. Matter cycles; it isn\'t used up.',
+  vocab: [['Decomposer', 'An organism that breaks down dead material.'], ['Nutrients', 'Materials in the soil that plants need to grow.'], ['Compost', 'Decomposed plant material used to enrich soil.'], ['Matter cycle', 'Matter moving from living things back to the soil and air, over and over.'], ['Control', 'The part of an experiment you leave unchanged to compare against.']],
+  warmup: { style: 'Estimation station', prompt: 'Estimate, then explain.', items: [['How long does it take a banana peel to decompose in a compost pile: 2 days, 2 weeks, or 2 years?', 'About 2 weeks to a month.'], ['What happens to leaves that fall in the forest every year?', 'Decomposers break them down into soil.'], ['Why don\'t forests fill up with dead leaves?', 'Decomposers break them down.']] },
+  steps: [
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'After 10 weeks, which box will have fewer leaves left?', choices: ['Box A (with decomposers)', 'Box B (no decomposers)', 'Both the same'] } },
+    { tag: 'test', title: 'Let time pass', sheet: 1, goal: { text: 'Run the boxes for at least **10 weeks**.', check: { weeks: { gte: 10 } } },
+      q: { type: 'num', q: 'What percent of leaves is left in Box A?', unit: '%', answer: function (s) { return s.leafA; }, tol: 1 } },
+    { tag: 'observe', title: 'Where did the leaves go?', sheet: 2, q: { type: 'mc', q: 'The leaves in Box A disappeared, but the box is sealed. Where did the matter go?', choices: ['Decomposers broke it down into soil nutrients', 'It vanished', 'The worms took it out of the box', 'It turned into sunlight'], answer: 0 } },
+    { tag: 'test', title: 'Test one decomposer', sheet: 3, text: 'Press ↺ Reset. Turn OFF worms and fungi so only bacteria are left.', goal: { text: 'Run Box A with **only 1 kind** of decomposer for 10 weeks.', check: { decA: 1, weeks: { gte: 10 } } },
+      q: { type: 'mc', q: 'Compared to all three decomposers, what happened with only bacteria?', choices: ['Leaves broke down more slowly', 'Leaves broke down faster', 'Nothing broke down at all'], answer: 0 } },
+    { tag: 'reason', title: 'Why use a control?', sheet: 3, q: { type: 'mc', q: 'Why does the experiment include Box B with NO decomposers?', choices: ['To compare and prove the decomposers caused the change', 'Because we ran out of worms', 'To make the test faster'], answer: 0 } },
+    { tag: 'test', title: 'Plant the seeds', sheet: 4, text: 'Reset, turn all decomposers ON, run 10 weeks, then plant beans.', goal: { text: 'Plant seeds and let them grow for at least **8 weeks**.', check: { planted: true, grownWeeks: { gte: 8 } } },
+      q: { type: 'table', q: 'Record the bean plant heights.', rowHead: 'Box', cols: [{ label: 'Plant height', unit: 'cm', value: function (s, r) { return s[r.k]; }, tol: 0.15 }], rows: [{ label: 'Box A (decomposers)', k: 'plantA' }, { label: 'Box B (none)', k: 'plantB' }] } },
+    { tag: 'reason', title: 'Connect it', sheet: 5, q: { type: 'order', q: 'Put the matter cycle in order.', items: ['A plant grows using nutrients from the soil', 'The plant dies and falls to the ground', 'Decomposers break it down', 'Nutrients return to the soil', 'A new plant uses those nutrients'] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: garden advice', sheet: 6, q: { type: 'mc', q: 'A gardener throws away all leaves and grass clippings every week. What is the best science-based advice?', choices: ['Compost them so decomposers return nutrients to the garden soil', 'Burn them to make the soil hotter', 'Leave them on the sidewalk'], answer: 0 } },
+    { tag: 'write', title: 'Is compost worth it? (CER)', sheet: 7, q: { type: 'write', q: 'How do decomposers help plants grow?', parts: [
+      { label: 'Claim', starter: 'Decomposers help plants grow by', min: 6, need: [{ words: ['nutrient', 'soil', 'break'], label: 'States how they help' }] },
+      { label: 'Evidence', starter: 'In Box A,', min: 12, number: true, need: [{ words: ['leaves', 'leaf'], label: 'Uses the leaf data' }, { words: ['plant', 'bean', 'cm'], label: 'Uses the plant height data' }] },
+      { label: 'Reasoning', starter: 'This happens because', min: 12, need: [{ words: ['break down', 'broke', 'decompos'], label: 'Explains breaking down' }, { words: ['cycle', 'return', 'back'], label: 'Explains matter returning/cycling' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-plant-chamber', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.1',
+  title: 'Plant Growth Chamber', model: 'plantLab', minutes: 25, icon: '🌱',
+  place: 'Sunnyside Greenhouse',
+  mission: 'Most people think plants "eat" soil. The greenhouse manager doesn\'t believe it. Grow plants in a sealed chamber, weigh the plant and the soil, and find out where a plant\'s mass really comes from.',
+  question: 'Where does a plant get the matter it needs to grow?',
+  takeaway: 'Plants get most of their mass from air (carbon dioxide) and water, using energy from sunlight. The soil barely loses any mass. Soil provides small amounts of nutrients, but it is not the plant\'s main food.',
+  vocab: [['Photosynthesis', 'How plants use light, water, and carbon dioxide to make food (sugar).'], ['Carbon dioxide (CO₂)', 'A gas in the air that plants take in.'], ['Mass', 'The amount of matter, in grams.'], ['Variable', 'The one thing you change in a fair test.']],
+  warmup: { style: 'Two truths and a lie', prompt: 'Find the lie and fix it.', items: [['A. Plants need sunlight. B. Plants take in carbon dioxide. C. Plants eat soil to grow.', 'C is the lie: most mass comes from air and water.'], ['A. A huge tree started as a tiny seed. B. Its mass came from somewhere. C. It grew by magic.', 'C is the lie: its matter came from air and water.'], ['A. Water is matter. B. Air is matter. C. Air has no mass.', 'C is the lie: air has mass.']] },
+  steps: [
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'A 5 g seedling grows for 30 days. Where will MOST of its new mass come from?', choices: ['The soil', 'Air and water', 'Sunlight'] } },
+    { tag: 'test', title: 'Normal growing', sheet: 1, goal: { text: 'Grow a plant 30 days with light, water, AND air all ON.', check: { trial_LWA: { gte: 1 } } },
+      q: { type: 'table', q: 'Record the results.', rowHead: 'Measurement', cols: [{ label: 'Value', unit: 'g', value: function (s, r) { return s[r.k]; }, tol: 0.15 }], rows: [{ label: 'Plant mass gained', k: 'gain' }, { label: 'Soil mass lost', k: 'soilLoss' }, { label: 'Water taken in', k: 'used' }] } },
+    { tag: 'reason', title: 'Compare', sheet: 2, q: { type: 'mc', q: 'The plant gained about 60 g, but the soil lost less than 1 g. What does this show?', choices: ['The plant\'s mass did NOT come mostly from the soil', 'The soil gave the plant 60 g', 'The scale is broken'], answer: 0 } },
+    { tag: 'test', title: 'Remove the air', sheet: 3, goal: { text: 'Turn OFF **Air with carbon dioxide** and grow for 30 days.', check: { trial_LW: { gte: 0.1 } } },
+      q: { type: 'mc', q: 'Without carbon dioxide, did the plant gain mass?', choices: ['No: the plant needs CO₂ from the air to build mass', 'Yes, just as much', 'Yes, even more'], answer: 0 } },
+    { tag: 'test', title: 'Remove the water', sheet: 3, goal: { text: 'Turn air back ON, turn **Water** OFF, and grow for 30 days.', check: { trial_LA: { gte: 0.1 } } },
+      q: { type: 'mc', q: 'What happened without water?', choices: ['The plant wilted and lost mass', 'It grew normally', 'It grew faster'], answer: 0 } },
+    { tag: 'test', title: 'Remove the light', sheet: 4, goal: { text: 'Turn water ON, turn **Light** OFF, and grow for 30 days.', check: { trial_WA: { gte: 0.1 } } },
+      q: { type: 'mc', q: 'Why couldn\'t the plant grow in the dark, even with air and water?', choices: ['Plants need light energy to turn air and water into food', 'Light is what the plant eats', 'The dark made the soil cold'], answer: 0 } },
+    { tag: 'reason', title: 'Sort the ingredients', sheet: 4, q: { type: 'sort', q: 'Sort each item.', bins: ['Matter the plant builds with', 'Energy source', 'Only tiny amounts needed'], items: [['Carbon dioxide from air', 0], ['Water', 0], ['Sunlight', 1], ['Soil minerals', 2]] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: the giant tree', sheet: 5, q: { type: 'text', q: 'A 1,000 kg tree grew from a tiny seed. Explain where its mass came from.', min: 14, need: [{ words: ['air', 'carbon dioxide', 'co2'], label: 'Names air / carbon dioxide' }, { words: ['water'], label: 'Names water' }, { words: ['light', 'sun'], label: 'Mentions the energy from light' }] } },
+    { tag: 'write', title: 'Report to the greenhouse (CER)', sheet: 6, q: { type: 'write', q: 'Where does a plant get the matter it needs to grow?', parts: [
+      { label: 'Claim', starter: 'Plants get most of their matter from', min: 6, need: [{ words: ['air', 'carbon dioxide'], label: 'Names air' }, { words: ['water'], label: 'Names water' }] },
+      { label: 'Evidence', starter: 'In my test, the plant gained', min: 12, number: true, need: [{ words: ['soil'], label: 'Compares with the soil data' }] },
+      { label: 'Reasoning', starter: 'This shows that', min: 10, need: [{ words: ['light', 'sun', 'energy'], label: 'Explains the role of light' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-energy-pyramid', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  title: 'Energy Pyramid Lab', model: 'energyPyramid', minutes: 20, icon: '🔺',
+  place: 'Sunnyside Nature Preserve · Energy Lab',
+  mission: 'The preserve has lots of grass but only two hawks. Pass energy up the food chain level by level and discover why there are so few top predators.',
+  question: 'Why are there fewer organisms at the top of a food chain?',
+  takeaway: 'At each level, organisms use most of the energy they get (about 90%) to move, grow, and stay warm; it is lost as heat. Only about 10% is passed to the next level, so there is much less energy at the top, which can only support a few predators.',
+  vocab: [['Energy pyramid', 'A model showing how much energy is at each level of a food chain.'], ['Trophic level', 'A feeding level (producer, primary consumer, ...).'], ['10% rule', 'About one-tenth of energy passes to the next level.'], ['Heat', 'Energy released as organisms live and move.']],
+  warmup: { style: 'Estimation station', prompt: 'Estimate and explain your thinking.', items: [['A field has 1,000 grasshoppers. About how many frogs could it support: 1,000, 100, or 5,000?', 'About 100: much less energy moves up.'], ['Why can\'t a hawk live on just one mouse a year?', 'It uses lots of energy to fly, hunt, and stay warm.'], ['Are there more lions or zebras on the savanna?', 'More zebras.']] },
+  steps: [
+    { tag: 'explore', title: 'Pass energy up', goal: { text: 'Pass energy up to the **frogs** (level 3).', check: { reached: { gte: 2 } } },
+      q: { type: 'num', q: 'The grass captured 10,000 units. How many units reached the frogs?', unit: 'units', answer: 100 } },
+    { tag: 'observe', title: 'Where did it go?', sheet: 1, q: { type: 'mc', q: 'Where did most of the grasshoppers\' energy go?', choices: ['Used for moving, growing, and living, then lost as heat', 'Destroyed', 'Stored in the soil', 'Sent back to the Sun'], answer: 0 } },
+    { tag: 'record', title: 'Energy table', sheet: 2, goal: { text: 'Pass energy all the way to the **hawks**.', check: { reached: 4, pct: 10, start: 10000 } },
+      q: { type: 'table', q: 'Record the energy at each level (10%, 10,000 start).', rowHead: 'Level', cols: [{ label: 'Energy', unit: 'units', value: function (s, r) { return s['e' + r.i]; }, tol: 0.06 }], rows: [{ label: 'Grass', i: 0 }, { label: 'Grasshoppers', i: 1 }, { label: 'Frogs', i: 2 }, { label: 'Snakes', i: 3 }, { label: 'Hawks', i: 4 }] } },
+    { tag: 'reason', title: 'The pattern', sheet: 3, q: { type: 'mc', q: 'Each level has what fraction of the energy of the level below?', choices: ['1/10', '1/2', 'The same', '10 times more'], answer: 0 } },
+    { tag: 'reason', title: 'Why so few hawks?', sheet: 3, q: { type: 'mc', q: 'Why does the preserve have lots of grass but only two hawks?', choices: ['There is very little energy left by the top of the chain', 'Hawks don\'t like grass', 'Hawks eat the grass', 'Hawks are faster'], answer: 0 } },
+    { tag: 'test', title: 'More sunlight', sheet: 4, goal: { text: 'Change the grass energy to **20,000** and pass energy to the hawks.', check: { start: 20000, reached: 4 } },
+      q: { type: 'num', q: 'How much energy reaches the hawks now?', unit: 'units', answer: 2, tol: 0.01 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: shorter chain', sheet: 5, q: { type: 'mc', q: 'Why do people say eating plants uses energy more efficiently than eating meat?', choices: ['Eating lower on the chain loses fewer steps of energy', 'Plants have no energy', 'Meat has more energy than the Sun'], answer: 0 } },
+    { tag: 'explain', title: 'Explain it', sheet: 6, q: { type: 'text', q: 'Explain why there are fewer organisms at the top of a food chain. Use a number from your table.', number: true, rows: 3, need: [{ words: ['energy'], label: 'Talks about energy' }, { words: ['10', 'tenth', 'less'], label: 'Uses the 10% idea' }, { words: ['heat', 'used', 'lost', 'living', 'move'], label: 'Explains where energy is lost' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-trail-cam', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  title: 'Trail Camera Detective', model: 'ecoCam', minutes: 20, icon: '📹',
+  place: 'Sunnyside Nature Preserve · Trail Camera Network',
+  mission: 'The preserve\'s trail cameras recorded eight clips overnight. Watch each clip, look for evidence of how each organism gets its energy, and tag its role for the wildlife database.',
+  question: 'How can we classify organisms by how they get energy?',
+  takeaway: 'Producers make their own food from sunlight. Consumers eat other organisms: herbivores eat plants, carnivores eat animals, omnivores eat both. Decomposers get energy by breaking down dead matter. What an organism eats is the evidence for its role.',
+  vocab: [['Herbivore', 'A consumer that eats only plants.'], ['Carnivore', 'A consumer that eats only animals.'], ['Omnivore', 'A consumer that eats plants and animals.'], ['Evidence', 'What you observe that supports your answer.']],
+  warmup: { style: 'Quick sort', prompt: 'Sort into Producer, Consumer, or Decomposer.', items: [['Sunflower, bear, earthworm', 'Producer, consumer, decomposer.'], ['What do you eat? What does that make you?', 'Plants and animals: an omnivore (consumer).'], ['Can a producer be a consumer too?', 'Usually no; producers make their own food.']] },
+  steps: [
+    { tag: 'explore', title: 'Watch the footage', goal: { text: 'Watch all 8 clips (use Next clip).', check: { watchedCount: 8 } } },
+    { tag: 'test', title: 'Tag the clips', sheet: 1, goal: { text: 'Tag every organism correctly.', check: { right: 8 } },
+      q: { type: 'table', q: 'Copy your database into the lab sheet: type the role you tagged.', rowHead: 'Organism', cols: [{ label: 'Role', value: function (s, r) { return r.role; } }], rows: [{ label: 'Oak tree', role: 'producer' }, { label: 'Raccoon', role: 'omnivore' }, { label: 'Mushroom', role: 'decomposer' }, { label: 'Owl', role: 'carnivore' }] } },
+    { tag: 'reason', title: 'Evidence', sheet: 2, q: { type: 'mc', q: 'What evidence shows the raccoon is an omnivore?', choices: ['It ate berries AND a crayfish', 'It is active at night', 'It lives near a creek', 'It is furry'], answer: 0 } },
+    { tag: 'reason', title: 'Tricky one', sheet: 2, q: { type: 'mc', q: 'Pond algae are not plants, but we tagged them as producers. Why?', choices: ['They make their own food using sunlight', 'They are green', 'They live in water', 'They are eaten by fish'], answer: 0 } },
+    { tag: 'reason', title: 'Two kinds of "eating"', sheet: 3, q: { type: 'mc', q: 'How is a mushroom different from a deer, even though both get energy from other living things?', choices: ['Mushrooms break down DEAD things; deer eat living plants', 'Mushrooms hunt', 'There is no difference'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: build a chain from the clips', sheet: 4, q: { type: 'order', q: 'Order a food chain using organisms from the clips.', items: ['Sun', 'Clover (producer)', 'Deer (herbivore)', 'Mushroom (breaks it down after it dies)'] } },
+    { tag: 'write', title: 'Database note (CER)', sheet: 5, q: { type: 'write', q: 'Pick one organism from the clips and explain its role.', parts: [
+      { label: 'Claim', starter: 'The', min: 6, need: [{ words: ['producer', 'herbivore', 'carnivore', 'omnivore', 'decomposer', 'consumer'], label: 'Names a role' }] },
+      { label: 'Evidence', starter: 'In the clip,', min: 10, need: [{ words: ['ate', 'eats', 'eating', 'caught', 'grow', 'sunlight', 'break'], label: 'Describes what it did in the clip' }] },
+      { label: 'Reasoning', starter: 'This shows it gets energy by', min: 8, need: [{ words: ['energy'], label: 'Explains how it gets energy' }] }] } }
+  ]
+});

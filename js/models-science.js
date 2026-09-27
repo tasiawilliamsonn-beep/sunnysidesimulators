@@ -790,3 +790,274 @@ SUNNY_MODELS.starBright = function (M) {
   M.set({ mode: mode }); draw();
   return { auto: function (st) { var c = st.goal.check || {}; if (c.mode) { mode = c.mode; mS.set(mode); } if (c.dB) { dB = c.dB.eq || c.dB; dS.set(dB, true); } if (c.pB) { pB = c.pB.eq || c.pB; pS.set(String(pB)); } if (c.equalFar) { pB = 4; dB = 2; pS.set('4'); dS.set(2, true); } for (var k in c) { var mm = k.match(/^m_(\d+)_([\d.]+)$/); if (mm) { pB = +mm[1]; dB = +mm[2]; draw(); } } draw(); for (var k2 in c) if (/^star_/.test(k2)) { var o = {}; o[k2] = true; M.set(o); } } };
 };
+
+/* ------------------------------------------------------------------ */
+/* Food Web Builder: draw energy arrows, label roles                   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.foodWeb = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var ORG = cfg.organisms || [
+    { id: 'sun', name: 'Sun', icon: '☀️', x: 60, y: 60, role: 'energy' }, { id: 'grass', name: 'Grass', icon: '🌾', x: 150, y: 290, role: 'producer' }, { id: 'clover', name: 'Clover', icon: '🍀', x: 300, y: 300, role: 'producer' },
+    { id: 'grasshopper', name: 'Grasshopper', icon: '🦗', x: 120, y: 190, role: 'consumer' }, { id: 'rabbit', name: 'Rabbit', icon: '🐇', x: 300, y: 200, role: 'consumer' }, { id: 'mouse', name: 'Mouse', icon: '🐁', x: 450, y: 240, role: 'consumer' },
+    { id: 'frog', name: 'Frog', icon: '🐸', x: 120, y: 100, role: 'consumer' }, { id: 'snake', name: 'Snake', icon: '🐍', x: 380, y: 110, role: 'consumer' }, { id: 'fox', name: 'Fox', icon: '🦊', x: 250, y: 90, role: 'consumer' }, { id: 'hawk', name: 'Hawk', icon: '🦅', x: 480, y: 50, role: 'consumer' },
+    { id: 'mushroom', name: 'Mushroom', icon: '🍄', x: 520, y: 320, role: 'decomposer' }
+  ];
+  var OK = cfg.links || ['sun>grass', 'sun>clover', 'grass>grasshopper', 'grass>rabbit', 'clover>rabbit', 'grass>mouse', 'clover>mouse', 'grasshopper>frog', 'grasshopper>mouse', 'frog>snake', 'mouse>snake', 'rabbit>fox', 'mouse>fox', 'mouse>hawk', 'snake>hawk', 'rabbit>hawk', 'frog>hawk', 'grass>mushroom', 'rabbit>mushroom', 'fox>mushroom', 'hawk>mushroom', 'clover>mushroom', 'mouse>mushroom', 'snake>mushroom', 'frog>mushroom', 'grasshopper>mushroom'];
+  var arrows = [], from = null, roles = {}, mode = 'arrow', roleSel = 'producer';
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 600 380', class: 'sn-svg', role: 'img', 'aria-label': 'Meadow food web board' });
+  M.el.appendChild(svg);
+  var msg = K.el('<div class="sn-panel" aria-live="polite"><b>Draw arrows:</b> tap the organism that is EATEN, then tap the one that EATS it. Arrows show where energy goes.</div>'); M.el.appendChild(msg);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var mS = K.seg([['arrow', '➜ Draw energy arrows'], ['role', '🏷 Label roles']], mode, function (v) { mode = v; from = null; draw(); msg.innerHTML = v === 'arrow' ? '<b>Draw arrows:</b> tap the organism that is EATEN, then tap the one that EATS it.' : '<b>Label roles:</b> pick a role, then tap organisms.'; });
+  var rS = K.seg([['producer', '🌱 Producer'], ['consumer', '🍽 Consumer'], ['decomposer', '🍄 Decomposer']], roleSel, function (v) { roleSel = v; });
+  var undo = K.btn('↶ Undo arrow', function () { arrows.pop(); report(); draw(); }, 'ghost sm');
+  ctr.appendChild(mS.el); ctr.appendChild(rS.el); ctr.appendChild(undo); M.el.appendChild(ctr);
+  function org(id) { return ORG.filter(function (o) { return o.id === id; })[0]; }
+  function report() {
+    var st = { arrows: arrows.length, good: arrows.filter(function (a) { return OK.indexOf(a) >= 0; }).length };
+    arrows.forEach(function (a) { st['a_' + a.replace('>', '_')] = true; });
+    st.rolesRight = ORG.filter(function (o) { return o.role !== 'energy' && roles[o.id] === o.role; }).length; st.rolesTotal = ORG.filter(function (o) { return o.role !== 'energy'; }).length;
+    st.chainToHawk = pathLen('sun', 'hawk'); M.set(st);
+  }
+  function pathLen(a, b) { var best = 0; (function dfs(n, d, seen) { if (n === b) { best = Math.max(best, d); return; } arrows.forEach(function (ar) { var p = ar.split('>'); if (p[0] === n && seen.indexOf(p[1]) < 0) dfs(p[1], d + 1, seen.concat([p[1]])); }); })(a, 0, [a]); return best; }
+  function tap(id) {
+    if (mode === 'role') { var o = org(id); if (o.role === 'energy') { M.toast('The Sun is not a living thing. It is the energy source.'); return; } roles[id] = roleSel; if (roleSel !== o.role) M.toast(o.name + ' as a ' + roleSel + '? Check how it gets its energy.', true); report(); draw(); return; }
+    if (!from) { from = id; draw(); return; }
+    if (from === id) { from = null; draw(); return; }
+    var key = from + '>' + id, rev = id + '>' + from;
+    if (arrows.indexOf(key) >= 0) { M.toast('That arrow is already there.'); }
+    else if (OK.indexOf(key) >= 0) { arrows.push(key); M.toast('✓ Energy flows from ' + org(from).name + ' to ' + org(id).name + '.'); }
+    else if (OK.indexOf(rev) >= 0) { M.toast('Backwards! Arrows point from the food TO the eater.', true); M.set('backwards', (S.backwards || 0) + 1); }
+    else { M.toast('In this meadow, the ' + org(id).name.toLowerCase() + ' does not eat the ' + org(from).name.toLowerCase() + '.', true); }
+    from = null; report(); draw();
+  }
+  function draw() {
+    var h = '<defs><marker id="fwA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c92a2a"/></marker><linearGradient id="fwBg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d0ebff"/><stop offset=".45" stop-color="#e6fcf5"/><stop offset=".46" stop-color="#b2f2bb"/><stop offset="1" stop-color="#8ce99a"/></linearGradient></defs><rect width="600" height="380" fill="url(#fwBg)"/>';
+    arrows.forEach(function (a) { var p = a.split('>'), A = org(p[0]), B = org(p[1]), dx = B.x - A.x, dy = B.y - A.y, L = Math.sqrt(dx * dx + dy * dy); h += '<line x1="' + (A.x + dx / L * 28) + '" y1="' + (A.y + dy / L * 28) + '" x2="' + (B.x - dx / L * 30) + '" y2="' + (B.y - dy / L * 30) + '" stroke="#c92a2a" stroke-width="3" marker-end="url(#fwA)" opacity=".85"/>'; });
+    ORG.forEach(function (o) {
+      var r = roles[o.id], col = r ? (r === o.role ? '#2b8a3e' : '#c92a2a') : '#495057';
+      h += '<g class="fw-o" data-o="' + o.id + '" role="button" tabindex="0" aria-label="' + o.name + '"><circle cx="' + o.x + '" cy="' + o.y + '" r="26" fill="#fff" stroke="' + (from === o.id ? '#f08c00' : col) + '" stroke-width="' + (from === o.id ? 5 : 2.5) + '"/><text x="' + o.x + '" y="' + (o.y + 9) + '" font-size="24" text-anchor="middle">' + o.icon + '</text><text x="' + o.x + '" y="' + (o.y + 42) + '" font-size="11" text-anchor="middle" font-weight="800" fill="#1d2433">' + o.name + '</text>' + (r ? '<text x="' + o.x + '" y="' + (o.y - 31) + '" font-size="10" text-anchor="middle" fill="' + col + '" font-weight="800">' + r.toUpperCase() + '</text>' : '') + '</g>';
+    });
+    svg.innerHTML = h;
+    svg.querySelectorAll('.fw-o').forEach(function (g) { g.addEventListener('click', function () { tap(g.getAttribute('data-o')); }); g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(g.getAttribute('data-o')); } }); });
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^a_(\w+)_(\w+)$/); if (mm && arrows.indexOf(mm[1] + '>' + mm[2]) < 0) arrows.push(mm[1] + '>' + mm[2]); } if (c.good) OK.slice(0, (c.good.gte || c.good)).forEach(function (a) { if (arrows.indexOf(a) < 0) arrows.push(a); }); if (c.chainToHawk) ['sun>grass', 'grass>grasshopper', 'grasshopper>frog', 'frog>snake', 'snake>hawk'].forEach(function (a) { if (arrows.indexOf(a) < 0) arrows.push(a); }); if (c.rolesRight) ORG.forEach(function (o) { if (o.role !== 'energy') roles[o.id] = o.role; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Meadow Populations: grass, rabbits, foxes over time                  */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.ecoPop = function (M) {
+  var K = M.kit, S = M.state;
+  var P = { a: 0.6, b: 0.3, d: 0.075, h: 0.6, e: 0.4, f: 0.15 };
+  var s, month, hist, foxes = true, drought = false, running = false, acc = 0, events = [];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 360 260', class: 'sn-svg', role: 'img', 'aria-label': 'Meadow with grass, rabbits, and foxes' });
+  var g = K.graph({ title: 'Populations over time', xLabel: 'Months', yLabel: 'Number', xMax: 48, yMax: 400, grow: true, series: [{ name: 'Grass ÷ 5', color: '#2f9e44' }, { name: 'Rabbits', color: '#868e96' }, { name: 'Foxes × 5', color: '#e8590c' }] });
+  row.appendChild(svg); row.appendChild(g.el); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rM = K.readout('Month', ''), rG = K.readout('Grass patches', ''), rR = K.readout('Rabbits', ''), rF = K.readout('Foxes', '');
+  [rM, rG, rR, rF].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var play = K.btn('▶ Run time', function () { running = !running; play.textContent = running ? '❚❚ Pause' : '▶ Run time'; M.set('ran', true); }, 'primary');
+  var rmF = K.btn('🦊 Remove all foxes', function () { if (!foxes) return; foxes = false; s.F = 0; events.push('No foxes (month ' + month + ')'); M.set({ foxesRemoved: true, removedAt: month, rabbitsAtRemove: Math.round(s.R) }); draw(); });
+  var addF = K.btn('🦊 +10 foxes', function () { foxes = true; s.F += 10; events.push('+10 foxes (month ' + month + ')'); M.set({ foxesAdded: true, addedAt: month, rabbitsAtAdd: Math.round(s.R) }); draw(); });
+  var dr = K.btn('☀️ Start a drought', function () { drought = !drought; dr.textContent = drought ? '🌧 End the drought' : '☀️ Start a drought'; events.push((drought ? 'Drought starts' : 'Drought ends') + ' (month ' + month + ')'); M.set(drought ? { drought: true, droughtAt: month, rabbitsAtDrought: Math.round(s.R), foxesAtDrought: Math.round(s.F) } : { drought: false }); });
+  var rs = K.btn('↺ New meadow', function () { reset(); }, 'ghost');
+  [play, rmF, addF, dr, rs].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function reset() { s = { G: 700, R: 60, F: 10 }; month = 0; hist = []; foxes = true; drought = false; running = false; events = []; play.textContent = '▶ Run time'; dr.textContent = '☀️ Start a drought'; g.clear(); g.range(48, 400); M.set({ month: 0, foxesRemoved: false, foxesAdded: false, drought: false, peakRabbits: 0, grassLow: 700 }); draw(); }
+  function step() {
+    var Kc = 1000 * (drought ? 0.45 : 1), eatG = P.a * s.R * s.G / (s.G + 300), eatR = foxes ? P.h * s.F * s.R / (s.R + 40) : 0;
+    s = { G: Math.max(5, s.G + 0.35 * s.G * (1 - s.G / Kc) - eatG), R: Math.max(0, s.R + P.b * eatG - P.d * s.R - eatR), F: foxes ? Math.max(0, s.F + P.e * eatR - P.f * s.F) : 0 };
+    month++;
+    g.add(0, month, s.G / 5); g.add(1, month, s.R); g.add(2, month, s.F * 5);
+    var st = { month: month, grass: Math.round(s.G), rabbits: Math.round(s.R), foxes: Math.round(s.F) };
+    st.peakRabbits = Math.max(S.peakRabbits || 0, st.rabbits); st.grassLow = Math.min(S.grassLow == null ? 9999 : S.grassLow, st.grass);
+    if (S.foxesRemoved) { st.sinceRemove = month - S.removedAt; st.peakAfterRemove = Math.max(S.peakAfterRemove || 0, st.rabbits); }
+    if (S.drought) st.sinceDrought = month - S.droughtAt;
+    if (S.foxesAdded) st.sinceAdd = month - S.addedAt;
+    M.set(st);
+  }
+  function draw() {
+    var h = '<rect width="360" height="260" fill="#b2f2bb"/><rect width="360" height="70" fill="#d0ebff"/>' + (drought ? '<rect width="360" height="260" fill="#ffd8a8" opacity=".45"/><circle cx="320" cy="30" r="20" fill="#ffd43b"/>' : '<circle cx="320" cy="30" r="16" fill="#ffe066"/>');
+    var r = K.rng('meadow'), gN = Math.round(s.G / 40), rN = Math.round(s.R / 10), fN = Math.round(s.F / 2);
+    for (var i = 0; i < gN; i++) h += '<text x="' + (10 + r() * 330) + '" y="' + (90 + r() * 160) + '" font-size="16">🌾</text>';
+    for (var j = 0; j < rN; j++) h += '<text x="' + (10 + r() * 330) + '" y="' + (100 + r() * 150) + '" font-size="18">🐇</text>';
+    for (var k = 0; k < fN; k++) h += '<text x="' + (10 + r() * 330) + '" y="' + (100 + r() * 150) + '" font-size="20">🦊</text>';
+    h += '<rect x="0" y="238" width="360" height="22" fill="#fff" opacity=".8"/><text x="8" y="253" font-size="11" fill="#1d2433" font-weight="700">Key: 🌾 = 40 grass patches · 🐇 = 10 rabbits · 🦊 = 2 foxes</text>';
+    svg.innerHTML = h;
+    rM.set(month); rG.set(Math.round(s.G)); rR.set(Math.round(s.R)); rF.set(Math.round(s.F));
+  }
+  M.loop(function (dt) { if (!running) return; acc += dt; if (acc > 0.25) { acc = 0; step(); draw(); if (month >= 120) { running = false; play.textContent = '▶ Run time'; } } });
+  reset();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.foxesRemoved) rmF.click(); if (c.drought) dr.click(); if (c.foxesAdded) addF.click(); var n = 0; var need = Math.max(c.month && c.month.gte || 0, c.sinceRemove && c.sinceRemove.gte || 0, c.sinceDrought && c.sinceDrought.gte || 0, c.sinceAdd && c.sinceAdd.gte || 0, 1); while (n++ < need + 1) step(); M.set('ran', true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Decomposer Lab: two sealed garden boxes, with and without decomposers */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.decompLab = function (M) {
+  var K = M.kit, S = M.state;
+  var weeks = 0, dec = { worms: true, fungi: true, bacteria: true }, A = { leaf: 100, soil: 20 }, B = { leaf: 100, soil: 20 }, planted = false, plantA = 0, plantB = 0, running = false, acc = 0;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 300', class: 'sn-svg', role: 'img', 'aria-label': 'Two garden boxes with fallen leaves' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rW = K.readout('Weeks', ''), rA = K.readout('Box A leaves left', '%'), rB = K.readout('Box B leaves left', '%'), rN = K.readout('Box A soil nutrients', '');
+  [rW, rA, rB, rN].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><b class="sn-note">Box A decomposers:</b></div>');
+  var tw = K.toggle('🪱 Worms', true, function (b) { dec.worms = b; M.set('decA', count()); }), tf = K.toggle('🍄 Fungi', true, function (b) { dec.fungi = b; M.set('decA', count()); }), tb = K.toggle('🦠 Bacteria', true, function (b) { dec.bacteria = b; M.set('decA', count()); });
+  var run = K.btn('▶ Let time pass', function () { running = !running; run.textContent = running ? '❚❚ Pause' : '▶ Let time pass'; }, 'primary');
+  var pl = K.btn('🌱 Plant bean seeds in both boxes', function () { planted = true; plantA = 1; plantB = 1; M.set({ planted: true, plantedAt: weeks }); draw(); });
+  var rs = K.btn('↺ Reset', function () { weeks = 0; A = { leaf: 100, soil: 20 }; B = { leaf: 100, soil: 20 }; planted = false; running = false; run.textContent = '▶ Let time pass'; M.set({ weeks: 0, planted: false }); draw(); }, 'ghost');
+  [tw.el, tf.el, tb.el, run, pl, rs].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function count() { return (dec.worms ? 1 : 0) + (dec.fungi ? 1 : 0) + (dec.bacteria ? 1 : 0); }
+  function tick() {
+    weeks++;
+    var rate = 3.2 * count(); var d = Math.min(A.leaf, rate); A.leaf -= d; A.soil += d * 0.8; B.leaf = Math.max(B.leaf - 0.15, 0);
+    if (planted) { plantA += 0.4 + A.soil / 60; plantB += 0.25 + B.soil / 200; }
+    var st = { weeks: weeks, leafA: Math.round(A.leaf), leafB: Math.round(B.leaf), soilA: Math.round(A.soil), soilB: Math.round(B.soil), decA: count(), plantA: K.round(plantA, 1), plantB: K.round(plantB, 1) };
+    if (planted) st.grownWeeks = weeks - S.plantedAt; M.set(st);
+  }
+  function box(x, lbl, b, withDec, plant) {
+    var h = '<rect x="' + x + '" y="60" width="260" height="190" rx="10" fill="rgba(230,245,255,.4)" stroke="#6c8a99" stroke-width="3"/><rect x="' + (x + 4) + '" y="170" width="252" height="76" rx="6" fill="' + (b.soil > 60 ? '#5c3a1a' : '#8b5a2b') + '"/><text x="' + (x + 130) + '" y="50" text-anchor="middle" font-size="14" font-weight="800" fill="#1d2433">' + lbl + '</text>';
+    var n = Math.round(b.leaf / 5), r = K.rng(lbl); for (var i = 0; i < n; i++) h += '<text x="' + (x + 14 + r() * 220) + '" y="' + (168 - r() * 30) + '" font-size="18" transform="rotate(' + (r() * 60 - 30) + ' ' + (x + 20 + r() * 220) + ' 160)">🍂</text>';
+    if (withDec) { if (dec.worms) h += '<text x="' + (x + 40) + '" y="215" font-size="18">🪱</text><text x="' + (x + 170) + '" y="230" font-size="18">🪱</text>'; if (dec.fungi) h += '<text x="' + (x + 200) + '" y="165" font-size="18">🍄</text>'; if (dec.bacteria) h += '<text x="' + (x + 110) + '" y="205" font-size="12" fill="#ffe066">· · bacteria · ·</text>'; }
+    if (plant > 0) { var ph = Math.min(90, plant * 6); h += '<line x1="' + (x + 130) + '" y1="170" x2="' + (x + 130) + '" y2="' + (170 - ph) + '" stroke="#2f9e44" stroke-width="5"/><ellipse cx="' + (x + 118) + '" cy="' + (170 - ph * 0.7) + '" rx="' + (6 + ph / 10) + '" ry="5" fill="#40c057"/><ellipse cx="' + (x + 142) + '" cy="' + (170 - ph * 0.5) + '" rx="' + (6 + ph / 10) + '" ry="5" fill="#40c057"/><text x="' + (x + 150) + '" y="' + (164 - ph) + '" font-size="11" font-weight="700">' + K.fmt(plant, 1) + ' cm</text>'; }
+    return h;
+  }
+  function draw() {
+    var h = '<rect width="640" height="300" fill="#f1f3f5"/>' + box(40, 'Box A: WITH decomposers', A, true, plantA) + box(340, 'Box B: NO decomposers (sterilized)', B, false, plantB);
+    h += '<text x="320" y="290" text-anchor="middle" font-size="12" fill="#495057">Both boxes are sealed, get the same light and water, and started with 100 leaves.</text>';
+    svg.innerHTML = h;
+    rW.set(weeks); rA.set(Math.round(A.leaf)); rB.set(Math.round(B.leaf)); rN.set(Math.round(A.soil));
+  }
+  M.loop(function (dt) { if (!running) return; acc += dt; if (acc > 0.35) { acc = 0; tick(); draw(); if (weeks >= 30) { running = false; run.textContent = '▶ Let time pass'; } } });
+  M.set({ weeks: 0, leafA: 100, leafB: 100, decA: 3, planted: false }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.decA != null) { var v = c.decA.eq != null ? c.decA.eq : c.decA; dec.worms = v > 0; dec.fungi = v > 1; dec.bacteria = v > 2; tw.set(dec.worms); tf.set(dec.fungi); tb.set(dec.bacteria); M.set('decA', count()); } if (c.planted) { planted = true; plantA = 1; plantB = 1; M.set({ planted: true, plantedAt: weeks }); } var need = Math.max(c.weeks && c.weeks.gte || 0, (c.grownWeeks && c.grownWeeks.gte || 0)); for (var i = 0; i < need; i++) tick(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Plant Growth Chamber: where does a plant's mass come from?           */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.plantLab = function (M) {
+  var K = M.kit, S = M.state;
+  var light = true, water = true, air = true, day = 0, plant = 5, soil = 2000, used = 0, running = false, acc = 0;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 320', class: 'sn-svg', role: 'img', 'aria-label': 'Sealed plant growth chamber with a pot on a scale' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rD = K.readout('Day', ''), rP = K.readout('Plant mass', 'g', true), rS = K.readout('Soil mass (dry)', 'g', true), rW = K.readout('Water taken in', 'g');
+  [rD, rP, rS, rW].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var tL = K.toggle('💡 Light', true, function (b) { light = b; draw(); }), tW = K.toggle('💧 Water', true, function (b) { water = b; draw(); }), tA = K.toggle('🌬 Air with carbon dioxide', true, function (b) { air = b; draw(); });
+  var go = K.btn('▶ Grow 30 days', function () { if (day >= 30) { M.toast('Press ↺ to start a new trial.'); return; } running = true; }, 'primary');
+  var rs = K.btn('↺ New seedling', function () { day = 0; plant = 5; soil = 2000; used = 0; running = false; M.set({ day: 0, grown: false }); draw(); }, 'ghost');
+  [tL.el, tW.el, tA.el, go, rs].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function tick() {
+    day++;
+    var ok = light && water && air, g = ok ? plant * 0.09 : 0;
+    if (!water) plant = Math.max(3, plant - 0.08); if (!light && water && air) plant = Math.max(3, plant - 0.05);
+    plant += g; used += water ? (ok ? 8 : 2) : 0; soil -= ok ? 0.03 : 0;
+    if (day >= 30) { running = false; var cond = (light ? 'L' : '') + (water ? 'W' : '') + (air ? 'A' : ''); var st = { day: day, grown: true, plant: K.round(plant, 1), soil: K.round(soil, 1), used: Math.round(used), cond: cond, gain: K.round(plant - 5, 1), soilLoss: K.round(2000 - soil, 1) }; st['trial_' + (cond || 'none')] = K.round(plant, 1); M.set(st); }
+    else M.set({ day: day });
+  }
+  function draw() {
+    var h = '<rect width="640" height="320" fill="#e9ecef"/><rect x="170" y="20" width="300" height="250" rx="14" fill="rgba(230,245,255,.55)" stroke="#6c8a99" stroke-width="4"/><text x="320" y="14" text-anchor="middle" font-size="12" fill="#495057" font-weight="700">SEALED GROWTH CHAMBER</text>';
+    if (light) h += '<rect x="250" y="26" width="140" height="12" rx="4" fill="#ffe066"/><path d="M270 40 l-20 60 M320 40 v60 M370 40 l20 60" stroke="#ffe066" stroke-width="3" opacity=".7"/>';
+    if (air) for (var i = 0; i < 10; i++) { var r = K.rng('co2' + i); h += '<text x="' + (190 + r() * 250) + '" y="' + (60 + r() * 120) + '" font-size="10" fill="#495057">CO₂</text>'; }
+    var ph = Math.min(150, 20 + plant * 1.4), wilt = !water || !light;
+    h += '<path d="M320 222 q' + (wilt ? 20 : 0) + ' -' + ph / 2 + ' 0 -' + ph + '" stroke="#2f9e44" stroke-width="' + (4 + plant / 20) + '" fill="none"/>';
+    for (var l = 0; l < Math.min(10, Math.round(plant / 6)); l++) { var y = 215 - (l + 1) * ph / 11, s = l % 2 ? 1 : -1; h += '<ellipse cx="' + (320 + s * (12 + plant / 12)) + '" cy="' + (y + (wilt ? 6 : 0)) + '" rx="' + (10 + plant / 14) + '" ry="5" fill="' + (wilt ? '#a9a24a' : '#40c057') + '" transform="rotate(' + (s * (wilt ? 40 : 20)) + ' ' + (320 + s * 12) + ' ' + y + ')"/>'; }
+    h += '<path d="M275 222 h90 l-10 40 h-70 z" fill="#b5651d"/><rect x="270" y="216" width="100" height="10" rx="3" fill="#8b5a2b"/>';
+    h += '<rect x="240" y="266" width="160" height="26" rx="5" fill="#dee2e6" stroke="#868e96"/><text x="320" y="284" text-anchor="middle" font-size="12" font-family="monospace" fill="#1d2433">soil ' + K.fmt(soil, 1) + ' g</text>';
+    if (water) h += '<text x="420" y="240" font-size="22">💧</text>';
+    svg.innerHTML = h;
+    rD.set(day); rP.set(K.fmt(plant, 1)); rS.set(K.fmt(soil, 1)); rW.set(Math.round(used));
+  }
+  M.loop(function (dt) { if (!running) return; acc += dt; if (acc > 0.1) { acc = 0; tick(); draw(); } });
+  M.set({ day: 0, grown: false }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var cond = null; for (var k in c) { var mm = k.match(/^trial_(\w+)$/); if (mm) cond = mm[1]; } if (c.cond) cond = c.cond; if (cond) { light = /L/.test(cond); water = /W/.test(cond); air = /A/.test(cond); tL.set(light); tW.set(water); tA.set(air); } day = 0; plant = 5; soil = 2000; used = 0; while (day < 30) tick(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Energy Pyramid: pass energy up the food chain (10% rule)            */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.energyPyramid = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var LV = cfg.levels || [['Sunlight captured by grass', '🌾', 'Producers'], ['Grasshoppers', '🦗', 'Primary consumers'], ['Frogs', '🐸', 'Secondary consumers'], ['Snakes', '🐍', 'Tertiary consumers'], ['Hawks', '🦅', 'Top predators']];
+  var start = 10000, pct = 10, reached = 0, anim = null;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 340', class: 'sn-svg', role: 'img', 'aria-label': 'Energy pyramid with five levels' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rL = K.readout('Energy at top level reached', 'units', true), rH = K.readout('Lost as heat & life activities', 'units');
+  reads.appendChild(rL.el); reads.appendChild(rH.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var up = K.btn('⬆ Pass energy up one level', function () { if (reached >= LV.length - 1) { M.toast('This is the top of the food chain.'); return; } reached++; M.set({ reached: reached }); report(); draw(); }, 'primary');
+  var pS = K.slider({ label: '% passed to next level', min: 5, max: 20, step: 5, value: pct, unit: '%', onInput: function (v) { pct = v; M.set('pct', v); report(); draw(); } });
+  var sS = K.slider({ label: '☀ Energy captured by grass', min: 1000, max: 20000, step: 1000, value: start, unit: 'units', onInput: function (v) { start = v; M.set('start', v); report(); draw(); } });
+  var rs = K.btn('↺ Start over', function () { reached = 0; M.set({ reached: 0 }); report(); draw(); }, 'ghost');
+  ctr.appendChild(pS.el); ctr.appendChild(sS.el); var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(up); r2.appendChild(rs); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function E(i) { return start * Math.pow(pct / 100, i); }
+  function report() { var st = { reached: reached, top: K.round(E(reached), 1), lost: K.round(start - E(reached), 1), pct: pct, start: start }; for (var i = 0; i <= reached; i++) st['e' + i] = K.round(E(i), 1); M.set(st); rL.set(K.fmt(E(reached), 1)); rH.set(K.fmt(start - E(reached), 1)); }
+  function draw() {
+    var h = '<rect width="640" height="340" fill="#f8f9fa"/>', n = LV.length, H = 56;
+    for (var i = 0; i < n; i++) { var y = 300 - (i + 1) * H, w = 520 - i * 100, x = 320 - w / 2, on = i <= reached, col = ['#2f9e44', '#74b816', '#f08c00', '#e8590c', '#c92a2a'][i];
+      h += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + (H - 4) + '" rx="6" fill="' + (on ? col : '#dee2e6') + '" opacity="' + (on ? 1 : .6) + '"/><text x="' + (x + 14) + '" y="' + (y + 32) + '" font-size="22">' + LV[i][1] + '</text><text x="' + (x + 44) + '" y="' + (y + 22) + '" font-size="12" font-weight="800" fill="' + (on ? '#fff' : '#495057') + '">' + LV[i][2] + '</text><text x="' + (x + 44) + '" y="' + (y + 38) + '" font-size="11" fill="' + (on ? '#fff' : '#495057') + '">' + LV[i][0] + '</text>' + (on ? '<text x="' + (x + w - 12) + '" y="' + (y + 32) + '" font-size="15" font-weight="800" fill="#fff" text-anchor="end">' + K.fmt(E(i), 1) + '</text>' : '<text x="' + (x + w - 12) + '" y="' + (y + 32) + '" font-size="13" fill="#495057" text-anchor="end">?</text>');
+      if (on && i < reached) h += '<text x="' + (x + w + 8) + '" y="' + (y + 10) + '" font-size="18">🔥</text>'; }
+    h += '<text x="320" y="330" text-anchor="middle" font-size="12" fill="#495057">Numbers show energy units at each level. 🔥 = energy used for living and lost as heat.</text>';
+    svg.innerHTML = h;
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.pct) { pct = c.pct.eq || c.pct; pS.set(pct, true); } if (c.start) { start = c.start.eq || c.start; sS.set(start, true); } var want = c.reached && (c.reached.gte || c.reached) || 0; reached = Math.max(reached, want); if (c.reached === 0) reached = 0; M.set('pct', pct); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Wildlife Camera: watch clips and tag each organism's role            */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.ecoCam = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var CLIPS = cfg.clips || [
+    { id: 'oak', name: 'Oak tree', icon: '🌳', role: 'producer', scene: 'Sunlight hits the leaves. The tree makes sugar from light, air, and water. It never eats anything.', food: '☀️' },
+    { id: 'deer', name: 'Deer', icon: '🦌', role: 'herbivore', scene: 'The deer nibbles clover and acorns all morning.', food: '🍀' },
+    { id: 'owl', name: 'Owl', icon: '🦉', role: 'carnivore', scene: 'At night the owl swoops down and catches a mouse.', food: '🐁' },
+    { id: 'raccoon', name: 'Raccoon', icon: '🦝', role: 'omnivore', scene: 'The raccoon eats berries, then catches a crayfish in the creek.', food: '🫐🦞' },
+    { id: 'mushroom', name: 'Mushroom', icon: '🍄', role: 'decomposer', scene: 'Mushrooms grow on a fallen, rotting log and slowly break it down.', food: '🪵' },
+    { id: 'worm', name: 'Earthworm', icon: '🪱', role: 'decomposer', scene: 'Worms pull dead leaves into the soil and break them into tiny bits.', food: '🍂' },
+    { id: 'algae', name: 'Pond algae', icon: '🟢', role: 'producer', scene: 'Green algae float at the sunny surface of the pond, making their own food.', food: '☀️' },
+    { id: 'hawk', name: 'Red-tailed hawk', icon: '🦅', role: 'carnivore', scene: 'The hawk circles the field and dives to catch a snake.', food: '🐍' }
+  ];
+  var i = 0, tags = {}, t = 0;
+  M.el.innerHTML = '';
+  var wrap = K.el('<div style="display:flex;flex-direction:column;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 300', class: 'sn-svg', role: 'img', 'aria-label': 'Trail camera footage' });
+  var cap = K.el('<div class="sn-panel" aria-live="polite"></div>');
+  var tagRow = K.el('<div class="sn-ctrls"><b class="sn-note">Tag this organism:</b></div>');
+  wrap.appendChild(svg); wrap.appendChild(cap); wrap.appendChild(tagRow); M.el.appendChild(wrap);
+  var ROLES = [['producer', '🌱 Producer'], ['herbivore', '🥕 Consumer: herbivore'], ['carnivore', '🥩 Consumer: carnivore'], ['omnivore', '🍽 Consumer: omnivore'], ['decomposer', '🍄 Decomposer']];
+  ROLES.forEach(function (r) { tagRow.appendChild(K.btn(r[1], function () { tag(r[0]); }, 'sm')); });
+  var nav = K.el('<div class="sn-row"></div>');
+  nav.appendChild(K.btn('◀ Previous clip', function () { i = (i + CLIPS.length - 1) % CLIPS.length; t = 0; show(); }, 'ghost sm'));
+  nav.appendChild(K.btn('Next clip ▶', function () { i = (i + 1) % CLIPS.length; t = 0; show(); }, 'sm'));
+  tagRow.appendChild(nav);
+  function tag(r) {
+    var c = CLIPS[i]; tags[c.id] = r; var ok = r === c.role;
+    M.toast(ok ? '✓ Tagged ' + c.name + ' as ' + r + '.' : '✗ Look again: how does the ' + c.name.toLowerCase() + ' get energy?', !ok);
+    var st = { tagged: Object.keys(tags).length, right: CLIPS.filter(function (x) { return tags[x.id] === x.role; }).length }; st['tag_' + c.id] = r; M.set(st); show();
+  }
+  function show() {
+    var c = CLIPS[i];
+    cap.innerHTML = '<b>Clip ' + (i + 1) + ' of ' + CLIPS.length + ': ' + c.name + '</b><br>' + c.scene + (tags[c.id] ? '<br><i>Your tag: ' + tags[c.id] + (tags[c.id] === c.role ? ' ✓' : ' ✗ (try again)') + '</i>' : '');
+    var st = { clip: c.id }; st['watched_' + c.id] = true; var w = (S.watched || []).slice(); if (w.indexOf(c.id) < 0) w.push(c.id); st.watched = w; st.watchedCount = w.length; M.set(st);
+  }
+  M.loop(function (dt) {
+    t += dt; var c = CLIPS[i], x = 120 + Math.sin(t) * 40;
+    var h = '<rect width="640" height="300" fill="#2b3a2b"/><rect x="8" y="8" width="624" height="284" rx="8" fill="#3b5d3b"/><text x="20" y="30" fill="#ff6b6b" font-size="12" font-family="monospace">● REC  TRAIL CAM 0' + (i + 1) + '</text><text x="620" y="30" fill="#fff" font-size="12" font-family="monospace" text-anchor="end">' + (c.id === 'owl' ? '02:14 AM' : '10:32 AM') + '</text>';
+    h += '<rect x="8" y="220" width="624" height="72" fill="#4a6b3a"/>';
+    h += '<text x="' + (320 + Math.sin(t * 1.5) * 60) + '" y="200" font-size="96" text-anchor="middle">' + c.icon + '</text><text x="' + (470 - (t * 20) % 60) + '" y="235" font-size="38" text-anchor="middle">' + c.food + '</text>';
+    h += '<rect x="8" y="8" width="624" height="284" rx="8" fill="none" stroke="#000" stroke-width="6" opacity=".4"/>';
+    svg.innerHTML = h;
+  });
+  show();
+  return { auto: function (st) { var c = st.goal.check || {}; CLIPS.forEach(function (cl, k) { if (c.right || c.tagged || c['tag_' + cl.id]) { i = k; tag(cl.role); } if (c.watchedCount) { i = k; show(); } }); } };
+};
