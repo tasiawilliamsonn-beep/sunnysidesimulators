@@ -1582,7 +1582,7 @@ function EscapePlayer(mount, room, opts) {
   }
   function renderDone() {
     if (opts.teach) {
-      root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + statusBar() + '<div class="ep-card" style="text-align:center">' + emblem() + '<h2>Mini-lesson complete!</h2><p>' + (room.wrapUp || 'Students should now have their guided notes filled in. Launch the activity next.') + '</p><div class="ep-row" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn plain" id="ep-restart">Back to step 1</button></div></div></div>';
+      root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + statusBar() + '<div class="ep-card" style="text-align:center">' + emblem() + '<h2>Mini-lesson complete!</h2><p>' + (room.wrapUp || 'Students should now have worksheet Parts 1–11 filled in. Launch the activity next.') + '</p><div class="ep-row" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn plain" id="ep-restart">Back to step 1</button></div></div></div>';
       root.querySelector('#ep-restart').onclick = function () { go('stage', 0); };
       bindCommon(); return;
     }

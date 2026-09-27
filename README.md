@@ -21,7 +21,7 @@ Each room includes:
 
 ## Live site and downloads
 
-The site is published with GitHub Pages at **https://tasiawilliamsonn-beep.github.io/thegreatescapes/** from this branch. Every push updates it. The header's **Download all (.zip)** link serves `downloads/crossroads-escapes.zip`: the full site plus every Canvas room file, exit ticket, warm-up, guided notes page, presenter script, facilitation guide, and set of gallery walk posters. `downloads/crossroads-escapes-website.html` is the whole teacher site as one file.
+The site is published with GitHub Pages at **https://tasiawilliamsonn-beep.github.io/thegreatescapes/** from this branch. Every push updates it. The header's **Download all (.zip)** link serves `downloads/crossroads-escapes.zip`: the full site plus every Canvas room file, exit ticket, warm-up, lesson worksheet (with key), presenter script, facilitation guide, and set of gallery walk posters. `downloads/crossroads-escapes-website.html` is the whole teacher site as one file.
 
 ## Gallery walks
 
@@ -29,15 +29,15 @@ The 10 gallery rooms (`data/gallery-art.js`) teach through pictures. Students wa
 
 ## Presenter and script
 
-Presenter slides show only student-facing cues (`data/lessons-cues.js`): a hook vote, a worked example revealed step by step, "In your notes" tasks, turn-and-talks, and checks. Students need only a notebook, the guided notes page, and a pencil. Everything the teacher says is in the separate **Presenter script PDF**: slide by slide, with directions, questions, answers, and reteach moves.
+Presenter slides show only student-facing cues (`data/lessons-cues.js`): a hook vote, a worked example revealed step by step, worksheet tasks, turn-and-talks, and checks. Students need only the printed lesson worksheet and a pencil; each slide shows which worksheet part to fill in. Everything the teacher says is in the separate **Presenter script PDF**: slide by slide, with directions, questions, answers, and reteach moves.
 
 ## 60-minute lessons
 
 Every room page and facilitation guide follows the same 60-minute plan: warm-up (0:00–0:08), mini-lesson (0:08–0:20), activity (0:20–0:48), debrief (0:48–0:52), and exit ticket (0:52–1:00). Lesson content for all 24 standards is in `data/lessons.js`:
 
-- **Warm-up:** 3 questions with notebook expectations and a printable worksheet (the key is on page 2).
+- **Warm-up:** 3 questions (Part 2 of the lesson worksheet; a standalone warm-up sheet with a key is also available).
 - **Lesson presenter** (`js/presenter.js`, opened with `#teach-<room-id>`): a projectable deck that runs the whole hour. It covers the target, success criteria, and agenda; the warm-up with a timer and expectations; a hook vote; 4 teaching steps, each with a key idea, an interactive tool, a turn-and-talk, guided notes, and a check for understanding with feedback; I do / we do / you do; a work-time screen with a big timer, checkpoints, expectations, and must-do / may-do lists; the debrief; and the exit ticket. Teacher tools: a timer, a random name picker, teacher notes (N), fullscreen (F), and arrow-key navigation. Turn-and-talks and practice are in `data/lessons-plus.js`.
-- **Guided notes:** a fill-in-the-blank handout that follows the presenter step by step, with vocabulary and "try it" problems, plus a key.
+- **Lesson worksheet:** one printable packet students complete during the whole lesson, plus a key. Its 13 parts match the "Worksheet Part" badge on each presenter slide: target in their own words, warm-up, hook prediction, vocabulary, then for each teaching step fill-in notes, a task, turn-and-talk notes, and a check with "I know because"; the worked example, we do, you do, a work-time tracker (code piece + key fact per stage), and a 3-2-1 wrap-up. It replaces the old guided notes.
 - **Evidence-based exit ticket:** Part A has students choose and justify, Part B explain with evidence, and Part C apply the standard to a new text, data set, or problem using CER, RACE, a historian's claim, or solve-show-explain. Page 3 onward is the key, with a rubric and a table that sorts scores into Mastered, Approaching, and Beginning, with next steps for each.
 
 ## Using it

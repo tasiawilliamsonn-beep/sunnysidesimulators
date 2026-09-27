@@ -229,7 +229,7 @@
     MATH: [['Solve', 'Final answer with units.', 1], ['Show', 'Equation or steps with numbers and operations.', 3], ['Explain', 'Explain your strategy using math words.', 3]]
   };
   var FRAME_NAME = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s Claim (Claim, Evidence, Source, Explain)', MATH: 'Solve-Show-Explain' };
-  var NOTEBOOK = ['Write the date and "Warm-Up" at the top of a new notebook page (or use the worksheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
+  var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet (or on this sheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
   function exitPoints(room, lesson) { var mc = room.exit.filter(function (q) { return q.choices; }).length, cr = room.exit.length - mc; return { mc: mc, cr: cr, total: mc * 2 + cr * 2 + (lesson && lesson.exit ? 4 : 0) }; }
 
   function exitTicket(room, std, lesson) {
@@ -281,7 +281,7 @@
     d.table([{ w: 0.22, h: 'Score' }, { w: 0.2, h: 'Level' }, { w: 0.58, h: 'Next step' }], [
       [m + '–' + pts.total + ' pts', 'Mastered', 'Extension: replay the room at the Legend level or write a second evidence response. Can serve as a peer helper.'],
       [a + '–' + (m - 1) + ' pts', 'Approaching', 'Quick reteach (5–10 min): replay the mini-lesson presenter steps tied to the missed items, then 2 similar practice questions.'],
-      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: guided notes review, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
+      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: review the lesson worksheet, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
     d.para('Evidence to look for: Did the student use vocabulary correctly, cite specific data or text, and explain the connection? A correct choice without a reason shows recognition, not yet mastery.', { size: 10, gap: 4 });
     d.footer('Crossroads Escapes · ' + room.title + ' · Exit Ticket');
     return d.bytes();
@@ -289,65 +289,105 @@
 
   function warmup(room, std, lesson) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2];
-    header(d, 'WARM-UP  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Use this sheet or copy the questions into your notebook.', c);
+    header(d, 'WARM-UP  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Also Part 2 of the lesson worksheet.', c);
     d.nameDate();
-    d.banner('Notebook expectations', c, '5 min silent + 2 min share');
+    d.banner('Expectations', c, '5 min silent + 2 min share');
     NOTEBOOK.forEach(function (t, i) { d.para((i + 1) + '.  ' + t, { size: 10.5, indent: 6, gap: 2 }); });
     d.banner('Warm-up questions', c);
     lesson.warmup.forEach(function (w, i) { d.ensure(40 + w[2] * 24); d.para((i + 1) + '.  ' + w[0], { size: 11.5, bold: true, gap: 2 }); d.writeLines(w[2] + 1, 18); });
     d.callout([{ label: 'Today\'s target:', text: std.lesson.target }], c);
     d.newPage();
-    header(d, 'TEACHER KEY  ·  WARM-UP', std.title, 'What to look for in student notebooks.', c);
+    header(d, 'TEACHER KEY  ·  WARM-UP', std.title, 'What to look for in student answers.', c);
     d.table([{ w: 0.06, h: '#' }, { w: 0.44, h: 'Question' }, { w: 0.5, h: 'Look for' }], lesson.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     d.para('Use the warm-up to activate prior knowledge. Call on 2–3 students, and write one strong answer on the board as a model. Question 3 previews today\'s lesson, so do not correct it yet; come back to it in the debrief.', { size: 10.5 });
     d.footer('Crossroads Escapes · ' + std.code + ' · Warm-Up');
     return d.bytes();
   }
 
+  // The lesson worksheet: one printable packet students complete as the presenter moves along.
+  // Part numbers match the "Worksheet Part" badge on each presenter slide.
   function notes(room, std, lesson, key) {
-    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson;
-    header(d, (key ? 'TEACHER KEY  ·  ' : '') + 'GUIDED NOTES  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Fill in these notes as your teacher presents each step of the mini-lesson.', c);
-    if (!key) d.nameDate();
-    d.callout([{ label: 'I can:', text: L.target.replace(/^I can\s*/i, '') }], c);
-    d.banner('Key vocabulary', c);
-    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'What it means (in my own words)' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], key ? v[1] : '', '']; }), c, { minH: 40 });
-    lesson.steps.forEach(function (st, i) {
-      d.banner('Step ' + (i + 1) + ': ' + st.t, c);
-      d.para(blanks(st.note, key), { size: 11, gap: 4, indent: 4 });
-      d.para('Do: ' + ((lesson.dos || [])[i] || st.do), { size: 10, gray: 0.3, indent: 4, gap: 4 });
-      var ck = st.check;
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson, K = key;
+    function ans(t) { if (K) d.para('Key: ' + t, { size: 10, indent: 18, gap: 4, gray: 0.25 }); }
+    function lines(n, t) { if (K && t) ans(t); else d.writeLines(n, 18); }
+    function part(n, title, right) { d.banner('Part ' + n + ': ' + title, c, right || ''); }
+    function choices(ck) {
+      if (ck.type === 'mc') { d.para('Circle one:   ' + ck.choices.map(function (ch, k) { return '(' + LET[k] + ') ' + ch; }).join('     '), { size: 10.5, indent: 18, gap: 2 }); }
+      else if (ck.type === 'order') d.para('Number these in order:   ' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '___ ' + x; }).join('    '), { size: 10.5, indent: 18, gap: 2 });
+      else if (ck.type === 'highlight') d.para('Underline the answer:   ' + ck.segments.join(' '), { size: 10.5, indent: 18, gap: 2 });
+      else d.para('Answer: ______________________ ' + (ck.unit || ''), { size: 10.5, indent: 18, gap: 2 });
+    }
+    function ckAns(ck) { return (ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '')) + (ck.explain ? (/[.!?"']$/.test(String(ck.choices ? ck.choices[ck.answer] : '')) ? ' ' : '. ') + ck.explain : ''); }
+    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Complete each part when you see its number on the presenter slide.', c);
+    if (!K) d.nameDate();
+    part(1, 'Today\'s target');
+    d.para(L.target, { size: 11, bold: true, indent: 6, gap: 3 });
+    d.para('Rewrite the target in your own words:', { size: 10.5, indent: 6, gap: 0 });
+    lines(2, 'Any accurate paraphrase of the target.');
+    part(2, 'Warm-up', '8 min');
+    X.warmup.forEach(function (w, i) { d.ensure(60); d.para((i + 1) + '.  ' + w[0], { size: 10.5, bold: true, gap: 1, indent: 6 }); lines(w[2], w[1]); });
+    part(3, 'Hook: make a prediction');
+    if (X.hook) { d.para(X.hook.q, { size: 10.5, bold: true, indent: 6, gap: 2 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
+    d.para('Why I think so:', { size: 10, indent: 18, gray: 0.35, gap: 0 }); lines(1, 'Any reasoned prediction. It is checked in Part 13.');
+    part(4, 'Key vocabulary', 'fill in as you learn');
+    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'Meaning in my own words' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], K ? v[1] : '', '']; }), c, { minH: 36 });
+    X.steps.forEach(function (st, i) {
+      part(5 + i, 'Learn ' + (i + 1) + ': ' + st.t, '3 min');
+      d.para('A. Fill in the blanks:', { size: 10, bold: true, indent: 6, gap: 1 });
+      d.para(blanks(st.note, K), { size: 11, indent: 18, gap: 4 });
+      d.para('B. ' + ((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
+      if (K) ans('Check that the task is complete and accurate. It should match the fill-in above: ' + blanks(st.note, true)); else { d.ensure(80); d.box(d.margin + 18, d.y - 70, d.inner() - 18, 66, 0.6); d.y -= 76; }
+      d.para('C. Turn and talk: ' + ((X.talk || [])[i] || ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
+      d.para('What my partner and I said:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, blanks(st.note, true));
       d.ensure(70);
-      d.para('Try it: ' + ck.q, { size: 10.5, bold: true, indent: 4, gap: 2 });
-      if (ck.type === 'mc') ck.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch + (key && k === ck.answer ? '   <- answer' : ''), { size: 10, indent: 20, gap: 0 }); });
-      else if (ck.type === 'order') d.para(key ? ck.items.join(' → ') : ck.items.slice().reverse().join('   |   '), { size: 10, indent: 20, gap: 0 });
-      else if (ck.type === 'highlight') d.para(ck.segments.map(function (sg, k) { return key && ck.answer.indexOf(k) >= 0 ? '[' + sg + ']' : sg; }).join(' '), { size: 10, indent: 20, gap: 0 });
-      else if (key) d.para('Answer: ' + ck.answer[0] + (ck.unit ? ' ' + ck.unit : ''), { size: 10, indent: 20, gap: 0 });
-      if (key && ck.explain) d.para('Why: ' + ck.explain, { size: 9.5, gray: 0.35, indent: 20, gap: 0 });
-      if (!key) d.writeLines(1, 20);
+      d.para('D. Check for understanding: ' + st.check.q, { size: 10.5, bold: true, indent: 6, gap: 1 });
+      choices(st.check);
+      d.para('I know because:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(1, ckAns(st.check));
     });
-    d.banner('Sum it up', c);
-    d.para('In my own words, the most important idea from today is...', { size: 10.5, gap: 2 });
-    if (key) d.para(L.target, { size: 10.5, gray: 0.3 }); else d.writeLines(3);
-    d.footer('Crossroads Escapes · ' + std.code + ' · Guided Notes' + (key ? ' (Key)' : ''));
+    part(9, 'Worked example', 'copy each step');
+    (X.model || []).forEach(function (t, k) { d.ensure(30); if (K) d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para((k + 1) + '.', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+    if (X.wedo) {
+      part(10, 'We do: solve it together');
+      d.para(X.wedo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      X.wedo.steps.forEach(function (t, k) { d.ensure(30); if (K) d.para('Step ' + (k + 1) + ': ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para('Step ' + (k + 1) + ':', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+      d.para('Answer: ' + (K ? X.wedo.a : '____________________________'), { size: 11, bold: true, indent: 6, gap: 12 });
+    }
+    if (X.youdo) {
+      part(11, 'You do: on your own', '2 min, silent');
+      d.para(X.youdo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      choices(X.youdo);
+      d.para('Show your thinking:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, ckAns(X.youdo));
+    }
+    part(12, 'Work time: ' + room.title, '28 min');
+    d.para('As you finish each ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'part') + ', record the code piece and one key fact you learned there.', { size: 10.5, indent: 6, gap: 4 });
+    var node = { escape: 'Lock', gallery: 'Exhibit', fieldtrip: 'Stop', mystery: 'File', quest: 'Level' }[room.format] || 'Stage';
+    d.table([{ w: 0.3, h: node }, { w: 0.14, h: 'Code piece' }, { w: 0.56, h: 'One key fact I learned' }], room.stages.map(function (st, i) { return [node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + String(st.title).replace(/^(Stop|Lock|Level|Evidence File|Room|Exhibit|Artifact)\s*#?\d*:\s*/i, ''), K ? (room.code || '')[i] || '' : '', '']; }), c, { minH: 34 });
+    d.para('Final code: ________________     [ ] Written task finished     [ ] Work copied into Canvas', { size: 10.5, indent: 6, gap: 12 });
+    part(13, 'Debrief and wrap-up', '4 min');
+    d.para('Check your prediction from Part 3. Was it right? What evidence changed or confirmed it?', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
+    d.para('3 things I learned today:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(3, 'Three accurate facts from the lesson.');
+    d.para('2 vocabulary words used correctly in a sentence:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, 'Two vocabulary words used correctly.');
+    d.para('1 question I still have:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(1, 'Any genuine question.');
+    d.footer('Crossroads Escapes · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
     return d.bytes();
   }
 
   function guide(room, std, answerLines, lesson) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson || {};
     header(d, 'FACILITATION GUIDE  ·  60-MINUTE LESSON  ·  GRADE ' + room.grade + '  ·  ' + room.standard, room.title, std.title + ': ' + std.text, c);
-    d.callout([{ label: 'Learning target:', text: L.target }, { label: 'Success looks like:', text: 'Students use the vocabulary correctly, complete the ' + room.formatLabel.toLowerCase() + ', and score 80% or higher on the evidence-based exit ticket.' }, { label: 'Materials:', text: 'Student devices, notebooks (or the printed warm-up and guided notes), projector for the mini-lesson presenter.' }], c);
+    d.callout([{ label: 'Learning target:', text: L.target }, { label: 'Success looks like:', text: 'Students use the vocabulary correctly, complete the ' + room.formatLabel.toLowerCase() + ', and score 80% or higher on the evidence-based exit ticket.' }, { label: 'Materials:', text: 'Student devices, the printed lesson worksheet (one per student), projector for the mini-lesson presenter.' }], c);
     d.banner('Lesson at a glance', c, '60 minutes');
     d.table([{ w: 0.13, h: 'Time' }, { w: 0.17, h: 'Part' }, { w: 0.4, h: 'Teacher does' }, { w: 0.3, h: 'Students do' }], [
-      ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer 3 questions in notebooks or on the worksheet; share with a partner.'],
-      ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Fill in guided notes; answer quick checks (whiteboards, fingers, or aloud).'],
+      ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer Part 2 of the lesson worksheet; share with a partner.'],
+      ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Complete worksheet Parts 4-11 as each slide appears; answer checks with fingers.'],
       ['0:20–0:48', room.formatLabel, 'Launch ' + room.title + '. Assign mission levels; circulate with the answer key.', 'Play solo or in pairs; record code pieces; complete any written evidence task.'],
-      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Discuss and correct their notes.'],
+      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + 3-2-1).'],
       ['0:52–1:00', 'Exit ticket', 'Hand out the exit ticket. Collect and sort with the mastery guide.', 'Answer with evidence independently.']], c);
     d.sub('Key vocabulary');
     d.table([{ w: 0.25, h: 'Word' }, { w: 0.75, h: 'Student-friendly definition' }], L.vocab, c);
     if (X.warmup) {
       d.banner('1. Warm-up', c, '0:00–0:08 · 8 min');
-      d.callout([{ label: 'Notebook expectations (post these):', text: NOTEBOOK.join(' ') }], c, { size: 10 });
+      d.callout([{ label: 'Warm-up expectations (post these):', text: NOTEBOOK.join(' ') }], c, { size: 10 });
       d.table([{ w: 0.06, h: '#' }, { w: 0.47, h: 'Question' }, { w: 0.47, h: 'Look for' }], X.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     }
     d.banner('2. Mini-lesson', c, '0:08–0:20 · 12 min');
@@ -357,7 +397,7 @@
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : 'Visual: ' + (st.tool.caption || st.tool.kind)) : st.cards ? 'Flip cards: ' + st.cards.map(function (x) { return x[0]; }).join(', ') : 'Board and notes';
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       d.sub('Step ' + (i + 1) + ' (3 min): ' + st.t);
-      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', (X.dos || [])[i] || st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Guided notes', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
+      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', (X.dos || [])[i] || st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Worksheet Part ' + (5 + i) + 'A', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
     });
     d.sub('I do: worked example (shown one step at a time)');
     (X.model || []).forEach(function (t, k) { d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 10, gap: 1 }); });
@@ -377,9 +417,9 @@
     d.para('Print the exit ticket PDF (page 2 is the key and mastery guide). Every item requires evidence: Part A asks students to justify each choice, Part B asks for an explanation, and Part C applies the standard to a new situation using ' + (X.exit ? FRAME_NAME[X.exit.frame] : 'a written response') + '. Sort results into Mastered, Approaching, and Beginning to plan tomorrow\'s groups.', { size: 10.5, gap: 4 });
     d.banner('Lesson resources', c);
     d.table([{ w: 0.3, h: 'Resource' }, { w: 0.7, h: 'How it fits the lesson' }], [
-      ['Warm-up worksheet (PDF)', 'Printable version of the warm-up with notebook expectations and a key.'],
+      ['Warm-up worksheet (PDF)', 'Optional standalone warm-up (also Part 2 of the lesson worksheet), with a key.'],
       ['Mini-lesson presenter', 'Projectable, step-by-step interactive lesson with tools and quick checks (room page).'],
-      ['Guided notes (PDF + key)', 'Students fill in blanks, vocabulary, and "try it" problems that match each presenter step.'],
+      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: target, warm-up, prediction, vocabulary, fill-ins, tasks, turn-and-talks, checks, worked example, practice, a work-time tracker, and a 3-2-1 wrap-up. Parts match the presenter slides.'],
       [room.title + ' (.html)', 'The ' + room.formatLabel.toLowerCase() + ' for Canvas, with differentiated levels, supports, and a turn-in.'],
       ['Exit ticket (PDF + key)', 'Evidence-based check with a rubric and a mastery sorting guide.']].concat((std.resources || []).slice(0, 4).map(function (x) { return [x.name + ' (extra)', x.note + ' ' + x.url]; })), c);
     d.banner('Answer key: ' + room.title, c);
@@ -392,30 +432,30 @@
   // Teacher script that goes with the lesson presenter, slide by slide.
   function script(room, std, lesson, taskName) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson, n = 0;
-    header(d, 'PRESENTER SCRIPT  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title + ': teacher script', 'Use with the Lesson presenter (room page → Lesson presenter). Slides show only student cues; this script has what to say. Students need a notebook, the guided notes page, and a pencil.', c);
-    d.callout([{ label: 'Presenter keys:', text: 'Right/left arrows change slides. N shows short notes. T pauses the timer. P picks a student. F is fullscreen.' }, { label: 'Response routine:', text: 'Students write each answer in their notes, then show it with fingers (1 = A, 2 = B, 3 = C, 4 = D). Scan the room before revealing.' }], c, { size: 10 });
+    header(d, 'PRESENTER SCRIPT  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title + ': teacher script', 'Use with the Lesson presenter (room page → Lesson presenter). Slides show only student cues; this script has what to say. Students need the printed lesson worksheet and a pencil.', c);
+    d.callout([{ label: 'Presenter keys:', text: 'Right/left arrows change slides. N shows short notes. T pauses the timer. P picks a student. F is fullscreen.' }, { label: 'Response routine:', text: 'Students write each answer on their worksheet, then show it with fingers (1 = A, 2 = B, 3 = C, 4 = D). Scan the room before revealing.' }], c, { size: 10 });
     function slide(title, time, rows) {
       n++;
       d.banner('Slide ' + n + ': ' + title, c, time || '');
       d.table([{ w: 0.2 }, { w: 0.8 }], rows.filter(function (r) { return r && r[1]; }), c, { repeat: false });
     }
     slide('Today\'s target', '1 min', [['Say', 'Today\'s learning target is: "' + L.target + '" Read it with me.'], ['Say', 'Here is how you will know you have it: the success criteria. You will prove it on the exit ticket at the end of class.'], ['Point to', 'The agenda and the key vocabulary. Tell students they need their notebook, guided notes page, and pencil.']]);
-    slide('Warm-up', '0:00–0:08', [['Say', 'Start a new notebook page: write today\'s date and "Warm-Up." Answer the three questions in complete sentences. You have 5 minutes of silent work. Go.'], ['Do', 'Start the 8:00 timer. Circulate. At 5 minutes say: "Turn to your partner and compare answers for 2 minutes."'], ['Look for', X.warmup.map(function (w, i) { return (i + 1) + ') ' + w[1]; }).join('  ')], ['Say', 'Call on 2–3 students for questions 1 and 2, then reveal. Say: "We will come back to question 3 at the end of class."']]);
-    slide('Hook', '1 min', [['Say', (X.hook ? 'Read the question on the screen: "' + X.hook.q + '" Write your prediction in your notes. Then vote.' : '')], ['Background', room.hook || L.hook], ['Do', 'Tap +1 for each vote. Do not give the answer. Say: "By the end of the lesson, you will be able to check your prediction."']]);
+    slide('Warm-up', '0:00–0:08', [['Say', 'Turn to Part 2 of your lesson worksheet. Answer the three questions in complete sentences. You have 5 minutes of silent work. Go.'], ['Do', 'Start the 8:00 timer. Circulate. At 5 minutes say: "Turn to your partner and compare answers for 2 minutes."'], ['Look for', X.warmup.map(function (w, i) { return (i + 1) + ') ' + w[1]; }).join('  ')], ['Say', 'Call on 2–3 students for questions 1 and 2, then reveal. Say: "We will come back to question 3 at the end of class."']]);
+    slide('Hook', '1 min', [['Say', (X.hook ? 'Read the question on the screen: "' + X.hook.q + '" Circle your prediction in Part 3 of your worksheet and write why. Then vote.' : '')], ['Background', room.hook || L.hook], ['Do', 'Tap +1 for each vote. Do not give the answer. Say: "By the end of the lesson, you will be able to check your prediction."']]);
     X.steps.forEach(function (st, i) {
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       slide('Learn ' + (i + 1) + ': ' + st.t, '3 min', [
         ['Say', st.say],
-        ['Guided notes', 'Say: "Fill in step ' + (i + 1) + ' of your guided notes." Answers: ' + blanks(st.note, true) + ' (tap "Show the missing words" after students try.)'],
+        ['Worksheet', 'Say: "Part ' + (5 + i) + ': fill in the blanks (A), do the task (B), write what your partner said (C), and answer the check (D)." Blank answers: ' + blanks(st.note, true) + ' (tap "Show the missing words" after students try.)'],
         ['Explore', (st.tool ? (st.tool.sim ? 'Run the simulation: ' + st.tool.sim.title + '. Before each change, ask students to predict in their notes.' : 'Point to the model: ' + (st.tool.caption || 'the picture') + '. Ask: "What do you notice?"') : st.cards ? 'Flip each card only after students guess: ' + st.cards.map(function (x) { return x[0] + ' = ' + x[1]; }).join('; ') + '.' : '') + ' Students do: ' + ((X.dos || [])[i] || st.do)],
         ['Turn and talk', 'Say: "' + ((X.talk || [])[i] || '') + '" Start the 1:00 timer. Then pick a pair to share.'],
         ['Check', 'Read the question aloud. Students write, then show fingers. Scan, then reveal. Answer: ' + ans + (ck.explain ? '. ' + ck.explain : '')],
         ['If < 80% correct', 'Go back to the Explore box and model a second example out loud, then re-ask the check with a partner discussion first. See "Misconceptions to watch for" at the end of this script.']
       ]);
     });
-    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into your notes.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
-    if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
-    if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own. Solve it in your notes with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
+    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
+    if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together in Part 10. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
+    if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own: Part 11. Solve it with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
     slide('Work time: ' + room.title, '0:20–0:48', [['Say', 'Open ' + room.title + ' on your device. Type your name, choose the level I assigned, and begin. Whisper voice with your partner only.'], ['Do', 'Start the 28:00 timer and leave this slide up. Circulate with the answer key.'], ['Checkpoints', 'At 10 minutes: ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'stage') + ' 2 done. At 20 minutes: stage 4 done; give a 5-minute warning for the ' + (taskName || 'final lock') + ' and turn-in.'], ['Turn-in', 'Students tap "Copy my work" and paste it into the Canvas assignment (Text Entry).']]);
     slide('Debrief', '0:48–0:52', [['Ask', L.debrief.join('  |  ')], ['Say', 'Back to warm-up question 3 and our hook vote: were our predictions right? What evidence changed your mind?'], ['Answer', X.warmup[2][1]]]);
     slide('Exit ticket', '0:52–1:00', [['Say', 'Clear your desk except a pencil. Work silently and on your own. For every answer, write "I know because..." and use evidence.'], ['Do', 'Hand out the exit ticket. Start the 8:00 timer. Collect and sort with page 3 (Mastered / Approaching / Beginning).']]);

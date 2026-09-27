@@ -63,7 +63,7 @@ for (const s of ctx.window.CX_STANDARDS) {
   if (!X.youdo) err(r, 'needs a you-do check');
   if (!X.hook || !X.hook.q || (X.hook.options || []).length !== 3) err(r, 'hook needs a question and 3 vote options');
   if (!X.model || X.model.length < 3) err(r, 'needs a worked example (3+ lines)');
-  if (!X.dos || X.dos.length !== (X.steps || []).length) err(r, 'needs an "In your notes" task for every step');
+  if (!X.dos || X.dos.length !== (X.steps || []).length) err(r, 'needs a worksheet task for every step');
   // slides show only student cues: no teacher directions or outside materials
   const shown = [X.hook && X.hook.q].concat(X.model || [], X.dos || [], X.talk || [], (X.steps || []).map(st => st.say), (X.warmup || []).map(w => w[0]), X.wedo ? [X.wedo.q].concat(X.wedo.steps) : []);
   shown.forEach(t => { if (/\b(say|ask|tell the class|think aloud)\s*:|\bthe board\b|whiteboard|\blamp\b|volunteers?\b/i.test(t || '')) err(r, 'teacher language or outside material on a slide: ' + String(t).slice(0, 60)); });

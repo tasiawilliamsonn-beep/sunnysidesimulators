@@ -314,3 +314,4 @@ textarea.code { width: 100%; min-height: 90px; font-family: var(--mono); font-si
 .lp-box ul+h3,.lp-box p+h3,.lp-box div+h3{margin-top:16px}
 .lp-task{margin:12px 0 0;font-weight:700;background:var(--lp-soft);border-radius:10px;padding:10px 12px}.lp-model li{font-size:1.05em}
 .navdl{font-weight:700}
+.lp-ws{float:right;margin:0 0 8px 12px;font-size:.78em;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lp);color:var(--lp);border-radius:999px;padding:4px 12px;background:#fff}

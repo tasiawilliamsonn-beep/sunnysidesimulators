@@ -20,7 +20,7 @@
     ],
     gallery: [
       'Exhibits can be visited in any order, which spreads students out naturally. Encourage them to start at a different exhibit than their neighbor.',
-      'Treat it like a real gallery walk: ask students to jot one "I notice / I wonder" in their notebook at each exhibit (optional, no printing).',
+      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece plus a key fact in Part 12 of the lesson worksheet.',
       'Pause the class once midway and have two students share their favorite exhibit so far.'
     ],
     fieldtrip: [
@@ -148,27 +148,27 @@
     h += '<h3>What students turn in</h3><p>The final screen builds a turn-in block with: name, mission level, completion code, time, XP, first-try accuracy, hints used, badges' + (t ? ', and their full written ' + esc(f[0]) : '') + '. Students tap <b>Copy my work</b> and paste it into a Canvas <b>Text Entry</b> submission. Grade the writing with the rubric above' + (t ? '' : ' (this room has no written task, so the code and stats show completion)') + '.</p></section>';
     return h;
   }
-  var NOTEBOOK = ['Write the date and "Warm-Up" at the top of a new notebook page (or use the worksheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
+  var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet.', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
   var LETTERS = 'ABCDEFGH';
   function planTable(r) {
     return '<table class="tbl plan"><thead><tr><th>Time</th><th>Part</th><th>Teacher does</th><th>Students do</th><th>Resource</th></tr></thead><tbody>' +
-      [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in notebooks or on the worksheet.', '<a href="#s-warm" data-jump>Warm-up</a>'],
-       ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Fill in guided notes; answer quick checks.', '<a href="#teach-' + r.id + '">Presenter</a>'],
-       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; finish any written task.', '<a href="#play-' + r.id + '">Student view</a>'],
-       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Discuss and correct notes.', '<a href="#s-debrief" data-jump>Questions</a>'],
+      [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in worksheet Part 2.', '<a href="#s-warm" data-jump>Warm-up</a>'],
+       ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Complete worksheet Parts 1 and 3–11 with each slide.', '<a href="#teach-' + r.id + '">Presenter</a>'],
+       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece and key fact in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
+       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write a 3-2-1.', '<a href="#s-debrief" data-jump>Questions</a>'],
        ['0:52–1:00', '5. Exit ticket', 'Hand out the ticket; sort results with the mastery guide.', 'Answer with evidence independently.', '<a href="#s-exit" data-jump>Exit ticket</a>']].map(function (x) { return '<tr>' + x.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function warmSection(r) {
     var X = lessonOf(r); if (!X) return '';
     return '<section class="sec" id="s-warm"><h2><span class="step">1</span>Warm-up <span class="when">0:00–0:08 · 8 min</span></h2>' +
-      '<div class="two"><div class="callout"><h3 style="margin-top:0">Notebook expectations</h3><ol>' + NOTEBOOK.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' +
+      '<div class="two"><div class="callout"><h3 style="margin-top:0">Warm-up expectations</h3><ol>' + NOTEBOOK.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' +
       '<div><table class="tbl"><thead><tr><th>#</th><th>Question</th><th>Look for</th></tr></thead><tbody>' + X.warmup.map(function (w, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(w[0]) + '</td><td>' + esc(w[1]) + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<p><button class="btn" data-do="warm">' + ICONS.down + 'Warm-up worksheet PDF</button></p></div></div></section>';
   }
   function lessonSection(r, L) {
     var X = lessonOf(r);
     var html = '<section class="sec" id="s-lesson"><h2><span class="step">2</span>Mini-lesson <span class="when">0:08–0:20 · 12 min</span></h2>' +
-      '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
+      '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">lesson worksheet</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
       (X && X.hook ? '<div class="callout"><b>Hook (1 min), shown on the slide:</b> ' + esc(X.hook.q) + ' <span class="lede">Class vote: ' + esc(X.hook.options.join(' / ')) + '</span></div>' : '') +
       '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>';
     if (X) html += '<div class="steps">' + X.steps.map(function (st, i) {
@@ -176,7 +176,7 @@
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : (st.tool.caption || 'Visual model')) : st.cards ? 'Flip cards' : 'Board and notes';
       return '<div class="stepcard"><div class="stephead"><span class="step">' + (i + 1) + '</span><h3>' + esc(st.t) + '</h3><span class="when">3 min</span></div>' +
         '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc((X.dos || [])[i] || st.do) + '</dd></div>' +
-        '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
+        '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Worksheet fill-in</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
     }).join('') + '</div>';
     else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
     html += '<h3>I do: worked example</h3>' + (X && X.model ? '<ol>' + X.model.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' : '') + '<p class="lede">What to say for every slide is in the <button class="linkbtn" data-do="script">presenter script PDF</button>.</p>' +
@@ -196,7 +196,7 @@
       '<h3>Sort students for tomorrow</h3><table class="tbl"><thead><tr><th>Score</th><th>Level</th><th>Next step</th></tr></thead><tbody>' +
       '<tr><td>' + m + '–' + total + '</td><td>Mastered</td><td>Extension: replay at the Legend level or write a second evidence response; peer helper.</td></tr>' +
       '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
-      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review guided notes, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
+      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review the lesson worksheet, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
       '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
   }
   function isGallery(r) { return r.format === 'gallery' && r.stages.every(function (s) { return s.art; }); }
@@ -428,10 +428,10 @@
 
     // Resources
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
-      [['1', 'Warm-up worksheet', 'Printable warm-up with notebook expectations. Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
+      [['1–5', 'Lesson worksheet', 'The one printable packet students fill out during the whole lesson. Its 13 parts match the "Worksheet Part" badge on each slide: target in their own words, warm-up, prediction, vocabulary, fill-in notes, a task, turn-and-talk notes, and a check for every step, the worked example, we do, you do, a work-time tracker (code piece + key fact per stage), and a 3-2-1 wrap-up. Collect it as evidence of work.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
+       ['1', 'Warm-up worksheet (optional)', 'Standalone warm-up if you want it separate (it is also Part 2 of the lesson worksheet). Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
        ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
        ['1–5', 'Presenter script', 'What to say on every slide: directions, questions, answers, and what to do if students struggle. Slides show only student cues.', '<button class="btn" data-do="script">' + ICONS.down + 'PDF</button>'],
-       ['2', 'Guided notes', 'Fill-in notes, vocabulary, and "try it" problems that follow the presenter step by step.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
 ].concat(isGallery(r) ? [['3', 'Gallery walk posters', 'One printable poster per exhibit (picture, numbered details, placard) plus setup directions for a classroom gallery walk.', '<button class="btn" data-do="posters">' + ICONS.play + 'Open posters</button>'], ['3', 'Gallery walk viewing guide', 'Student recording sheet: I see / I think / I wonder for every exhibit.', '<button class="btn" data-do="gguide">' + ICONS.down + 'PDF</button>']] : []).concat([
        ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
@@ -473,12 +473,12 @@
     var X = lessonOf(r), s = STD[r.std];
     return {
       id: 'lesson-' + r.std, title: s.title, grade: r.grade, subject: r.subject, standard: s.code, format: 'escape', game: 'locks',
-      theme: r.theme, vocab: s.lesson.vocab, story: '', finale: '', wrapUp: 'Students should have their guided notes filled in. Launch ' + r.title + ' next.',
+      theme: r.theme, vocab: s.lesson.vocab, story: '', finale: '', wrapUp: 'Students should have worksheet Parts 1–11 filled in. Launch ' + r.title + ' next.',
       stages: X.steps.map(function (st, i) {
         var tool = st.tool && !st.tool.sim ? st.tool : null;
         return {
           title: st.t,
-          content: '<p class="ep-say"><b>Teach:</b> ' + esc(st.say) + '</p><p class="ep-notebox"><b>Students:</b> ' + esc(st.do) + '<br><b>Guided notes:</b> ' + esc(st.note.replace(/\[([^\]]+)\]/g, '____')) + '</p>',
+          content: '<p class="ep-say"><b>Teach:</b> ' + esc(st.say) + '</p><p class="ep-notebox"><b>Students:</b> ' + esc(st.do) + '<br><b>Worksheet:</b> ' + esc(st.note.replace(/\[([^\]]+)\]/g, '____')) + '</p>',
           visual: tool, sim: st.tool && st.tool.sim ? st.tool.sim : null, cards: st.cards, puzzles: [st.check]
         };
       })
@@ -587,8 +587,8 @@
       else if (act === 'script') { var wt = writeTask(r); download(slug(r) + '-presenter-script.pdf', CrossroadsPDF.script(r, STD[r.std], lessonOf(r), wt ? (FRAME_INFO[wt.frame] || [wt.frame])[0] : ''), 'application/pdf'); toast('Presenter script downloaded.'); }
       else if (act === 'gguide') { download(slug(r) + '-gallery-viewing-guide.pdf', CrossroadsPDF.galleryGuide(r, STD[r.std]), 'application/pdf'); toast('Viewing guide downloaded.'); }
       else if (act === 'warm') { download(slug(r) + '-warm-up.pdf', CrossroadsPDF.warmup(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Warm-up worksheet downloaded.'); }
-      else if (act === 'notes') { download(slug(r) + '-guided-notes.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Guided notes downloaded.'); }
-      else if (act === 'noteskey') { download(slug(r) + '-guided-notes-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Guided notes key downloaded.'); }
+      else if (act === 'notes') { download(slug(r) + '-lesson-worksheet.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Lesson worksheet downloaded.'); }
+      else if (act === 'noteskey') { download(slug(r) + '-lesson-worksheet-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Lesson worksheet key downloaded.'); }
       else if (act === 'guide') {
         var gr = Object.assign({}, r, { runTips: runTips(r), finalCode: finalCode(r) });
         download(slug(r) + '-facilitation-guide.pdf', CrossroadsPDF.guide(gr, STD[r.std], answerLines(r), lessonOf(r)), 'application/pdf'); toast('Facilitation guide PDF downloaded.');

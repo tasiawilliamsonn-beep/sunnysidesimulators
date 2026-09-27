@@ -325,6 +325,7 @@ textarea.code { width: 100%; min-height: 90px; font-family: var(--mono); font-si
 .lp-box ul+h3,.lp-box p+h3,.lp-box div+h3{margin-top:16px}
 .lp-task{margin:12px 0 0;font-weight:700;background:var(--lp-soft);border-radius:10px;padding:10px 12px}.lp-model li{font-size:1.05em}
 .navdl{font-weight:700}
+.lp-ws{float:right;margin:0 0 8px 12px;font-size:.78em;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lp);color:var(--lp);border-radius:999px;padding:4px 12px;background:#fff}
 
 </style>
 </head>
@@ -2812,7 +2813,7 @@ function EscapePlayer(mount, room, opts) {
   }
   function renderDone() {
     if (opts.teach) {
-      root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + statusBar() + '<div class="ep-card" style="text-align:center">' + emblem() + '<h2>Mini-lesson complete!</h2><p>' + (room.wrapUp || 'Students should now have their guided notes filled in. Launch the activity next.') + '</p><div class="ep-row" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn plain" id="ep-restart">Back to step 1</button></div></div></div>';
+      root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + statusBar() + '<div class="ep-card" style="text-align:center">' + emblem() + '<h2>Mini-lesson complete!</h2><p>' + (room.wrapUp || 'Students should now have worksheet Parts 1–11 filled in. Launch the activity next.') + '</p><div class="ep-row" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn plain" id="ep-restart">Back to step 1</button></div></div></div>';
       root.querySelector('#ep-restart').onclick = function () { go('stage', 0); };
       bindCommon(); return;
     }
@@ -2923,11 +2924,11 @@ function LessonPresenter(mount, P, opts) {
     var id = 'c' + (cfuN++), body = '';
     if (ck.type === 'mc') body = '<div class="lp-choices">' + ck.choices.map(function (c, k) { return '<button type="button" class="lp-choice" data-cfu="' + id + '" data-k="' + k + '"><b>' + LET[k] + '</b>' + esc(c) + '</button>'; }).join('') + '</div>';
     else if (ck.type === 'input') body = '<div class="lp-inrow"><input type="text" data-in="' + id + '" placeholder="Class answer" aria-label="Class answer">' + (ck.unit ? '<span>' + esc(ck.unit) + '</span>' : '') + '<button type="button" class="lp-btn" data-incheck="' + id + '">Check</button></div>';
-    else if (ck.type === 'order') body = '<ol class="lp-order">' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol><p class="lp-small">In your notes: number these in the correct order.</p>';
+    else if (ck.type === 'order') body = '<ol class="lp-order">' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol><p class="lp-small">On your worksheet: number these in the correct order.</p>';
     else if (ck.type === 'highlight') body = '<p class="lp-segs">' + ck.segments.map(function (sg, k) { return '<button type="button" class="lp-seg" data-seg="' + id + '" data-k="' + k + '">' + esc(sg) + '</button>'; }).join(' ') + '</p>';
     var ans = ck.type === 'mc' ? LET[ck.answer] + '. ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return '"' + ck.segments[k] + '"'; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '');
     cfuData[id] = ck;
-    return '<div class="lp-cfu" id="' + id + '"><div class="lp-cfuh"><span class="lp-tag">' + esc(label || 'Check for understanding') + '</span><span class="lp-mode">' + esc(mode || 'Write your answer in your notes, then show me with fingers.') + '</span></div>' +
+    return '<div class="lp-cfu" id="' + id + '"><div class="lp-cfuh"><span class="lp-tag">' + esc(label || 'Check for understanding') + '</span><span class="lp-mode">' + esc(mode || 'Write your answer on your worksheet, then show me with fingers.') + '</span></div>' +
       '<p class="lp-q">' + esc(ck.q) + '</p>' + body + '<div class="lp-fb" data-fb="' + id + '"></div>' +
       '<div class="lp-row"><button type="button" class="lp-btn ghost" data-reveal="' + id + '">Reveal answer</button><button type="button" class="lp-btn ghost" data-pick>Pick a student to explain</button></div>' +
       '<div class="lp-ans" data-ans="' + id + '" hidden><b>Answer:</b> ' + esc(ans) + (ck.explain ? '<br><span>' + esc(ck.explain) + '</span>' : '') + '</div></div>';
@@ -2939,66 +2940,66 @@ function LessonPresenter(mount, P, opts) {
   function slide(o) { S.push(o); }
   var L = P.lesson, X = P.X, steps = X.steps || [];
 
-  slide({ part: 0, title: 'Today\'s target', html: function () {
+  slide({ part: 0, ws: '1', title: 'Today\'s target', html: function () {
     return '<div class="lp-hero"><div class="lp-kick">' + esc(P.code) + ' · Grade ' + esc(P.grade) + '</div><h1>' + esc(P.title) + '</h1></div>' +
       '<div class="lp-grid2"><div class="lp-box accent"><h3>Learning target</h3><p class="lp-big">' + esc(L.target) + '</p>' +
       '<h3>Success criteria</h3><ul class="lp-checks"><li>I can explain and use the key words: ' + esc(L.vocab.map(function (v) { return v[0]; }).join(', ')) + '.</li>' +
       steps.slice(0, 2).map(function (st) { return '<li>I can explain: ' + esc(st.t.toLowerCase()) + '.</li>'; }).join('') +
-      '<li>I can support my answers with evidence on the exit ticket.</li></ul><h3>You need</h3><p>Notebook · guided notes page · pencil</p></div>' +
+      '<li>I can support my answers with evidence on the exit ticket.</li></ul><h3>You need</h3><p>Lesson worksheet · pencil</p><h3>On your worksheet (Part 1)</h3><p>Rewrite the target in your own words.</p></div>' +
       '<div class="lp-box"><h3>Agenda</h3><ol class="lp-agenda">' + AG.map(function (a) { return '<li><span>' + a[1] + '</span>' + esc(a[0]) + '<em>' + a[2] + ' min</em></li>'; }).join('') + '</ol>' +
       '<h3>Key vocabulary</h3><div class="lp-chips">' + L.vocab.map(function (v) { return '<span title="' + esc(v[1]) + '">' + esc(v[0]) + '</span>'; }).join('') + '</div></div></div>';
-  }, notes: ['Read the learning target aloud; have students repeat it chorally or write it at the top of their notes.', 'Point to the agenda so students know the plan and how they will show learning (exit ticket).', 'Materials: notebooks or printed warm-up and guided notes; devices closed until work time.'] });
+  }, notes: ['Read the learning target aloud; have students repeat it chorally or rewrite it in Part 1 of the worksheet.', 'Point to the agenda so students know the plan and how they will show learning (exit ticket).', 'Materials: the printed lesson worksheet (one per student) and a pencil; devices closed until work time.'] });
 
-  slide({ part: 0, title: 'Warm-up', timer: 8 * 60, html: function () {
+  slide({ part: 0, ws: '2', title: 'Warm-up', timer: 8 * 60, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Warm-up · 8 minutes</span><h2>Do now</h2></div><div class="lp-grid2 wide"><div class="lp-box"><ol class="lp-wq">' + X.warmup.map(function (w, i) { return '<li><p>' + esc(w[0]) + '</p><div class="lp-look" data-look hidden><b>Look for:</b> ' + esc(w[1]) + '</div></li>'; }).join('') + '</ol>' +
       '<div class="lp-row"><button type="button" class="lp-btn" data-starttimer="480">Start 8:00 timer</button><button type="button" class="lp-btn ghost" data-showlook>Reveal answers 1–2</button><button type="button" class="lp-btn ghost" data-pick>Pick a student</button></div></div>' +
-      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Where:</b> notebook (date + "Warm-Up") or worksheet</li><li><b>How:</b> number each answer; complete sentences; show math work</li><li><b>Voice:</b> 0 (silent) for 5 minutes</li><li><b>Then:</b> 2 minutes to share with a partner</li><li><b>Be ready:</b> anyone may be called on to share</li></ul></div></div>';
+      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Where:</b> worksheet Part 2</li><li><b>How:</b> number each answer; complete sentences; show math work</li><li><b>Voice:</b> 0 (silent) for 5 minutes</li><li><b>Then:</b> 2 minutes to share with a partner</li><li><b>Be ready:</b> anyone may be called on to share</li></ul></div></div>';
   }, notes: ['Start the timer as students enter. Circulate and note who is unsure of question 1 or 2 (prior knowledge).', 'At 5 minutes, say "Partner share" and reset to 2:00 if you want.', 'Reveal answers to questions 1–2 only. Question 3 is a prediction: collect ideas without correcting; you will return to it in the debrief.'] });
 
-  slide({ part: 1, title: 'Hook', html: function () {
+  slide({ part: 1, ws: '3', title: 'Hook', html: function () {
     return '<div class="lp-head"><span class="lp-tag">Hook · 1 minute</span><h2>Make a prediction</h2></div><div class="lp-box accent lp-hook"><p class="lp-big">' + esc((X.hook || {}).q || '') + '</p></div>' +
-      '<div class="lp-box"><h3>Class vote</h3><div class="lp-votes">' + ((X.hook || {}).options || ['Yes', 'Not sure', 'No']).map(function (v, k) { return '<div class="lp-vote"><span>' + v + '</span><b data-vote="' + k + '">0</b><div><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="1">+1</button><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="-1">−1</button></div></div>'; }).join('') + '</div><p class="lp-small">1. Write your prediction in your notes. 2. Vote. 3. We will check it at the end of class.</p></div>';
+      '<div class="lp-box"><h3>Class vote</h3><div class="lp-votes">' + ((X.hook || {}).options || ['Yes', 'Not sure', 'No']).map(function (v, k) { return '<div class="lp-vote"><span>' + v + '</span><b data-vote="' + k + '">0</b><div><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="1">+1</button><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="-1">−1</button></div></div>'; }).join('') + '</div><p class="lp-small">1. Circle your prediction in Part 3 and write why. 2. Vote. 3. We will check it at the end of class.</p></div>';
   }, notes: ['Pose the question and have students commit to a prediction in writing before voting. This creates a reason to listen.', 'Do not reveal the answer. Tell students the lesson will help them decide.'] });
 
   steps.forEach(function (st, i) {
-    slide({ part: 1, title: 'Learn ' + (i + 1) + ': ' + st.t, tool: st.tool, html: function () {
+    slide({ part: 1, ws: String(5 + i) + (i ? '' : ' (and Part 4 vocabulary)'), title: 'Learn ' + (i + 1) + ': ' + st.t, tool: st.tool, html: function () {
       return '<div class="lp-head"><span class="lp-tag">Learn · step ' + (i + 1) + ' of ' + steps.length + '</span><h2>' + esc(st.t) + '</h2></div>' +
         '<div class="lp-grid2"><div><div class="lp-box accent"><h3>Key idea</h3><p class="lp-big">' + esc(st.say) + '</p></div>' +
-        '<div class="lp-box"><h3>Guided notes</h3><p class="lp-notes" data-notes>' + blanks(st.note, false) + '</p><button type="button" class="lp-btn ghost sm" data-fill>Show the missing words</button></div>' +
-        '<div class="lp-box talk"><h3>Turn and talk <span class="lp-small">(1 minute)</span></h3><p class="lp-big2">' + esc((X.talk || [])[i] || 'Explain this idea to your partner in your own words.') + '</p><div class="lp-row"><button type="button" class="lp-btn ghost sm" data-starttimer="60">Start 1:00</button><button type="button" class="lp-btn ghost sm" data-pick>Pick a pair to share</button></div></div></div>' +
-        '<div><div class="lp-box tool"><h3>' + (st.tool || st.cards ? 'Explore it' : 'In your notes') + '</h3>' + (st.tool ? vis(st.tool) : '') + (st.cards ? cards(st.cards) : '') + '<p class="lp-task">' + esc((X.dos || [])[i] || st.do) + '</p></div>' +
-        cfu(st.check, 'Check for understanding', ['Write your answer in your notes, then hold up fingers: 1 = A, 2 = B, 3 = C, 4 = D.', 'Think for 10 seconds, then show your answer with fingers.', 'Tell your partner your answer and why. Then we vote.', 'Write it in your notes. Be ready to explain.'][i % 4]) + '</div></div>';
-    }, notes: ['Teach (about 3 minutes): ' + st.say, 'Use the tool: ' + (st.tool ? (st.tool.sim ? 'run the simulation and ask students to predict before each change.' : 'point to the model and ask "What do you notice?"') : st.cards ? 'flip each card only after students guess.' : 'walk through the "In your notes" task on the slide.'), 'Check: if fewer than 80% are correct, reteach with a new example before moving on.'] });
+        '<div class="lp-box"><h3>A. Fill in the blanks</h3><p class="lp-notes" data-notes>' + blanks(st.note, false) + '</p><button type="button" class="lp-btn ghost sm" data-fill>Show the missing words</button></div>' +
+        '<div class="lp-box talk"><h3>C. Turn and talk <span class="lp-small">(1 minute)</span></h3><p class="lp-big2">' + esc((X.talk || [])[i] || 'Explain this idea to your partner in your own words.') + '</p><p class="lp-small">Write what you and your partner said.</p><div class="lp-row"><button type="button" class="lp-btn ghost sm" data-starttimer="60">Start 1:00</button><button type="button" class="lp-btn ghost sm" data-pick>Pick a pair to share</button></div></div></div>' +
+        '<div><div class="lp-box tool"><h3>' + (st.tool || st.cards ? 'B. Explore it, then do this' : 'B. Do this') + '</h3>' + (st.tool ? vis(st.tool) : '') + (st.cards ? cards(st.cards) : '') + '<p class="lp-task">' + esc(((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, '')) + '</p></div>' +
+        cfu(st.check, 'D. Check for understanding', ['Answer in Part ' + (5 + i) + 'D, then hold up fingers: 1 = A, 2 = B, 3 = C, 4 = D.', 'Answer in Part ' + (5 + i) + 'D and write "I know because..." Then show fingers.', 'Answer in Part ' + (5 + i) + 'D. Tell your partner why. Then we vote.', 'Answer in Part ' + (5 + i) + 'D. Be ready to explain.'][i % 4]) + '</div></div>';
+    }, notes: ['Teach (about 3 minutes): ' + st.say, 'Use the tool: ' + (st.tool ? (st.tool.sim ? 'run the simulation and ask students to predict before each change.' : 'point to the model and ask "What do you notice?"') : st.cards ? 'flip each card only after students guess.' : 'walk through task B on the slide.'), 'Check: if fewer than 80% are correct, reteach with a new example before moving on.'] });
   });
 
-  slide({ part: 1, title: 'Worked example', html: function () {
+  slide({ part: 1, ws: '9', title: 'Worked example', html: function () {
     var lines = X.model || [L.model];
     return '<div class="lp-head"><span class="lp-tag">I do · worked example</span><h2>Worked example</h2></div><div class="lp-grid2 wide"><div class="lp-box accent"><ol class="lp-steps lp-model">' + lines.map(function (t, k) { return '<li data-mstep' + (k ? ' hidden' : '') + '>' + esc(t) + '</li>'; }).join('') + '</ol><button type="button" class="lp-btn" data-nextm>Show next step</button></div>' +
-      '<div class="lp-box"><h3>As you watch, notice</h3><ul class="lp-exp"><li>What is looked at first?</li><li>Which key word or rule is used?</li><li>How is the answer checked?</li></ul><h3>In your notes</h3><p>Copy each step of the example.</p></div></div>';
+      '<div class="lp-box"><h3>As you watch, notice</h3><ul class="lp-exp"><li>What is looked at first?</li><li>Which key word or rule is used?</li><li>How is the answer checked?</li></ul><h3>On your worksheet (Part 9)</h3><p>Copy each step of the example.</p></div></div>';
   }, notes: ['Reveal one step at a time and think aloud (see the presenter script).'] });
 
-  if (X.wedo) slide({ part: 1, title: 'We do: solve it together', html: function () {
-    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p><p class="lp-small">In your notes: write each step as we solve it.</p></div>' +
+  if (X.wedo) slide({ part: 1, ws: '10', title: 'We do: solve it together', html: function () {
+    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p><p class="lp-small">Worksheet Part 10: write each step as we solve it.</p></div>' +
       '<div class="lp-box"><ol class="lp-steps">' + X.wedo.steps.map(function (t, k) { return '<li data-wstep hidden>' + esc(t) + '</li>'; }).join('') + '</ol><div class="lp-row"><button type="button" class="lp-btn" data-nextstep>Show next step</button><button type="button" class="lp-btn ghost" data-pick>Pick a student for the next step</button></div>' +
       '<div class="lp-ans" data-wans hidden><b>Answer:</b> ' + esc(X.wedo.a) + '</div></div>';
-  }, notes: ['Before revealing each step, ask the class "What should we do next?" and take an answer.', 'Students copy the worked steps into their notes.'] });
+  }, notes: ['Before revealing each step, ask the class "What should we do next?" and take an answer.', 'Students write the steps in Part 10 of the worksheet.'] });
 
-  if (X.youdo) slide({ part: 1, title: 'You do: try it on your own', timer: 120, html: function () {
-    return '<div class="lp-head"><span class="lp-tag">You do · independent</span><h2>Your turn: on your own</h2></div><div class="lp-grid2 wide"><div>' + cfu(X.youdo, 'Independent check', 'Solve in your notes. No talking for 2 minutes.') + '</div>' +
+  if (X.youdo) slide({ part: 1, ws: '11', title: 'You do: try it on your own', timer: 120, html: function () {
+    return '<div class="lp-head"><span class="lp-tag">You do · independent</span><h2>Your turn: on your own</h2></div><div class="lp-grid2 wide"><div>' + cfu(X.youdo, 'Independent check', 'Solve in Part 11 and show your thinking. No talking for 2 minutes.') + '</div>' +
       '<div class="lp-box accent"><h3>Then</h3><ul class="lp-exp"><li><b>Got it?</b> Get ready to launch ' + esc(P.room.title) + '.</li><li><b>Not sure?</b> Stay at the teacher table for a 3-minute reteach, then start at the Explorer level.</li></ul><button type="button" class="lp-btn" data-starttimer="120">Start 2:00 timer</button></div></div>';
   }, notes: ['Scan answers. Pull students who miss this item to a quick reteach group before they start the room.', 'Assign mission levels now: Explorer for students who need support, Legend for students ready for more.'] });
 
-  slide({ part: 2, title: 'Work time: ' + P.room.title, timer: 28 * 60, work: true, html: function () {
+  slide({ part: 2, ws: '12', title: 'Work time: ' + P.room.title, timer: 28 * 60, work: true, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Work time · 28 minutes</span><h2>' + esc(P.room.title) + '</h2><p class="lp-sub">' + esc(P.room.formatLabel) + ' · open it on your device</p></div>' +
       '<div class="lp-work"><div class="lp-box lp-bigtimer"><div class="lp-bt" data-bigtime="1680">28:00</div><div class="lp-row center"><button type="button" class="lp-btn" data-starttimer="1680">Start 28:00</button><button type="button" class="lp-btn ghost" data-toggletimer>Pause / resume</button></div>' +
       '<div class="lp-checkpts"><b>Checkpoints</b><span>10 min: ' + esc(P.room.node) + ' 2 done</span><span>20 min: ' + esc(P.room.node) + ' 4 done</span><span>28 min: final code + turn-in</span></div></div>' +
-      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Voice:</b> level 1 (whisper) with your partner only</li><li><b>Work:</b> solo or with your assigned partner</li><li><b>Stuck?</b> 1) reread the clue card 2) Show a hint 3) Supports button 4) ask your partner 5) ask the teacher</li><li><b>Level:</b> Explorer, Agent, or Legend as assigned</li><li><b>Write it down:</b> code pieces go in your guided notes</li></ul></div>' +
+      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Voice:</b> level 1 (whisper) with your partner only</li><li><b>Work:</b> solo or with your assigned partner</li><li><b>Stuck?</b> 1) reread the clue card 2) Show a hint 3) Supports button 4) ask your partner 5) ask the teacher</li><li><b>Level:</b> Explorer, Agent, or Legend as assigned</li><li><b>Write it down:</b> record each code piece and one key fact in Part 12</li></ul></div>' +
       '<div class="lp-box"><h3>Must do</h3><ul class="lp-checks"><li>Finish every ' + esc(P.room.node.toLowerCase()) + ' and open the final lock</li>' + (P.room.task ? '<li>Complete the written evidence task (' + esc(P.room.task) + ')</li>' : '') + '<li>Tap "Copy my work" and paste it into Canvas</li></ul><h3>May do (finished early?)</h3><ul class="lp-exp"><li>Replay at the Legend level</li><li>Help a classmate without giving answers</li><li>Write one new challenge question for the class</li></ul></div></div>';
   }, notes: ['Leave this slide up the whole work time. The big timer and checkpoints keep students on pace.', 'Circulate with the answer key. Prioritize students from the "Not sure" group.', 'At 20 minutes, give a 5-minute warning for the written task and turn-in.'] });
 
-  slide({ part: 3, title: 'Debrief', timer: 4 * 60, html: function () {
+  slide({ part: 3, ws: '13', title: 'Debrief', timer: 4 * 60, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Debrief · 4 minutes</span><h2>What did we learn?</h2></div><div class="lp-grid2 wide"><div class="lp-box"><ol class="lp-wq">' + L.debrief.map(function (q) { return '<li><p>' + esc(q) + '</p></li>'; }).join('') + '</ol><button type="button" class="lp-btn ghost" data-pick>Pick a student</button></div>' +
-      '<div class="lp-box accent"><h3>Back to the warm-up</h3><p class="lp-big2">' + esc(X.warmup[2][0]) + '</p><button type="button" class="lp-btn ghost sm" data-showlast>Reveal</button><div class="lp-ans" data-last hidden>' + esc(X.warmup[2][1]) + '</div><h3>And the hook</h3><p>Were our predictions right? What evidence changed your mind?</p></div></div>';
+      '<div class="lp-box accent"><h3>Back to the warm-up</h3><p class="lp-big2">' + esc(X.warmup[2][0]) + '</p><button type="button" class="lp-btn ghost sm" data-showlast>Reveal</button><div class="lp-ans" data-last hidden>' + esc(X.warmup[2][1]) + '</div><h3>And the hook</h3><p>Were our predictions right? What evidence changed your mind?</p><h3>On your worksheet (Part 13)</h3><p>Check your prediction, then finish your 3-2-1.</p></div></div>';
   }, notes: ['Ask for evidence: "How do you know?" after every answer.', 'Close the loop on warm-up question 3 and the hook vote.'] });
 
   slide({ part: 4, title: 'Exit ticket', timer: 8 * 60, html: function () {
@@ -3019,7 +3020,7 @@ function LessonPresenter(mount, P, opts) {
     root.innerHTML = '<header class="lp-top"><div class="lp-title"><b>' + esc(P.title) + '</b><span>' + esc(P.code) + '</span></div>' +
       '<nav class="lp-parts">' + PARTS.map(function (p, k) { return '<span class="' + (k === s.part ? 'on' : k < s.part ? 'past' : '') + '">' + p + '</span>'; }).join('') + '</nav>' +
       '<div class="lp-tools"><button type="button" class="lp-timer' + (T.left <= 0 && T.total ? ' done' : '') + '" data-timerbtn title="Timer (T)">' + (T.total ? fmt(T.left) : 'Timer') + '</button><button type="button" class="lp-ico" data-pick title="Name picker (P)">Pick</button><button type="button" class="lp-ico' + (notesOn ? ' on' : '') + '" data-notesbtn title="Teacher notes (N)">Notes</button><button type="button" class="lp-ico" data-fs title="Fullscreen (F)">Full</button>' + (opts.onExit ? '<button type="button" class="lp-ico" data-close title="Close (Esc)">Close</button>' : '') + '</div></header>' +
-      '<main class="lp-main">' + s.html() + '</main>' +
+      '<main class="lp-main">' + (s.ws ? '<div class="lp-ws">Worksheet · Part ' + esc(s.ws) + '</div>' : '') + s.html() + '</main>' +
       (notesOn ? '<aside class="lp-notesp"><h3>Teacher notes: ' + esc(s.title) + '</h3><ul>' + (s.notes || []).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul></aside>' : '') +
       '<footer class="lp-foot"><button type="button" class="lp-btn ghost" data-prev' + (cur ? '' : ' disabled') + '>← Back</button><div class="lp-dots">' + S.map(function (x, k) { return '<button type="button" class="' + (k === cur ? 'on' : '') + '" data-go="' + k + '" title="' + esc(x.title) + '" aria-label="Slide ' + (k + 1) + ': ' + esc(x.title) + '"></button>'; }).join('') + '</div><span class="lp-count">' + (cur + 1) + ' / ' + S.length + '</span><button type="button" class="lp-btn" data-next' + (cur < S.length - 1 ? '' : ' disabled') + '>Next →</button></footer>';
     bind();
@@ -3357,7 +3358,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
     MATH: [['Solve', 'Final answer with units.', 1], ['Show', 'Equation or steps with numbers and operations.', 3], ['Explain', 'Explain your strategy using math words.', 3]]
   };
   var FRAME_NAME = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s Claim (Claim, Evidence, Source, Explain)', MATH: 'Solve-Show-Explain' };
-  var NOTEBOOK = ['Write the date and "Warm-Up" at the top of a new notebook page (or use the worksheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
+  var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet (or on this sheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
   function exitPoints(room, lesson) { var mc = room.exit.filter(function (q) { return q.choices; }).length, cr = room.exit.length - mc; return { mc: mc, cr: cr, total: mc * 2 + cr * 2 + (lesson && lesson.exit ? 4 : 0) }; }
 
   function exitTicket(room, std, lesson) {
@@ -3409,7 +3410,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
     d.table([{ w: 0.22, h: 'Score' }, { w: 0.2, h: 'Level' }, { w: 0.58, h: 'Next step' }], [
       [m + '–' + pts.total + ' pts', 'Mastered', 'Extension: replay the room at the Legend level or write a second evidence response. Can serve as a peer helper.'],
       [a + '–' + (m - 1) + ' pts', 'Approaching', 'Quick reteach (5–10 min): replay the mini-lesson presenter steps tied to the missed items, then 2 similar practice questions.'],
-      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: guided notes review, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
+      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: review the lesson worksheet, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
     d.para('Evidence to look for: Did the student use vocabulary correctly, cite specific data or text, and explain the connection? A correct choice without a reason shows recognition, not yet mastery.', { size: 10, gap: 4 });
     d.footer('Crossroads Escapes · ' + room.title + ' · Exit Ticket');
     return d.bytes();
@@ -3417,65 +3418,105 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
 
   function warmup(room, std, lesson) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2];
-    header(d, 'WARM-UP  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Use this sheet or copy the questions into your notebook.', c);
+    header(d, 'WARM-UP  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Also Part 2 of the lesson worksheet.', c);
     d.nameDate();
-    d.banner('Notebook expectations', c, '5 min silent + 2 min share');
+    d.banner('Expectations', c, '5 min silent + 2 min share');
     NOTEBOOK.forEach(function (t, i) { d.para((i + 1) + '.  ' + t, { size: 10.5, indent: 6, gap: 2 }); });
     d.banner('Warm-up questions', c);
     lesson.warmup.forEach(function (w, i) { d.ensure(40 + w[2] * 24); d.para((i + 1) + '.  ' + w[0], { size: 11.5, bold: true, gap: 2 }); d.writeLines(w[2] + 1, 18); });
     d.callout([{ label: 'Today\'s target:', text: std.lesson.target }], c);
     d.newPage();
-    header(d, 'TEACHER KEY  ·  WARM-UP', std.title, 'What to look for in student notebooks.', c);
+    header(d, 'TEACHER KEY  ·  WARM-UP', std.title, 'What to look for in student answers.', c);
     d.table([{ w: 0.06, h: '#' }, { w: 0.44, h: 'Question' }, { w: 0.5, h: 'Look for' }], lesson.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     d.para('Use the warm-up to activate prior knowledge. Call on 2–3 students, and write one strong answer on the board as a model. Question 3 previews today\'s lesson, so do not correct it yet; come back to it in the debrief.', { size: 10.5 });
     d.footer('Crossroads Escapes · ' + std.code + ' · Warm-Up');
     return d.bytes();
   }
 
+  // The lesson worksheet: one printable packet students complete as the presenter moves along.
+  // Part numbers match the "Worksheet Part" badge on each presenter slide.
   function notes(room, std, lesson, key) {
-    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson;
-    header(d, (key ? 'TEACHER KEY  ·  ' : '') + 'GUIDED NOTES  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Fill in these notes as your teacher presents each step of the mini-lesson.', c);
-    if (!key) d.nameDate();
-    d.callout([{ label: 'I can:', text: L.target.replace(/^I can\s*/i, '') }], c);
-    d.banner('Key vocabulary', c);
-    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'What it means (in my own words)' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], key ? v[1] : '', '']; }), c, { minH: 40 });
-    lesson.steps.forEach(function (st, i) {
-      d.banner('Step ' + (i + 1) + ': ' + st.t, c);
-      d.para(blanks(st.note, key), { size: 11, gap: 4, indent: 4 });
-      d.para('Do: ' + ((lesson.dos || [])[i] || st.do), { size: 10, gray: 0.3, indent: 4, gap: 4 });
-      var ck = st.check;
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson, K = key;
+    function ans(t) { if (K) d.para('Key: ' + t, { size: 10, indent: 18, gap: 4, gray: 0.25 }); }
+    function lines(n, t) { if (K && t) ans(t); else d.writeLines(n, 18); }
+    function part(n, title, right) { d.banner('Part ' + n + ': ' + title, c, right || ''); }
+    function choices(ck) {
+      if (ck.type === 'mc') { d.para('Circle one:   ' + ck.choices.map(function (ch, k) { return '(' + LET[k] + ') ' + ch; }).join('     '), { size: 10.5, indent: 18, gap: 2 }); }
+      else if (ck.type === 'order') d.para('Number these in order:   ' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '___ ' + x; }).join('    '), { size: 10.5, indent: 18, gap: 2 });
+      else if (ck.type === 'highlight') d.para('Underline the answer:   ' + ck.segments.join(' '), { size: 10.5, indent: 18, gap: 2 });
+      else d.para('Answer: ______________________ ' + (ck.unit || ''), { size: 10.5, indent: 18, gap: 2 });
+    }
+    function ckAns(ck) { return (ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '')) + (ck.explain ? (/[.!?"']$/.test(String(ck.choices ? ck.choices[ck.answer] : '')) ? ' ' : '. ') + ck.explain : ''); }
+    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Complete each part when you see its number on the presenter slide.', c);
+    if (!K) d.nameDate();
+    part(1, 'Today\'s target');
+    d.para(L.target, { size: 11, bold: true, indent: 6, gap: 3 });
+    d.para('Rewrite the target in your own words:', { size: 10.5, indent: 6, gap: 0 });
+    lines(2, 'Any accurate paraphrase of the target.');
+    part(2, 'Warm-up', '8 min');
+    X.warmup.forEach(function (w, i) { d.ensure(60); d.para((i + 1) + '.  ' + w[0], { size: 10.5, bold: true, gap: 1, indent: 6 }); lines(w[2], w[1]); });
+    part(3, 'Hook: make a prediction');
+    if (X.hook) { d.para(X.hook.q, { size: 10.5, bold: true, indent: 6, gap: 2 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
+    d.para('Why I think so:', { size: 10, indent: 18, gray: 0.35, gap: 0 }); lines(1, 'Any reasoned prediction. It is checked in Part 13.');
+    part(4, 'Key vocabulary', 'fill in as you learn');
+    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'Meaning in my own words' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], K ? v[1] : '', '']; }), c, { minH: 36 });
+    X.steps.forEach(function (st, i) {
+      part(5 + i, 'Learn ' + (i + 1) + ': ' + st.t, '3 min');
+      d.para('A. Fill in the blanks:', { size: 10, bold: true, indent: 6, gap: 1 });
+      d.para(blanks(st.note, K), { size: 11, indent: 18, gap: 4 });
+      d.para('B. ' + ((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
+      if (K) ans('Check that the task is complete and accurate. It should match the fill-in above: ' + blanks(st.note, true)); else { d.ensure(80); d.box(d.margin + 18, d.y - 70, d.inner() - 18, 66, 0.6); d.y -= 76; }
+      d.para('C. Turn and talk: ' + ((X.talk || [])[i] || ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
+      d.para('What my partner and I said:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, blanks(st.note, true));
       d.ensure(70);
-      d.para('Try it: ' + ck.q, { size: 10.5, bold: true, indent: 4, gap: 2 });
-      if (ck.type === 'mc') ck.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch + (key && k === ck.answer ? '   <- answer' : ''), { size: 10, indent: 20, gap: 0 }); });
-      else if (ck.type === 'order') d.para(key ? ck.items.join(' → ') : ck.items.slice().reverse().join('   |   '), { size: 10, indent: 20, gap: 0 });
-      else if (ck.type === 'highlight') d.para(ck.segments.map(function (sg, k) { return key && ck.answer.indexOf(k) >= 0 ? '[' + sg + ']' : sg; }).join(' '), { size: 10, indent: 20, gap: 0 });
-      else if (key) d.para('Answer: ' + ck.answer[0] + (ck.unit ? ' ' + ck.unit : ''), { size: 10, indent: 20, gap: 0 });
-      if (key && ck.explain) d.para('Why: ' + ck.explain, { size: 9.5, gray: 0.35, indent: 20, gap: 0 });
-      if (!key) d.writeLines(1, 20);
+      d.para('D. Check for understanding: ' + st.check.q, { size: 10.5, bold: true, indent: 6, gap: 1 });
+      choices(st.check);
+      d.para('I know because:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(1, ckAns(st.check));
     });
-    d.banner('Sum it up', c);
-    d.para('In my own words, the most important idea from today is...', { size: 10.5, gap: 2 });
-    if (key) d.para(L.target, { size: 10.5, gray: 0.3 }); else d.writeLines(3);
-    d.footer('Crossroads Escapes · ' + std.code + ' · Guided Notes' + (key ? ' (Key)' : ''));
+    part(9, 'Worked example', 'copy each step');
+    (X.model || []).forEach(function (t, k) { d.ensure(30); if (K) d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para((k + 1) + '.', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+    if (X.wedo) {
+      part(10, 'We do: solve it together');
+      d.para(X.wedo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      X.wedo.steps.forEach(function (t, k) { d.ensure(30); if (K) d.para('Step ' + (k + 1) + ': ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para('Step ' + (k + 1) + ':', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+      d.para('Answer: ' + (K ? X.wedo.a : '____________________________'), { size: 11, bold: true, indent: 6, gap: 12 });
+    }
+    if (X.youdo) {
+      part(11, 'You do: on your own', '2 min, silent');
+      d.para(X.youdo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      choices(X.youdo);
+      d.para('Show your thinking:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, ckAns(X.youdo));
+    }
+    part(12, 'Work time: ' + room.title, '28 min');
+    d.para('As you finish each ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'part') + ', record the code piece and one key fact you learned there.', { size: 10.5, indent: 6, gap: 4 });
+    var node = { escape: 'Lock', gallery: 'Exhibit', fieldtrip: 'Stop', mystery: 'File', quest: 'Level' }[room.format] || 'Stage';
+    d.table([{ w: 0.3, h: node }, { w: 0.14, h: 'Code piece' }, { w: 0.56, h: 'One key fact I learned' }], room.stages.map(function (st, i) { return [node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + String(st.title).replace(/^(Stop|Lock|Level|Evidence File|Room|Exhibit|Artifact)\s*#?\d*:\s*/i, ''), K ? (room.code || '')[i] || '' : '', '']; }), c, { minH: 34 });
+    d.para('Final code: ________________     [ ] Written task finished     [ ] Work copied into Canvas', { size: 10.5, indent: 6, gap: 12 });
+    part(13, 'Debrief and wrap-up', '4 min');
+    d.para('Check your prediction from Part 3. Was it right? What evidence changed or confirmed it?', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
+    d.para('3 things I learned today:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(3, 'Three accurate facts from the lesson.');
+    d.para('2 vocabulary words used correctly in a sentence:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, 'Two vocabulary words used correctly.');
+    d.para('1 question I still have:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(1, 'Any genuine question.');
+    d.footer('Crossroads Escapes · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
     return d.bytes();
   }
 
   function guide(room, std, answerLines, lesson) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson || {};
     header(d, 'FACILITATION GUIDE  ·  60-MINUTE LESSON  ·  GRADE ' + room.grade + '  ·  ' + room.standard, room.title, std.title + ': ' + std.text, c);
-    d.callout([{ label: 'Learning target:', text: L.target }, { label: 'Success looks like:', text: 'Students use the vocabulary correctly, complete the ' + room.formatLabel.toLowerCase() + ', and score 80% or higher on the evidence-based exit ticket.' }, { label: 'Materials:', text: 'Student devices, notebooks (or the printed warm-up and guided notes), projector for the mini-lesson presenter.' }], c);
+    d.callout([{ label: 'Learning target:', text: L.target }, { label: 'Success looks like:', text: 'Students use the vocabulary correctly, complete the ' + room.formatLabel.toLowerCase() + ', and score 80% or higher on the evidence-based exit ticket.' }, { label: 'Materials:', text: 'Student devices, the printed lesson worksheet (one per student), projector for the mini-lesson presenter.' }], c);
     d.banner('Lesson at a glance', c, '60 minutes');
     d.table([{ w: 0.13, h: 'Time' }, { w: 0.17, h: 'Part' }, { w: 0.4, h: 'Teacher does' }, { w: 0.3, h: 'Students do' }], [
-      ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer 3 questions in notebooks or on the worksheet; share with a partner.'],
-      ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Fill in guided notes; answer quick checks (whiteboards, fingers, or aloud).'],
+      ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer Part 2 of the lesson worksheet; share with a partner.'],
+      ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Complete worksheet Parts 4-11 as each slide appears; answer checks with fingers.'],
       ['0:20–0:48', room.formatLabel, 'Launch ' + room.title + '. Assign mission levels; circulate with the answer key.', 'Play solo or in pairs; record code pieces; complete any written evidence task.'],
-      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Discuss and correct their notes.'],
+      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + 3-2-1).'],
       ['0:52–1:00', 'Exit ticket', 'Hand out the exit ticket. Collect and sort with the mastery guide.', 'Answer with evidence independently.']], c);
     d.sub('Key vocabulary');
     d.table([{ w: 0.25, h: 'Word' }, { w: 0.75, h: 'Student-friendly definition' }], L.vocab, c);
     if (X.warmup) {
       d.banner('1. Warm-up', c, '0:00–0:08 · 8 min');
-      d.callout([{ label: 'Notebook expectations (post these):', text: NOTEBOOK.join(' ') }], c, { size: 10 });
+      d.callout([{ label: 'Warm-up expectations (post these):', text: NOTEBOOK.join(' ') }], c, { size: 10 });
       d.table([{ w: 0.06, h: '#' }, { w: 0.47, h: 'Question' }, { w: 0.47, h: 'Look for' }], X.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     }
     d.banner('2. Mini-lesson', c, '0:08–0:20 · 12 min');
@@ -3485,7 +3526,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : 'Visual: ' + (st.tool.caption || st.tool.kind)) : st.cards ? 'Flip cards: ' + st.cards.map(function (x) { return x[0]; }).join(', ') : 'Board and notes';
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       d.sub('Step ' + (i + 1) + ' (3 min): ' + st.t);
-      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', (X.dos || [])[i] || st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Guided notes', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
+      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', (X.dos || [])[i] || st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Worksheet Part ' + (5 + i) + 'A', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
     });
     d.sub('I do: worked example (shown one step at a time)');
     (X.model || []).forEach(function (t, k) { d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 10, gap: 1 }); });
@@ -3505,9 +3546,9 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
     d.para('Print the exit ticket PDF (page 2 is the key and mastery guide). Every item requires evidence: Part A asks students to justify each choice, Part B asks for an explanation, and Part C applies the standard to a new situation using ' + (X.exit ? FRAME_NAME[X.exit.frame] : 'a written response') + '. Sort results into Mastered, Approaching, and Beginning to plan tomorrow\'s groups.', { size: 10.5, gap: 4 });
     d.banner('Lesson resources', c);
     d.table([{ w: 0.3, h: 'Resource' }, { w: 0.7, h: 'How it fits the lesson' }], [
-      ['Warm-up worksheet (PDF)', 'Printable version of the warm-up with notebook expectations and a key.'],
+      ['Warm-up worksheet (PDF)', 'Optional standalone warm-up (also Part 2 of the lesson worksheet), with a key.'],
       ['Mini-lesson presenter', 'Projectable, step-by-step interactive lesson with tools and quick checks (room page).'],
-      ['Guided notes (PDF + key)', 'Students fill in blanks, vocabulary, and "try it" problems that match each presenter step.'],
+      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: target, warm-up, prediction, vocabulary, fill-ins, tasks, turn-and-talks, checks, worked example, practice, a work-time tracker, and a 3-2-1 wrap-up. Parts match the presenter slides.'],
       [room.title + ' (.html)', 'The ' + room.formatLabel.toLowerCase() + ' for Canvas, with differentiated levels, supports, and a turn-in.'],
       ['Exit ticket (PDF + key)', 'Evidence-based check with a rubric and a mastery sorting guide.']].concat((std.resources || []).slice(0, 4).map(function (x) { return [x.name + ' (extra)', x.note + ' ' + x.url]; })), c);
     d.banner('Answer key: ' + room.title, c);
@@ -3520,30 +3561,30 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
   // Teacher script that goes with the lesson presenter, slide by slide.
   function script(room, std, lesson, taskName) {
     var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson, n = 0;
-    header(d, 'PRESENTER SCRIPT  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title + ': teacher script', 'Use with the Lesson presenter (room page → Lesson presenter). Slides show only student cues; this script has what to say. Students need a notebook, the guided notes page, and a pencil.', c);
-    d.callout([{ label: 'Presenter keys:', text: 'Right/left arrows change slides. N shows short notes. T pauses the timer. P picks a student. F is fullscreen.' }, { label: 'Response routine:', text: 'Students write each answer in their notes, then show it with fingers (1 = A, 2 = B, 3 = C, 4 = D). Scan the room before revealing.' }], c, { size: 10 });
+    header(d, 'PRESENTER SCRIPT  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title + ': teacher script', 'Use with the Lesson presenter (room page → Lesson presenter). Slides show only student cues; this script has what to say. Students need the printed lesson worksheet and a pencil.', c);
+    d.callout([{ label: 'Presenter keys:', text: 'Right/left arrows change slides. N shows short notes. T pauses the timer. P picks a student. F is fullscreen.' }, { label: 'Response routine:', text: 'Students write each answer on their worksheet, then show it with fingers (1 = A, 2 = B, 3 = C, 4 = D). Scan the room before revealing.' }], c, { size: 10 });
     function slide(title, time, rows) {
       n++;
       d.banner('Slide ' + n + ': ' + title, c, time || '');
       d.table([{ w: 0.2 }, { w: 0.8 }], rows.filter(function (r) { return r && r[1]; }), c, { repeat: false });
     }
     slide('Today\'s target', '1 min', [['Say', 'Today\'s learning target is: "' + L.target + '" Read it with me.'], ['Say', 'Here is how you will know you have it: the success criteria. You will prove it on the exit ticket at the end of class.'], ['Point to', 'The agenda and the key vocabulary. Tell students they need their notebook, guided notes page, and pencil.']]);
-    slide('Warm-up', '0:00–0:08', [['Say', 'Start a new notebook page: write today\'s date and "Warm-Up." Answer the three questions in complete sentences. You have 5 minutes of silent work. Go.'], ['Do', 'Start the 8:00 timer. Circulate. At 5 minutes say: "Turn to your partner and compare answers for 2 minutes."'], ['Look for', X.warmup.map(function (w, i) { return (i + 1) + ') ' + w[1]; }).join('  ')], ['Say', 'Call on 2–3 students for questions 1 and 2, then reveal. Say: "We will come back to question 3 at the end of class."']]);
-    slide('Hook', '1 min', [['Say', (X.hook ? 'Read the question on the screen: "' + X.hook.q + '" Write your prediction in your notes. Then vote.' : '')], ['Background', room.hook || L.hook], ['Do', 'Tap +1 for each vote. Do not give the answer. Say: "By the end of the lesson, you will be able to check your prediction."']]);
+    slide('Warm-up', '0:00–0:08', [['Say', 'Turn to Part 2 of your lesson worksheet. Answer the three questions in complete sentences. You have 5 minutes of silent work. Go.'], ['Do', 'Start the 8:00 timer. Circulate. At 5 minutes say: "Turn to your partner and compare answers for 2 minutes."'], ['Look for', X.warmup.map(function (w, i) { return (i + 1) + ') ' + w[1]; }).join('  ')], ['Say', 'Call on 2–3 students for questions 1 and 2, then reveal. Say: "We will come back to question 3 at the end of class."']]);
+    slide('Hook', '1 min', [['Say', (X.hook ? 'Read the question on the screen: "' + X.hook.q + '" Circle your prediction in Part 3 of your worksheet and write why. Then vote.' : '')], ['Background', room.hook || L.hook], ['Do', 'Tap +1 for each vote. Do not give the answer. Say: "By the end of the lesson, you will be able to check your prediction."']]);
     X.steps.forEach(function (st, i) {
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       slide('Learn ' + (i + 1) + ': ' + st.t, '3 min', [
         ['Say', st.say],
-        ['Guided notes', 'Say: "Fill in step ' + (i + 1) + ' of your guided notes." Answers: ' + blanks(st.note, true) + ' (tap "Show the missing words" after students try.)'],
+        ['Worksheet', 'Say: "Part ' + (5 + i) + ': fill in the blanks (A), do the task (B), write what your partner said (C), and answer the check (D)." Blank answers: ' + blanks(st.note, true) + ' (tap "Show the missing words" after students try.)'],
         ['Explore', (st.tool ? (st.tool.sim ? 'Run the simulation: ' + st.tool.sim.title + '. Before each change, ask students to predict in their notes.' : 'Point to the model: ' + (st.tool.caption || 'the picture') + '. Ask: "What do you notice?"') : st.cards ? 'Flip each card only after students guess: ' + st.cards.map(function (x) { return x[0] + ' = ' + x[1]; }).join('; ') + '.' : '') + ' Students do: ' + ((X.dos || [])[i] || st.do)],
         ['Turn and talk', 'Say: "' + ((X.talk || [])[i] || '') + '" Start the 1:00 timer. Then pick a pair to share.'],
         ['Check', 'Read the question aloud. Students write, then show fingers. Scan, then reveal. Answer: ' + ans + (ck.explain ? '. ' + ck.explain : '')],
         ['If < 80% correct', 'Go back to the Explore box and model a second example out loud, then re-ask the check with a partner discussion first. See "Misconceptions to watch for" at the end of this script.']
       ]);
     });
-    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into your notes.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
-    if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
-    if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own. Solve it in your notes with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
+    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
+    if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together in Part 10. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
+    if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own: Part 11. Solve it with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
     slide('Work time: ' + room.title, '0:20–0:48', [['Say', 'Open ' + room.title + ' on your device. Type your name, choose the level I assigned, and begin. Whisper voice with your partner only.'], ['Do', 'Start the 28:00 timer and leave this slide up. Circulate with the answer key.'], ['Checkpoints', 'At 10 minutes: ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'stage') + ' 2 done. At 20 minutes: stage 4 done; give a 5-minute warning for the ' + (taskName || 'final lock') + ' and turn-in.'], ['Turn-in', 'Students tap "Copy my work" and paste it into the Canvas assignment (Text Entry).']]);
     slide('Debrief', '0:48–0:52', [['Ask', L.debrief.join('  |  ')], ['Say', 'Back to warm-up question 3 and our hook vote: were our predictions right? What evidence changed your mind?'], ['Answer', X.warmup[2][1]]]);
     slide('Exit ticket', '0:52–1:00', [['Say', 'Clear your desk except a pencil. Work silently and on your own. For every answer, write "I know because..." and use evidence.'], ['Do', 'Hand out the exit ticket. Start the 8:00 timer. Collect and sort with page 3 (Mastered / Approaching / Beginning).']]);
@@ -9156,110 +9197,126 @@ window.CX_LESSONS = {};
 <script>
 /*
  * Student-facing cues for the lesson presenter. Slides show only these cues; everything the
- * teacher says lives in the separate presenter script PDF. Students need only a notebook,
- * the guided notes page, and a pencil.
+ * teacher says lives in the separate presenter script PDF. Students need only the printed
+ * lesson worksheet (js/pdf.js notes()) and a pencil.
  *   hook:  { q, options }       prediction question with three vote choices
  *   model: [lines]              worked example shown one line at a time
- *   dos:   [4 strings]          "In your notes" task for each mini-lesson step (all content included)
+ *   dos:   [4 strings]          worksheet task (Part B) for each mini-lesson step (all content included)
  */
 (function (X) {
   function add(id, o) { if (X[id]) Object.keys(o).forEach(function (k) { X[id][k] = o[k]; }); }
   add('g5-sci-matter', {
     hook: { q: 'A 50-gram ice cube melts inside a sealed bag. What will the water weigh?', options: ['More than 50 g', 'Exactly 50 g', 'Less than 50 g'] },
     model: ['Problem: 30 g of water + 5 g of salt are stirred together. The salt seems to disappear. What is the total mass?', 'Step 1: The salt particles did not vanish. They spread out through the water.', 'Step 2: Nothing left the cup, and nothing was added.', 'Step 3: 30 g + 5 g = 35 g.', 'Answer: 35 g. Mass is conserved.'],
-    dos: ['In your notes: list 3 properties of your pencil (color, hardness, shape, texture...).', 'In your notes: read the cylinder in the picture and write its volume in mL. Then find the box\'s volume: 3 × 2 × 2.', 'In your notes: make two columns, Physical and Chemical. Sort the four flip cards.', 'In your notes: predict what the scale will show, open and sealed. Then watch and check.'] });
+    dos: ['List 3 properties of your pencil (color, hardness, shape, texture...).', 'Read the cylinder in the picture and write its volume in mL. Then find the box\'s volume: 3 × 2 × 2.', 'Make two columns, Physical and Chemical. Sort the four flip cards.', 'Predict what the scale will show, open and sealed. Then watch and check.'] });
   add('g5-sci-space', {
     hook: { q: 'This morning the Sun was in the east. At dismissal it will be in the west. What moved?', options: ['The Sun moved', 'Earth spun', 'Both moved'] },
     model: ['Imagine Earth spinning on its axis, with Indiana marked by a dot.', 'Step 1: When Indiana faces the Sun, it is daytime (noon when it faces it directly).', 'Step 2: As Earth keeps spinning west to east, Indiana turns away: sunset, then night.', 'Step 3: One full spin takes 24 hours: one day.', 'Step 4: Earth also orbits the Sun once a year, always tilted the same way. Tilt toward the Sun = summer.'],
-    dos: ['In your notes: draw Earth, mark Indiana, and shade the night side. Label "day" and "night."', 'In your notes: make a table with 3 times (9 a.m., noon, 4 p.m.). Record the shadow as long or short.', 'In your notes: draw Earth tilted toward the Sun and label "summer in Indiana."', 'In your notes: write the name of the phase at each Moon position you try.'] });
+    dos: ['Draw Earth, mark Indiana, and shade the night side. Label "day" and "night."', 'Make a table with 3 times (9 a.m., noon, 4 p.m.). Record the shadow as long or short.', 'Draw Earth tilted toward the Sun and label "summer in Indiana."', 'Write the name of the phase at each Moon position you try.'] });
   add('g5-sci-eco', {
     hook: { q: 'In a forest, a hawk eats a snake that ate a mouse that ate seeds. Where did the hawk\'s energy START?', options: ['The mouse', 'The seeds', 'The Sun'] },
     model: ['Food chain: acorn → squirrel → red-tailed hawk.', 'Question: A disease wipes out the squirrels. What happens?', 'Step 1: Hawks lose a food source, so the hawk population may shrink.', 'Step 2: Fewer squirrels eat acorns, so more acorns survive.', 'Step 3: More acorns means more oak seedlings grow. One change ripples through the web.'],
-    dos: ['In your notes: copy this chain and circle the producer: sunlight → clover → rabbit → fox.', 'In your notes: fix this backward chain: hawk → mouse → grass.', 'In your notes: label each flip-card organism herbivore, carnivore, omnivore, or decomposer.', 'In your notes: predict what happens to the bluegill when invasive fish arrive. Then watch the simulation.'] });
+    dos: ['Copy this chain and circle the producer: sunlight → clover → rabbit → fox.', 'Fix this backward chain: hawk → mouse → grass.', 'Label each flip-card organism herbivore, carnivore, omnivore, or decomposer.', 'Predict what happens to the bluegill when invasive fish arrive. Then watch the simulation.'] });
   add('g6-sci-particles', {
     hook: { q: 'Which particles are moving right now: the ones in your desk, your water bottle, or the air?', options: ['Only the air', 'The water and the air', 'All three'] },
     model: ['Problem: Explain what happens to ice particles as the ice is heated.', 'Step 1: At −10 °C, particles are packed tightly and vibrate in place: solid.', 'Step 2: Adding thermal energy makes them vibrate faster.', 'Step 3: At 0 °C they break out of fixed positions and slide past each other: liquid.', 'Step 4: At 100 °C they spread far apart and move fast: gas.'],
-    dos: ['In your notes: describe how the particles move at −20 °C in 5 words or fewer.', 'In your notes: draw three boxes labeled solid, liquid, gas. Draw the particles in each.', 'In your notes: explain why the heating curve is flat at 0 °C and at 100 °C.', 'In your notes: name each change: steam on a mirror, frost disappearing, a puddle drying.'] });
+    dos: ['Describe how the particles move at −20 °C in 5 words or fewer.', 'Draw three boxes labeled solid, liquid, gas. Draw the particles in each.', 'Explain why the heating curve is flat at 0 °C and at 100 °C.', 'Name each change: steam on a mirror, frost disappearing, a puddle drying.'] });
   add('g6-sci-energy', {
     hook: { q: 'A pencil is held still above the floor. Does it have energy?', options: ['Yes', 'No, it is not moving', 'Not sure'] },
     model: ['Imagine a roller coaster car on a big hill.', 'Step 1: At the top, the car is high and slow: most potential energy (PE).', 'Step 2: Halfway down, it has some PE and some kinetic energy (KE).', 'Step 3: At the bottom, it is low and fast: most KE.', 'Step 4: Energy changed form. It did not disappear (some becomes heat from friction).'],
-    dos: ['In your notes: label each as mostly PE or KE: a book on a shelf, a rolling ball, a stretched rubber band.', 'In your notes: sketch the energy bars at the top and the bottom of the hill.', 'In your notes: explain why a metal desk feels cold. Use the words heat and warmer.', 'In your notes: write your own example of conduction, convection, and radiation.'] });
+    dos: ['Label each as mostly PE or KE: a book on a shelf, a rolling ball, a stretched rubber band.', 'Sketch the energy bars at the top and the bottom of the hill.', 'Explain why a metal desk feels cold. Use the words heat and warmer.', 'Write your own example of conduction, convection, and radiation.'] });
   add('g6-sci-space', {
     hook: { q: 'On April 8, 2024, the sky over Indiana went dark at midday. What lined up?', options: ['Sun – Moon – Earth', 'Sun – Earth – Moon', 'Earth – Sun – Moon'] },
     model: ['Imagine the Sun, Earth, and the Moon in a row.', 'Step 1: Moon between the Sun and Earth: that is a new moon.', 'Step 2: If the line is perfect, the Moon\'s shadow falls on Earth: solar eclipse.', 'Step 3: Earth between the Sun and the Moon: that is a full moon.', 'Step 4: If the line is perfect, Earth\'s shadow falls on the Moon: lunar eclipse.'],
-    dos: ['In your notes: write what happens to the cannonball at slow, medium, and fast speeds.', 'In your notes: draw 4 Moon shapes: new, first quarter, full, third quarter.', 'In your notes: sketch the line-up for a solar eclipse and a lunar eclipse.', 'In your notes: draw Earth, the Moon, and the two ocean bulges.'] });
+    dos: ['Write what happens to the cannonball at slow, medium, and fast speeds.', 'Draw 4 Moon shapes: new, first quarter, full, third quarter.', 'Sketch the line-up for a solar eclipse and a lunar eclipse.', 'Draw Earth, the Moon, and the two ocean bulges.'] });
   add('g5-ss-colonial', {
     hook: { q: 'You must start a town with rocky soil and long, cold winters. What will most people do for work?', options: ['Grow big fields of crops', 'Fish, build ships, and trade', 'Mine for gold'] },
     model: ['Chart: New England | Middle | Southern.', 'Climate row: cold, rocky | mild, fertile | warm, long growing season.', 'Economy row: fishing, shipbuilding, trade | grain farms ("breadbasket") | plantations of tobacco, rice, indigo.', 'Key idea: geography (land and climate) shaped how people made a living.'],
-    dos: ['In your notes: match each region to its way of life: Woodlands, Plains, Southwest.', 'In your notes: list one item that went each way in the Columbian Exchange.', 'In your notes: copy the three-region chart and fill in the Economy row.', 'In your notes: read this clue and name the region: "Our farms grow wheat to sell in Philadelphia."'] });
+    dos: ['Match each region to its way of life: Woodlands, Plains, Southwest.', 'List one item that went each way in the Columbian Exchange.', 'Copy the three-region chart and fill in the Economy row.', 'Read this clue and name the region: "Our farms grow wheat to sell in Philadelphia."'] });
   add('g5-ss-revolution', {
     hook: { q: 'Imagine a new 10-cent tax on every pencil, and you get no vote about it. Is that fair?', options: ['Fair', 'Unfair', 'It depends'] },
     model: ['Cause-and-effect chain:', 'Debt: Britain owed money after the French and Indian War.', '→ Taxes: the Stamp Act, Townshend Acts, and Tea Act.', '→ Protests: boycotts and the Boston Tea Party.', '→ Punishment: the Intolerable Acts.', '→ Battles: Lexington and Concord, then the Declaration of Independence (1776).'],
-    dos: ['In your notes: start a timeline from 1760 to 1785. Add 1763 (war ends) and 1765 (Stamp Act).', 'In your notes: write "No taxation without representation" in your own words.', 'In your notes: add 1770, 1773, and 1775 events to your timeline.', 'In your notes: circle the battle that brought France into the war: Saratoga (1777).'] });
+    dos: ['Start a timeline from 1760 to 1785. Add 1763 (war ends) and 1765 (Stamp Act).', 'Write "No taxation without representation" in your own words.', 'Add 1770, 1773, and 1775 events to your timeline.', 'Circle the battle that brought France into the war: Saratoga (1777).'] });
   add('g5-ss-civics', {
     hook: { q: 'Should one student make all the class rules, enforce them, AND judge who broke them?', options: ['Yes, it is faster', 'No, it is too much power', 'Not sure'] },
     model: ['Three boxes: Legislative (Congress) | Executive (President) | Judicial (courts).', 'Step 1: Congress passes a bill.', 'Step 2: The President vetoes it (a check on Congress).', 'Step 3: Two-thirds of Congress votes to override (a check on the President).', 'Result: the bill becomes law anyway. No branch has all the power.'],
-    dos: ['In your notes: list one weakness of the Articles of Confederation.', 'In your notes: write what "We the People" means in your own words.', 'In your notes: draw three boxes for the branches and write each one\'s job.', 'In your notes: draw one arrow showing one branch checking another. Label it.'] });
+    dos: ['List one weakness of the Articles of Confederation.', 'Write what "We the People" means in your own words.', 'Draw three boxes for the branches and write each one\'s job.', 'Draw one arrow showing one branch checking another. Label it.'] });
   add('g6-ss-americas', {
     hook: { q: 'How would you grow food on a steep mountain?', options: ['Cut flat steps into it', 'Move somewhere else', 'Only hunt and fish'] },
     model: ['Venn diagram: Maya | Aztec | Inca.', 'Maya and Aztec: stone pyramids and temples.', 'Inca only: roads, rope bridges, and quipus.', 'All three (center): farming adapted to geography, and a strong ruler tied to religion.'],
-    dos: ['In your notes: draw the number 13 with Maya symbols (2 bars and 3 dots).', 'In your notes: sketch a chinampa (a garden bed built up in a lake).', 'In your notes: read the quipu cord: count the tens knots, then the ones knots.', 'In your notes: rank the causes of the conquest: disease, horses, steel, allies.'] });
+    dos: ['Draw the number 13 with Maya symbols (2 bars and 3 dots).', 'Sketch a chinampa (a garden bed built up in a lake).', 'Read the quipu cord: count the tens knots, then the ones knots.', 'Rank the causes of the conquest: disease, horses, steel, allies.'] });
   add('g6-ss-europe', {
     hook: { q: 'In medieval Europe, who do you think had the most land?', options: ['The king', 'The knights', 'The farmers'] },
     model: ['Feudal pyramid: King → Nobles → Knights → Peasants and serfs.', 'Each level gave something and got something: land for loyalty, service for protection.', 'Then the Black Death: fewer workers → peasants could demand pay → feudalism weakened.'],
-    dos: ['In your notes: draw and label the feudal pyramid.', 'In your notes: write how the Magna Carta connects to the U.S. Constitution.', 'In your notes: copy the cause-and-effect chain for the Black Death.', 'In your notes: list one Renaissance artist and one invention.'] });
+    dos: ['Draw and label the feudal pyramid.', 'Write how the Magna Carta connects to the U.S. Constitution.', 'Copy the cause-and-effect chain for the Black Death.', 'List one Renaissance artist and one invention.'] });
   add('g6-ss-geo', {
     hook: { q: 'Indianapolis (40° N) and Madrid, Spain (40° N) are the same distance from the Equator. Will their weather be the same?', options: ['Yes', 'No', 'Not sure'] },
     model: ['Problem: find 20° S, 60° W on the grid.', 'Step 1: Start at the Equator (0°). Move DOWN to 20° S.', 'Step 2: Start at the Prime Meridian (0°). Move LEFT to 60° W.', 'Step 3: Where they meet is in South America.', 'Remember: latitude first, then longitude.'],
-    dos: ['In your notes: write the coordinates of the point where the Equator meets the Prime Meridian.', 'In your notes: write London\'s coordinates from the grid (latitude first).', 'In your notes: compare London and Montréal. Which is colder? Why?', 'In your notes: sort the flip cards into adapt, depend, and modify.'] });
+    dos: ['Write the coordinates of the point where the Equator meets the Prime Meridian.', 'Write London\'s coordinates from the grid (latitude first).', 'Compare London and Montréal. Which is colder? Why?', 'Sort the flip cards into adapt, depend, and modify.'] });
   add('g5-ela-theme', {
     hook: { q: 'The tortoise beats the hare. Is "a race" the lesson of the story?', options: ['Yes', 'No', 'Not sure'] },
     model: ['Formula: Character + challenge + response + change → lesson.', 'Character: the tortoise. Challenge: racing a much faster hare.', 'Response: keeps moving steadily. Change: wins while the hare naps.', 'Lesson: "The tortoise learned slow and steady wins."', 'Make it universal (remove the name): "Slow and steady effort can beat talent without effort."'],
-    dos: ['In your notes: turn "courage" and "friendship" into full theme sentences.', 'In your notes: answer the four questions (challenge, response, change, lesson) for the tortoise.', 'In your notes: fix this theme by removing the name: "Leo learned to share."', 'In your notes: write a 3-sentence summary of "The Tortoise and the Hare."'] });
+    dos: ['Turn "courage" and "friendship" into full theme sentences.', 'Answer the four questions (challenge, response, change, lesson) for the tortoise.', 'Fix this theme by removing the name: "Leo learned to share."', 'Write a 3-sentence summary of "The Tortoise and the Hare."'] });
   add('g5-ela-info', {
     hook: { q: 'A table has a top and legs. If the tabletop is the main idea, what are the legs?', options: ['Key details', 'The title', 'The pictures'] },
     model: ['Paragraph: "Monarch butterflies travel up to 3,000 miles each fall. They fly south to forests in Mexico. They rest in the same trees every year. Monarchs are orange and black."', 'Step 1: What do most sentences have in common? The long trip.', 'Step 2: Main idea: Monarchs make a long journey to Mexico each fall.', 'Step 3: "Orange and black" is interesting but does not support the trip. It is not a key detail.'],
-    dos: ['In your notes: write the main idea sentence of the wetlands paragraph in the check.', 'In your notes: cross out the detail that does not support "Wetlands protect towns from floods."', 'In your notes: write a main idea for "How Bees Make Honey" and "Why Bees Are Disappearing."', 'In your notes: match each signal word card to its text structure.'] });
+    dos: ['Write the main idea sentence of the wetlands paragraph in the check.', 'Cross out the detail that does not support "Wetlands protect towns from floods."', 'Write a main idea for "How Bees Make Honey" and "Why Bees Are Disappearing."', 'Match each signal word card to its text structure.'] });
   add('g5-ela-vocab', {
     hook: { q: '"My backpack weighs a ton." Is that literally true?', options: ['Yes', 'No, it is an exaggeration', 'Not sure'] },
     model: ['Word: transportable.', 'Step 1: Break it apart: trans + port + able.', 'Step 2: trans = across, port = carry, able = can be.', 'Step 3: Put it together: able to be carried across.', 'Check the sentence: "The transportable stage was moved to the park." It makes sense.'],
-    dos: ['In your notes: name the clue type (definition, synonym, antonym, example): "Unlike her timid brother, Rosa was bold."', 'In your notes: build three words from the root cards (like biology, telegraph, spectator).', 'In your notes: add affixes to "help" (helpful, helpless) and "view" (review, preview).', 'In your notes: write one simile, one metaphor, and one personification.'] });
+    dos: ['Name the clue type (definition, synonym, antonym, example): "Unlike her timid brother, Rosa was bold."', 'Build three words from the root cards (like biology, telegraph, spectator).', 'Add affixes to "help" (helpful, helpless) and "view" (review, preview).', 'Write one simile, one metaphor, and one personification.'] });
   add('g6-ela-evidence', {
     hook: { q: 'A girl walks in, drops her backpack, slams her binder down, and says nothing. How does she feel?', options: ['Happy', 'Upset', 'Sleepy'] },
     model: ['Inference: Marcus is nervous about the game.', 'Evidence A: "The game started at 7:00."', 'Evidence B: "Marcus retied his shoes for the fourth time."', 'Step 1: Does A show nervousness? No. It is about the game but proves nothing about Marcus.', 'Step 2: B shows a nervous habit. B is the strongest evidence.'],
-    dos: ['In your notes: complete Text clue + What I know = Inference for: "Jada checked the clock for the fifth time."', 'In your notes: rank the two pieces of evidence in the check from strongest to weakest.', 'In your notes: write one sentence: "According to the text, ___, which shows ___."', 'In your notes: make a beginning / middle / end chart for a character you know.'] });
+    dos: ['Complete Text clue + What I know = Inference for: "Jada checked the clock for the fifth time."', 'Rank the two pieces of evidence in the check from strongest to weakest.', 'Write one sentence: "According to the text, ___, which shows ___."', 'Make a beginning / middle / end chart for a character you know.'] });
   add('g6-ela-central', {
     hook: { q: 'Which ad is more convincing? A: "Our cereal is the BEST, everyone loves it!" B: "Our cereal has 8 grams of protein, twice the leading brand."', options: ['Ad A', 'Ad B', 'Both the same'] },
     model: ['Claim: Our school should start later.', 'Reason: Students need more sleep to learn well.', 'Evidence: The American Academy of Pediatrics recommends 8:30 a.m. or later.', 'Label: expert source = strong evidence.'],
-    dos: ['In your notes: write a one-sentence central idea for an article about how school gardens help bees.', 'In your notes: label the flip cards claim, reason, and evidence.', 'In your notes: list the two unsupported phrases from the check.', 'In your notes: write a "Some people argue... However..." sentence about later school start times.'] });
+    dos: ['Write a one-sentence central idea for an article about how school gardens help bees.', 'Label the flip cards claim, reason, and evidence.', 'List the two unsupported phrases from the check.', 'Write a "Some people argue... However..." sentence about later school start times.'] });
   add('g6-ela-vocab', {
     hook: { q: 'Would you rather be called "thrifty" or "cheap"?', options: ['Thrifty', 'Cheap', 'No difference'] },
     model: ['Sentence: "The old house stood on the hill."', 'Version 1: "The ancient mansion loomed over the hill." (creepy tone)', 'Version 2: "The cozy cottage perched on the hill." (warm tone)', 'Only a few words changed, but the connotation changed the whole tone.'],
-    dos: ['In your notes: rank thin, slender, scrawny, skinny from most negative to most positive.', 'In your notes: rewrite "The kitten walked across the room" to sound sneaky, then playful.', 'In your notes: name the figurative language in "He has the Midas touch."', 'In your notes: use the root "male" (bad) to define "malevolent."'] });
+    dos: ['Rank thin, slender, scrawny, skinny from most negative to most positive.', 'Rewrite "The kitten walked across the room" to sound sneaky, then playful.', 'Name the figurative language in "He has the Midas touch."', 'Use the root "male" (bad) to define "malevolent."'] });
   add('g5-math-fractions', {
     hook: { q: 'You ate 1/2 of a pizza and your friend ate 1/3. Did you eat 2/5 together?', options: ['Yes, 2/5', 'No, more than 2/5', 'No, less than 2/5'] },
     model: ['Problem: 1/2 + 1/3.', 'Step 1: Halves and thirds are different sizes. Both fit into sixths.', 'Step 2: 1/2 = 3/6 and 1/3 = 2/6.', 'Step 3: 3/6 + 2/6 = 5/6.', 'Check: 5/6 is close to 1, and half a pizza plus a third is almost a whole. 2/5 was wrong.'],
-    dos: ['In your notes: draw a bar, shade 1/2 and 1/4, and write the total as fourths.', 'In your notes: solve 1/3 + 1/4. Show the common denominator.', 'In your notes: solve 3 1/4 − 1 3/4 by regrouping 1 whole as 4/4.', 'In your notes: solve 1/2 × 3/4 and draw it as an area model.'] });
+    dos: ['Draw a bar, shade 1/2 and 1/4, and write the total as fourths.', 'Solve 1/3 + 1/4. Show the common denominator.', 'Solve 3 1/4 − 1 3/4 by regrouping 1 whole as 4/4.', 'Solve 1/2 × 3/4 and draw it as an area model.'] });
   add('g5-math-decimals', {
     hook: { q: 'Which is bigger: 0.5 or 0.45?', options: ['0.5', '0.45', 'They are equal'] },
     model: ['Problem: 3.6 × 0.4.', 'Step 1: Multiply as whole numbers: 36 × 4 = 144.', 'Step 2: Count decimal places: one in 3.6, one in 0.4 → two in all.', 'Step 3: 1.44.', 'Check with an estimate: about 4 × 0.4 = 1.6. 1.44 is close, so it makes sense.'],
-    dos: ['In your notes: write the value of each digit in 3.572.', 'In your notes: order 0.6, 0.06, 0.66 from least to greatest.', 'In your notes: round 3.46 to the nearest tenth.', 'In your notes: solve 4.5 + 2.37 and 1.2 × 3.'] });
+    dos: ['Write the value of each digit in 3.572.', 'Order 0.6, 0.06, 0.66 from least to greatest.', 'Round 3.46 to the nearest tenth.', 'Solve 4.5 + 2.37 and 1.2 × 3.'] });
   add('g5-math-volume', {
     hook: { q: 'How could you find how many sugar cubes fill a box without filling it?', options: ['Count one layer, then multiply', 'Guess', 'Measure the outside only'] },
     model: ['Problem: a prism 4 cubes long, 3 wide, and 5 tall.', 'Step 1: One layer: 4 × 3 = 12 cubes.', 'Step 2: There are 5 layers.', 'Step 3: 12 × 5 = 60.', 'Answer: 60 cubic units. Formula: V = l × w × h.'],
-    dos: ['In your notes: count the cubes in the prism by layers.', 'In your notes: write V = l × w × h and solve for a 5 × 2 × 3 box.', 'In your notes: find V for a box with base 6 cm² and height 4 cm.', 'In your notes: split the figure into two prisms and find each volume.'] });
+    dos: ['Count the cubes in the prism by layers.', 'Write V = l × w × h and solve for a 5 × 2 × 3 box.', 'Find V for a box with base 6 cm² and height 4 cm.', 'Split the figure into two prisms and find each volume.'] });
   add('g6-math-ratios', {
     hook: { q: 'A 12-pack of juice costs $6. A 20-pack costs $9. Which is the better deal?', options: ['12-pack', '20-pack', 'Same price per juice'] },
     model: ['Problem: 12 for $6 or 20 for $9?', 'Step 1: Unit rate for the 12-pack: $6 ÷ 12 = $0.50 per juice.', 'Step 2: Unit rate for the 20-pack: $9 ÷ 20 = $0.45 per juice.', 'Step 3: Compare: $0.45 < $0.50.', 'Answer: the 20-pack is the better deal, by 5 cents a juice.'],
-    dos: ['In your notes: write two ratios from the tape diagram (strawberries to yogurt, yogurt to strawberries).', 'In your notes: finish the double number line: 12 strawberries → ? yogurt.', 'In your notes: find the price per item: 3 pens for $2.40 and 5 pens for $3.50.', 'In your notes: find 35% of 200 using 10% first.'] });
+    dos: ['Write two ratios from the tape diagram (strawberries to yogurt, yogurt to strawberries).', 'Finish the double number line: 12 strawberries → ? yogurt.', 'Find the price per item: 3 pens for $2.40 and 5 pens for $3.50.', 'Find 35% of 200 using 10% first.'] });
   add('g6-math-expressions', {
     hook: { q: 'I multiplied a number by 4 and got 36. What was my number?', options: ['8', '9', '32'] },
     model: ['Problem: x + 7 = 15.', 'Step 1: x has 7 added to it.', 'Step 2: Undo +7 by subtracting 7 from BOTH sides: x + 7 − 7 = 15 − 7.', 'Step 3: x = 8.', 'Check: 8 + 7 = 15 ✓'],
-    dos: ['In your notes: translate "5 more than n," "twice a number," and "7 less than x."', 'In your notes: evaluate 2n + 3 when n = 5.', 'In your notes: simplify 5y + 2 + 3y.', 'In your notes: solve x + 4 = 10 and check your answer.'] });
+    dos: ['Translate "5 more than n," "twice a number," and "7 less than x."', 'Evaluate 2n + 3 when n = 5.', 'Simplify 5y + 2 + 3y.', 'Solve x + 4 = 10 and check your answer.'] });
   add('g6-math-integers', {
     hook: { q: 'It was −8 °F in Fort Wayne and −3 °F in Evansville. Which city was colder?', options: ['Fort Wayne', 'Evansville', 'Same'] },
     model: ['Problem: plot (−3, 4), then find its distance to (5, 4).', 'Step 1: Start at the origin. x = −3, so move 3 left.', 'Step 2: y = 4, so move 4 up. That is Quadrant II.', 'Step 3: Both points have y = 4. Opposite signs, so add: |−3| + |5| = 8.', 'Answer: 8 units apart.'],
-    dos: ['In your notes: write an integer for 20 feet below sea level and for a $15 deposit.', 'In your notes: order −5, 2, −9, 0 from least to greatest.', 'In your notes: find |−7|, |7|, and |0|.', 'In your notes: plot (−3, 4) on a sketch and name its quadrant.'] });
+    dos: ['Write an integer for 20 feet below sea level and for a $15 deposit.', 'Order −5, 2, −9, 0 from least to greatest.', 'Find |−7|, |7|, and |0|.', 'Plot (−3, 4) on a sketch and name its quadrant.'] });
+})(window.CX_LESSONS);
+
+// Spread the correct choices across A-D. The source data lists every answer first, so each
+// multiple-choice check is rotated by a fixed amount taken from its question text. The rotation
+// is deterministic, so the presenter, worksheet, key, and script always show the same letters.
+(function (LS) {
+  function mix(ck) {
+    if (!ck || ck.type !== 'mc' || !ck.choices || ck._mixed) return;
+    var h = 0, s = ck.q || '', n = ck.choices.length;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+    var r = h % n, old = ck.choices.slice();
+    ck.choices = old.map(function (_, k) { return old[(k + r) % n]; });
+    ck.answer = (ck.answer - r + n) % n;
+    ck._mixed = true;
+  }
+  Object.keys(LS).forEach(function (id) { var L = LS[id]; (L.steps || []).forEach(function (st) { mix(st.check); }); mix(L.youdo); });
 })(window.CX_LESSONS);
 
 </script>
@@ -9724,7 +9781,7 @@ window.CX_TASKS = {
     ],
     gallery: [
       'Exhibits can be visited in any order, which spreads students out naturally. Encourage them to start at a different exhibit than their neighbor.',
-      'Treat it like a real gallery walk: ask students to jot one "I notice / I wonder" in their notebook at each exhibit (optional, no printing).',
+      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece plus a key fact in Part 12 of the lesson worksheet.',
       'Pause the class once midway and have two students share their favorite exhibit so far.'
     ],
     fieldtrip: [
@@ -9852,27 +9909,27 @@ window.CX_TASKS = {
     h += '<h3>What students turn in</h3><p>The final screen builds a turn-in block with: name, mission level, completion code, time, XP, first-try accuracy, hints used, badges' + (t ? ', and their full written ' + esc(f[0]) : '') + '. Students tap <b>Copy my work</b> and paste it into a Canvas <b>Text Entry</b> submission. Grade the writing with the rubric above' + (t ? '' : ' (this room has no written task, so the code and stats show completion)') + '.</p></section>';
     return h;
   }
-  var NOTEBOOK = ['Write the date and "Warm-Up" at the top of a new notebook page (or use the worksheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
+  var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet.', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
   var LETTERS = 'ABCDEFGH';
   function planTable(r) {
     return '<table class="tbl plan"><thead><tr><th>Time</th><th>Part</th><th>Teacher does</th><th>Students do</th><th>Resource</th></tr></thead><tbody>' +
-      [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in notebooks or on the worksheet.', '<a href="#s-warm" data-jump>Warm-up</a>'],
-       ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Fill in guided notes; answer quick checks.', '<a href="#teach-' + r.id + '">Presenter</a>'],
-       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; finish any written task.', '<a href="#play-' + r.id + '">Student view</a>'],
-       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Discuss and correct notes.', '<a href="#s-debrief" data-jump>Questions</a>'],
+      [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in worksheet Part 2.', '<a href="#s-warm" data-jump>Warm-up</a>'],
+       ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Complete worksheet Parts 1 and 3–11 with each slide.', '<a href="#teach-' + r.id + '">Presenter</a>'],
+       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece and key fact in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
+       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write a 3-2-1.', '<a href="#s-debrief" data-jump>Questions</a>'],
        ['0:52–1:00', '5. Exit ticket', 'Hand out the ticket; sort results with the mastery guide.', 'Answer with evidence independently.', '<a href="#s-exit" data-jump>Exit ticket</a>']].map(function (x) { return '<tr>' + x.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function warmSection(r) {
     var X = lessonOf(r); if (!X) return '';
     return '<section class="sec" id="s-warm"><h2><span class="step">1</span>Warm-up <span class="when">0:00–0:08 · 8 min</span></h2>' +
-      '<div class="two"><div class="callout"><h3 style="margin-top:0">Notebook expectations</h3><ol>' + NOTEBOOK.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' +
+      '<div class="two"><div class="callout"><h3 style="margin-top:0">Warm-up expectations</h3><ol>' + NOTEBOOK.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' +
       '<div><table class="tbl"><thead><tr><th>#</th><th>Question</th><th>Look for</th></tr></thead><tbody>' + X.warmup.map(function (w, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(w[0]) + '</td><td>' + esc(w[1]) + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<p><button class="btn" data-do="warm">' + ICONS.down + 'Warm-up worksheet PDF</button></p></div></div></section>';
   }
   function lessonSection(r, L) {
     var X = lessonOf(r);
     var html = '<section class="sec" id="s-lesson"><h2><span class="step">2</span>Mini-lesson <span class="when">0:08–0:20 · 12 min</span></h2>' +
-      '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
+      '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">lesson worksheet</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
       (X && X.hook ? '<div class="callout"><b>Hook (1 min), shown on the slide:</b> ' + esc(X.hook.q) + ' <span class="lede">Class vote: ' + esc(X.hook.options.join(' / ')) + '</span></div>' : '') +
       '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>';
     if (X) html += '<div class="steps">' + X.steps.map(function (st, i) {
@@ -9880,7 +9937,7 @@ window.CX_TASKS = {
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : (st.tool.caption || 'Visual model')) : st.cards ? 'Flip cards' : 'Board and notes';
       return '<div class="stepcard"><div class="stephead"><span class="step">' + (i + 1) + '</span><h3>' + esc(st.t) + '</h3><span class="when">3 min</span></div>' +
         '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc((X.dos || [])[i] || st.do) + '</dd></div>' +
-        '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
+        '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Worksheet fill-in</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
     }).join('') + '</div>';
     else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
     html += '<h3>I do: worked example</h3>' + (X && X.model ? '<ol>' + X.model.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' : '') + '<p class="lede">What to say for every slide is in the <button class="linkbtn" data-do="script">presenter script PDF</button>.</p>' +
@@ -9900,7 +9957,7 @@ window.CX_TASKS = {
       '<h3>Sort students for tomorrow</h3><table class="tbl"><thead><tr><th>Score</th><th>Level</th><th>Next step</th></tr></thead><tbody>' +
       '<tr><td>' + m + '–' + total + '</td><td>Mastered</td><td>Extension: replay at the Legend level or write a second evidence response; peer helper.</td></tr>' +
       '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
-      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review guided notes, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
+      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review the lesson worksheet, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
       '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
   }
   function isGallery(r) { return r.format === 'gallery' && r.stages.every(function (s) { return s.art; }); }
@@ -10132,10 +10189,10 @@ window.CX_TASKS = {
 
     // Resources
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
-      [['1', 'Warm-up worksheet', 'Printable warm-up with notebook expectations. Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
+      [['1–5', 'Lesson worksheet', 'The one printable packet students fill out during the whole lesson. Its 13 parts match the "Worksheet Part" badge on each slide: target in their own words, warm-up, prediction, vocabulary, fill-in notes, a task, turn-and-talk notes, and a check for every step, the worked example, we do, you do, a work-time tracker (code piece + key fact per stage), and a 3-2-1 wrap-up. Collect it as evidence of work.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
+       ['1', 'Warm-up worksheet (optional)', 'Standalone warm-up if you want it separate (it is also Part 2 of the lesson worksheet). Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
        ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
        ['1–5', 'Presenter script', 'What to say on every slide: directions, questions, answers, and what to do if students struggle. Slides show only student cues.', '<button class="btn" data-do="script">' + ICONS.down + 'PDF</button>'],
-       ['2', 'Guided notes', 'Fill-in notes, vocabulary, and "try it" problems that follow the presenter step by step.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
 ].concat(isGallery(r) ? [['3', 'Gallery walk posters', 'One printable poster per exhibit (picture, numbered details, placard) plus setup directions for a classroom gallery walk.', '<button class="btn" data-do="posters">' + ICONS.play + 'Open posters</button>'], ['3', 'Gallery walk viewing guide', 'Student recording sheet: I see / I think / I wonder for every exhibit.', '<button class="btn" data-do="gguide">' + ICONS.down + 'PDF</button>']] : []).concat([
        ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
@@ -10177,12 +10234,12 @@ window.CX_TASKS = {
     var X = lessonOf(r), s = STD[r.std];
     return {
       id: 'lesson-' + r.std, title: s.title, grade: r.grade, subject: r.subject, standard: s.code, format: 'escape', game: 'locks',
-      theme: r.theme, vocab: s.lesson.vocab, story: '', finale: '', wrapUp: 'Students should have their guided notes filled in. Launch ' + r.title + ' next.',
+      theme: r.theme, vocab: s.lesson.vocab, story: '', finale: '', wrapUp: 'Students should have worksheet Parts 1–11 filled in. Launch ' + r.title + ' next.',
       stages: X.steps.map(function (st, i) {
         var tool = st.tool && !st.tool.sim ? st.tool : null;
         return {
           title: st.t,
-          content: '<p class="ep-say"><b>Teach:</b> ' + esc(st.say) + '</p><p class="ep-notebox"><b>Students:</b> ' + esc(st.do) + '<br><b>Guided notes:</b> ' + esc(st.note.replace(/\[([^\]]+)\]/g, '____')) + '</p>',
+          content: '<p class="ep-say"><b>Teach:</b> ' + esc(st.say) + '</p><p class="ep-notebox"><b>Students:</b> ' + esc(st.do) + '<br><b>Worksheet:</b> ' + esc(st.note.replace(/\[([^\]]+)\]/g, '____')) + '</p>',
           visual: tool, sim: st.tool && st.tool.sim ? st.tool.sim : null, cards: st.cards, puzzles: [st.check]
         };
       })
@@ -10291,8 +10348,8 @@ window.CX_TASKS = {
       else if (act === 'script') { var wt = writeTask(r); download(slug(r) + '-presenter-script.pdf', CrossroadsPDF.script(r, STD[r.std], lessonOf(r), wt ? (FRAME_INFO[wt.frame] || [wt.frame])[0] : ''), 'application/pdf'); toast('Presenter script downloaded.'); }
       else if (act === 'gguide') { download(slug(r) + '-gallery-viewing-guide.pdf', CrossroadsPDF.galleryGuide(r, STD[r.std]), 'application/pdf'); toast('Viewing guide downloaded.'); }
       else if (act === 'warm') { download(slug(r) + '-warm-up.pdf', CrossroadsPDF.warmup(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Warm-up worksheet downloaded.'); }
-      else if (act === 'notes') { download(slug(r) + '-guided-notes.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Guided notes downloaded.'); }
-      else if (act === 'noteskey') { download(slug(r) + '-guided-notes-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Guided notes key downloaded.'); }
+      else if (act === 'notes') { download(slug(r) + '-lesson-worksheet.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Lesson worksheet downloaded.'); }
+      else if (act === 'noteskey') { download(slug(r) + '-lesson-worksheet-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Lesson worksheet key downloaded.'); }
       else if (act === 'guide') {
         var gr = Object.assign({}, r, { runTips: runTips(r), finalCode: finalCode(r) });
         download(slug(r) + '-facilitation-guide.pdf', CrossroadsPDF.guide(gr, STD[r.std], answerLines(r), lessonOf(r)), 'application/pdf'); toast('Facilitation guide PDF downloaded.');
