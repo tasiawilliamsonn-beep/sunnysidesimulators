@@ -19,6 +19,15 @@ Each room includes:
 - **Written evidence tasks** (`data/tasks.js`). RACE (ELA), CER (science), a historian's claim with a source check (social studies), and solve–show–explain (math). A live checklist has to be complete before the final code unlocks. Rooms with a task: g5-sci-missing-mass, g6-sci-cold-cocoa, g5-ss-midnight-messenger, g6-ss-plague-detective, g5-ela-context-caper, g6-ela-evidence-vault, g6-ela-theme-quest, g5-math-bakery-mystery, and g6-math-sale-scam. To add more, add entries to `data/tasks.js`.
 - **Turn-in.** The final screen builds a block of text with the student's name, level, completion code, stats, badges, and full written response. Students copy it into a Canvas Text Entry submission.
 
+## 60-minute lessons
+
+Every room page and facilitation guide follows the same 60-minute plan: warm-up (0:00–0:08), mini-lesson (0:08–0:20), activity (0:20–0:48), debrief (0:48–0:52), and exit ticket (0:52–1:00). Lesson content for all 24 standards is in `data/lessons.js`:
+
+- **Warm-up:** 3 questions with notebook expectations and a printable worksheet (the key is on page 2).
+- **Mini-lesson presenter:** a projectable, 4-step lesson (`#teach-<room-id>`). Each step has a teacher script, an interactive tool (a simulation, visual model, or flip cards), and a quick check for the whole class.
+- **Guided notes:** a fill-in-the-blank handout that follows the presenter step by step, with vocabulary and "try it" problems, plus a key.
+- **Evidence-based exit ticket:** Part A has students choose and justify, Part B explain with evidence, and Part C apply the standard to a new text, data set, or problem using CER, RACE, a historian's claim, or solve-show-explain. Page 3 onward is the key, with a rubric and a table that sorts scores into Mastered, Approaching, and Beginning, with next steps for each.
+
 ## Using it
 
 Open `index.html` in any browser. You can also publish the repo with GitHub Pages (Settings → Pages → deploy from the branch root) so the site has a web address.

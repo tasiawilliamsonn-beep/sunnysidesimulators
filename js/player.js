@@ -924,6 +924,10 @@ function EscapePlayer(mount, room, opts) {
 .ep-confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:160}
 .ep-confetti i{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:ep-fall linear forwards}
 @keyframes ep-fall{to{transform:translateY(110vh) rotate(720deg)}}
+.ep-teachmode .ep-wrap{max-width:1000px}.ep-teachmode .ep-stagecard{font-size:22px}.ep-teachmode .ep-stagecard h2{font-size:clamp(30px,5vw,44px)}
+.ep-say{background:rgba(255,209,102,.25);border-left:6px solid var(--accent2);padding:10px 14px;border-radius:0 10px 10px 0}
+.ep-notebox{border:3px dashed var(--line);border-radius:12px;padding:10px 14px}
+.ep-stepdots{display:flex;gap:6px}.ep-stepdots i{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;opacity:.5}.ep-stepdots i.cur{background:var(--accent2);opacity:1}.ep-stepdots i.done{background:currentColor;opacity:.8}
 .ep-i{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em}
 .ep-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .ep-pill{display:inline-flex;align-items:center;gap:5px}
@@ -1047,10 +1051,11 @@ function EscapePlayer(mount, room, opts) {
   var saveTimer = null;
   function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 600); }
   if (S.finished) S.screen = 'done'; else if (!S.started) S.screen = 'start'; else if (S.screen !== 'stage' && S.screen !== 'final') S.screen = 'hub';
+  if (opts.teach) { S.started = true; S.name = 'Class'; S.screen = 'stage'; S.current = 0; }
   var work = {}, tick = null, hintShown = {};
 
   var root = document.createElement('div');
-  root.className = 'ep th-' + themeId + ' ep-f-' + (room.format || 'escape') + ' ep-g-' + GAME;
+  root.className = 'ep th-' + themeId + ' ep-f-' + (room.format || 'escape') + ' ep-g-' + GAME + (opts.teach ? ' ep-teachmode' : '');
   mount.innerHTML = ''; mount.appendChild(root);
 
   function totalPuzzles() { return stages.reduce(function (n, s) { return n + s.puzzles.length; }, 0); }
@@ -1096,6 +1101,7 @@ function EscapePlayer(mount, room, opts) {
   function pieceWord() { return { board: 'Stamps', museum: 'Stamps', 'case': 'Files', boss: 'Levels', locks: 'Code pieces' }[GAME] || 'Pieces'; }
   function statusBar() {
     var L = curLevel();
+    if (opts.teach) return '<div class="ep-status" id="ep-status"><span class="ep-lvl">Mini-lesson presenter</span><span class="ep-spacer"></span><span class="ep-pill">Step <strong>' + (S.current + 1) + ' of ' + stages.length + '</strong></span><button type="button" class="ep-btn small ep-supbtn" data-sup>' + ICON.tools + 'Supports</button>' + (opts.onExit ? '<button type="button" class="ep-btn plain small" data-exit>Close presenter</button>' : '') + '</div>';
     return '<div class="ep-status" id="ep-status"><span>' + (S.name ? 'Player: <strong>' + esc(S.name) + '</strong> ' : '') + '<span class="ep-lvl lv-' + L.id + '">' + esc(L.name) + '</span></span><span class="ep-spacer"></span>' +
       '<span class="ep-pill ep-xp" title="Experience points">' + ICON.xp + '<strong>' + S.xp + '</strong> XP</span>' +
       '<span class="ep-pill ep-streak' + (S.streak >= 3 ? ' hot' : '') + '" title="First-try streak">' + ICON.flame + '<strong>' + S.streak + '</strong><span class="ep-sr"> in a row</span></span>' +
@@ -1299,11 +1305,15 @@ function EscapePlayer(mount, room, opts) {
     var flips = s.cards ? '<div class="ep-flips">' + s.cards.map(function (c, k) { return '<button type="button" class="ep-flip" data-flip="' + k + '" aria-label="Flip card: ' + esc(strip(c[0])) + '"><span class="ep-flip-in"><span class="ep-flip-f">' + fx(c[0]) + '</span><span class="ep-flip-b">' + fx(c[1]) + '</span></span></button>'; }).join('') + '</div>' : '';
     var back = { escape: '← Back to the locks', gallery: '← Back to the floor plan', fieldtrip: '← Back to the game board', mystery: '← Back to the case board', quest: '← Back to the quest map' }[room.format] || '← Back';
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
-      '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">' + back + '</button><span class="ep-spacer"></span><span class="ep-small">' + esc(nodeName(i)) + ' of ' + stages.length + '</span></div>' + heartsHTML(i) +
-      '<div class="ep-card ep-stagecard">' + listenBtn('stage') + '<div class="ep-kicker">' + esc(nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips +
+      (opts.teach ? '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back"' + (i ? '' : ' disabled') + '>← Previous step</button><span class="ep-spacer"></span><div class="ep-stepdots">' + stages.map(function (_, k) { return '<i class="' + (k === i ? 'cur' : k < i ? 'done' : '') + '"></i>'; }).join('') + '</div><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" id="ep-fwd">' + (i < stages.length - 1 ? 'Next step →' : 'Finish →') + '</button></div>' :
+      '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">' + back + '</button><span class="ep-spacer"></span><span class="ep-small">' + esc(nodeName(i)) + ' of ' + stages.length + '</span></div>') + heartsHTML(i) +
+      '<div class="ep-card ep-stagecard">' + listenBtn('stage') + '<div class="ep-kicker">' + esc(opts.teach ? 'Step ' + (i + 1) + ' of ' + stages.length : nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips +
       (s.sim ? '<div class="ep-sim"><div class="ep-sim-h">' + esc(s.sim.title || 'Try it yourself') + '</div><div data-sim></div></div>' : '') + '</div>' +
       '<div id="ep-qa"></div></div>';
-    root.querySelector('#ep-back').onclick = function () { go('hub'); };
+    if (opts.teach) {
+      root.querySelector('#ep-back').onclick = function () { if (i) go('stage', i - 1); };
+      root.querySelector('#ep-fwd').onclick = function () { if (i < stages.length - 1) go('stage', i + 1); else go('done'); };
+    } else root.querySelector('#ep-back').onclick = function () { go('hub'); };
     root.querySelectorAll('[data-flip]').forEach(function (b) { b.onclick = function () { b.classList.toggle('on'); }; });
     if (s.sim && SIMS[s.sim.kind]) { try { SIMS[s.sim.kind](root.querySelector('[data-sim]'), s.sim); } catch (e) { root.querySelector('[data-sim]').textContent = 'This simulation could not load.'; } }
     bindCommon();
@@ -1325,9 +1335,9 @@ function EscapePlayer(mount, room, opts) {
     var dots = s.puzzles.map(function (_, k) { return '<i class="' + (S.solved[i + '-' + k] ? 'done' : k === j ? 'cur' : '') + '"></i>'; }).join('');
     var needsCheck = !t.instant && !w.solved, stageDoneNow = s.puzzles.every(function (_, k) { return S.solved[i + '-' + k]; });
     var left = Math.max(0, L.removes - (S.removesUsed || 0));
-    var canRemove = p.type === 'mc' && p.choices.length >= 4 && !w.solved && !S.removed[key] && left > 0;
+    var canRemove = !opts.teach && p.type === 'mc' && p.choices.length >= 4 && !w.solved && !S.removed[key] && left > 0;
     var isWrite = p.type === 'write';
-    qa.innerHTML = '<div class="ep-panel ep-qcard' + (isWrite ? ' ep-wcard' : '') + '" data-key="' + key + '"><div class="ep-qhead"><span class="ep-qcount">' + (isWrite ? 'Evidence task · ' : '') + 'Challenge ' + (j + 1) + ' of ' + s.puzzles.length + '</span>' + listenBtn('q') + '<span class="ep-dots" aria-hidden="true">' + dots + '</span></div>' +
+    qa.innerHTML = '<div class="ep-panel ep-qcard' + (isWrite ? ' ep-wcard' : '') + '" data-key="' + key + '"><div class="ep-qhead"><span class="ep-qcount">' + (opts.teach ? 'Quick check · answer together' : (isWrite ? 'Evidence task · ' : '') + 'Challenge ' + (j + 1) + ' of ' + s.puzzles.length) + '</span>' + listenBtn('q') + '<span class="ep-dots" aria-hidden="true">' + dots + '</span></div>' +
       '<div class="ep-qtext">' + fx(p.q) + '</div>' + (p.type !== 'tap' ? visualHTML(p.visual) : '') + '<div class="ep-ans">' + t.html(p, w, key) + '</div>' +
       '<div class="ep-fb" role="status" aria-live="polite"></div>' +
       (!w.solved ? '<div class="ep-row" style="margin-top:12px">' + (needsCheck ? '<button type="button" class="ep-btn" data-check>' + (isWrite ? 'Submit my response' : 'Check') + '</button>' : '') +
@@ -1335,7 +1345,7 @@ function EscapePlayer(mount, room, opts) {
         (canRemove ? '<button type="button" class="ep-btn plain small" data-rm2>' + ICON.scissors + 'Remove 2 wrong' + (left < 20 ? ' (' + left + ' left)' : '') + '</button>' : '') +
         (opts.preview ? '<button type="button" class="ep-btn small ep-teacher" data-solve>Teacher: ' + (isWrite ? 'fill model answer' : 'show answer') + '</button>' : '') + '</div>' +
         '<div class="ep-hintbox' + (hintShown[key] ? ' show' : '') + '">' + (p.hint ? '<b>Hint:</b> ' + fx(p.hint) : '') + '</div>' : '') +
-      (w.solved ? '<div class="ep-fb good show"><b>' + (isWrite ? 'Response saved!' : 'Correct!') + '</b> ' + (S.gains[key] ? '<span class="ep-gain">+' + S.gains[key] + ' XP</span> ' : '') + (p.explain ? fx(p.explain) : isWrite ? 'It will appear on your turn-in page at the end.' : '') + '</div><div class="ep-row" style="margin-top:12px"><button type="button" class="ep-btn" data-next>' + (stageDoneNow ? 'Get your code piece' : 'Next challenge →') + '</button></div>' : '') + '</div>';
+      (w.solved ? '<div class="ep-fb good show"><b>' + (isWrite ? 'Response saved!' : 'Correct!') + '</b> ' + (S.gains[key] ? '<span class="ep-gain">+' + S.gains[key] + ' XP</span> ' : '') + (p.explain ? fx(p.explain) : isWrite ? 'It will appear on your turn-in page at the end.' : '') + '</div><div class="ep-row" style="margin-top:12px"><button type="button" class="ep-btn" data-next>' + (opts.teach ? (i < stages.length - 1 ? 'Next step →' : 'Finish the mini-lesson') : stageDoneNow ? 'Get your code piece' : 'Next challenge →') + '</button></div>' : '') + '</div>';
     var box = qa.querySelector('.ep-qcard'), fb = box.querySelector('.ep-fb');
     if (prev && !w.solved) { fb.className = prevCls; fb.innerHTML = prevHtml; }
     function say(cls, html) { fb.className = 'ep-fb show ' + cls; fb.innerHTML = html; }
@@ -1409,11 +1419,12 @@ function EscapePlayer(mount, room, opts) {
     if (p.type === 'write' && work[key]) S.writing[key] = Object.assign({}, work[key].v);
     save(); renderPuzzle(i); refreshStatus();
     var hh = root.querySelector('#ep-hearts'); if (hh) hh.outerHTML = heartsHTML(i);
-    toast('+' + gain + ' XP' + (S.streak >= 3 && first ? ' <small>' + S.streak + ' in a row!</small>' : '') + (GAME === 'boss' ? ' <small>Boss hit!</small>' : ''));
+    if (!opts.teach) toast('+' + gain + ' XP' + (S.streak >= 3 && first ? ' <small>' + S.streak + ' in a row!</small>' : '') + (GAME === 'boss' ? ' <small>Boss hit!</small>' : ''));
   }
 
   function stageComplete(i) {
     S.done[i] = true; save();
+    if (opts.teach) { go(i < stages.length - 1 ? 'stage' : 'done', i < stages.length - 1 ? i + 1 : null); return; }
     var extra = { boss: '<p>Level cleared! ' + esc(room.boss || 'The boss') + ' is down to <b>' + Math.round(bossHP() * 100) + '%</b> health.</p>', board: '<div class="ep-stamp on big">' + ICON.star + '<b>' + esc(nodeName(i)) + '</b></div><p>Passport stamped! Your game piece moves ahead.</p>', 'case': '<p>This file is pinned to the case board with a red string.</p>', museum: '<p>Exhibit stamped on your floor plan.</p>', locks: '' }[GAME] || '';
     var ov = document.createElement('div'); ov.className = 'ep-overlay';
     ov.innerHTML = '<div class="ep-card" role="dialog" aria-label="Code piece found"><div class="ep-pop">' + esc(fmt.done) + '</div>' + extra + '<p>Write this code piece on your paper. It goes in slot ' + (i + 1) + ':</p><div class="ep-bigdigit">' + esc(code[i]) + '</div>' +
@@ -1481,6 +1492,11 @@ function EscapePlayer(mount, room, opts) {
     return lines.join('\n');
   }
   function renderDone() {
+    if (opts.teach) {
+      root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + statusBar() + '<div class="ep-card" style="text-align:center">' + emblem() + '<h2>Mini-lesson complete!</h2><p>' + (room.wrapUp || 'Students should now have their guided notes filled in. Launch the activity next.') + '</p><div class="ep-row" style="justify-content:center;margin-top:12px"><button type="button" class="ep-btn plain" id="ep-restart">Back to step 1</button></div></div></div>';
+      root.querySelector('#ep-restart').onclick = function () { go('stage', 0); };
+      bindCommon(); return;
+    }
     var bs = badges(), title = { boss: 'Boss defeated!', board: 'Trip complete!', 'case': 'Case closed!', museum: 'Gallery complete!', locks: 'You escaped!' }[GAME] || 'You escaped!';
     root.innerHTML = '<div class="ep-band"></div><div class="ep-wrap">' + (opts.onExit ? '<div class="ep-row ep-noprint"><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" data-exit>Exit preview</button></div>' : '') +
       '<div class="ep-card ep-cert" style="text-align:center;margin-top:18px"><div class="ep-pop" style="font-size:52px">' + title + '</div>' + (GAME === 'boss' ? bossSVG(0) : emblem()) + '<h2>Nice work, ' + esc(S.name || 'explorer') + '!</h2>' + (room.finale || '') +

@@ -217,3 +217,22 @@ textarea.code { width: 100%; min-height: 90px; font-family: var(--mono); font-si
 #s-game code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px}
 #s-game details{margin-top:8px}
 @media (max-width:640px){#s-game .tbl{display:block;overflow-x:auto}}
+.plan td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:700}
+.sec h2 .step,.made-row .step,.stephead .step{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:8px;background:var(--ink,#1d2433);color:#fff;font-size:16px;margin-right:10px;vertical-align:middle}
+.sec h2 .when,.stephead .when{font-size:14px;font-weight:600;color:var(--muted,#5d6475);margin-left:8px;letter-spacing:0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:18px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.steps{display:grid;gap:14px;margin:14px 0}
+.stepcard{border:1px solid var(--line,#cfd6e2);border-radius:14px;padding:14px 16px;background:rgba(255,255,255,.6)}
+.stephead{display:flex;align-items:center;gap:4px;margin-bottom:8px}.stephead h3{margin:0;flex:1}
+.stepcard dl{display:grid;gap:6px;margin:0}.stepcard dl>div{display:grid;grid-template-columns:130px 1fr;gap:10px}
+.stepcard dt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#5d6475);padding-top:2px}.stepcard dd{margin:0}
+@media (max-width:640px){.stepcard dl>div{grid-template-columns:1fr;gap:0}}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+.ticket .stim{background:rgba(0,0,0,.05);padding:10px 14px;border-radius:10px}
+.ticket i{display:block;color:var(--muted,#5d6475);margin-top:4px}
+.made{display:grid;gap:10px;margin:8px 0 18px}
+.made-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border:1px solid var(--line,#cfd6e2);border-radius:12px;padding:10px 14px}
+.made-row b{display:block}.made-row span:not(.step){font-size:14px;color:var(--muted,#5d6475)}
+.made-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.made-row{grid-template-columns:auto 1fr}.made-act{grid-column:1/-1;justify-content:flex-start}}

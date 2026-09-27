@@ -148,6 +148,55 @@
     h += '<h3>What students turn in</h3><p>The final screen builds a turn-in block with: name, mission level, completion code, time, XP, first-try accuracy, hints used, badges' + (t ? ', and their full written ' + esc(f[0]) : '') + '. Students tap <b>Copy my work</b> and paste it into a Canvas <b>Text Entry</b> submission. Grade the writing with the rubric above' + (t ? '' : ' (this room has no written task, so the code and stats show completion)') + '.</p></section>';
     return h;
   }
+  var NOTEBOOK = ['Write the date and "Warm-Up" at the top of a new notebook page (or use the worksheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
+  var LETTERS = 'ABCDEFGH';
+  function planTable(r) {
+    return '<table class="tbl plan"><thead><tr><th>Time</th><th>Part</th><th>Teacher does</th><th>Students do</th><th>Resource</th></tr></thead><tbody>' +
+      [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in notebooks or on the worksheet.', '<a href="#s-warm" data-jump>Warm-up</a>'],
+       ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Fill in guided notes; answer quick checks.', '<a href="#teach-' + r.id + '">Presenter</a>'],
+       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; finish any written task.', '<a href="#play-' + r.id + '">Student view</a>'],
+       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Discuss and correct notes.', '<a href="#s-debrief" data-jump>Questions</a>'],
+       ['0:52–1:00', '5. Exit ticket', 'Hand out the ticket; sort results with the mastery guide.', 'Answer with evidence independently.', '<a href="#s-exit" data-jump>Exit ticket</a>']].map(function (x) { return '<tr>' + x.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  }
+  function warmSection(r) {
+    var X = lessonOf(r); if (!X) return '';
+    return '<section class="sec" id="s-warm"><h2><span class="step">1</span>Warm-up <span class="when">0:00–0:08 · 8 min</span></h2>' +
+      '<div class="two"><div class="callout"><h3 style="margin-top:0">Notebook expectations</h3><ol>' + NOTEBOOK.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' +
+      '<div><table class="tbl"><thead><tr><th>#</th><th>Question</th><th>Look for</th></tr></thead><tbody>' + X.warmup.map(function (w, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(w[0]) + '</td><td>' + esc(w[1]) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<p><button class="btn" data-do="warm">' + ICONS.down + 'Warm-up worksheet PDF</button></p></div></div></section>';
+  }
+  function lessonSection(r, L) {
+    var X = lessonOf(r);
+    var html = '<section class="sec" id="s-lesson"><h2><span class="step">2</span>Mini-lesson <span class="when">0:08–0:20 · 12 min</span></h2>' +
+      '<p class="lede">Project the <a href="#teach-' + r.id + '">mini-lesson presenter</a>. Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
+      '<div class="callout"><b>Hook (1 min):</b> ' + esc(r.hook || L.hook) + '</div>' +
+      '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>';
+    if (X) html += '<div class="steps">' + X.steps.map(function (st, i) {
+      var ck = st.check, ans = ck.type === 'mc' ? '(' + LETTERS[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
+      var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : (st.tool.caption || 'Visual model')) : st.cards ? 'Flip cards' : 'Board and notes';
+      return '<div class="stepcard"><div class="stephead"><span class="step">' + (i + 1) + '</span><h3>' + esc(st.t) + '</h3><span class="when">3 min</span></div>' +
+        '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc(st.do) + '</dd></div>' +
+        '<div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
+    }).join('') + '</div>';
+    else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+    html += '<h3>Model it</h3><p>' + esc(L.model) + '</p>' +
+      '<div class="callout warn"><h3 style="margin:0">Watch for these misconceptions</h3><ul>' + L.misconceptions.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></section>';
+    return html;
+  }
+  var FRAME_LABEL = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s claim (Claim, Evidence, Source check, Explain)', MATH: 'Solve-Show-Explain' };
+  function exitSection(r) {
+    var X = lessonOf(r), ex = X && X.exit, mcs = r.exit.filter(function (q) { return q.choices; }), crs = r.exit.filter(function (q) { return !q.choices; });
+    var total = mcs.length * 2 + crs.length * 2 + (ex ? 4 : 0), m = Math.ceil(total * 0.8), a = Math.ceil(total * 0.5), n = 0;
+    return '<section class="sec" id="s-exit"><h2><span class="step">5</span>Exit ticket <span class="when">0:52–1:00 · 8 min</span></h2><p class="lede">Every answer needs evidence. Part A asks students to justify each choice, Part B asks for an explanation, and Part C applies the standard to a brand-new situation. Total: ' + total + ' points.</p>' +
+      '<div class="ticket"><h3>Part A: Choose and justify (2 pts each)</h3><ol>' + mcs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol><i>I know because...</i></li>'; }).join('') + '</ol>' +
+      (crs.length ? '<h3>Part B: Explain with evidence (2 pts each)</h3><ol>' + crs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><br><span class="ans">Look for: ' + esc(q.answer) + '</span></li>'; }).join('') + '</ol>' : '') +
+      (ex ? '<h3>Part C: Apply it (' + esc(FRAME_LABEL[ex.frame]) + ', 4 pts)</h3><p class="stim">' + esc(ex.stim) + '</p><p><b>' + (n + 1) + '. ' + esc(ex.q) + '</b></p><details><summary>Model answer and rubric</summary><p>' + esc(ex.model) + '</p><p><b>4 = mastered:</b> ' + esc(ex.look.join('; ')) + '. <b>3</b> = correct with thin reasoning. <b>2</b> = partly correct or general evidence. <b>1</b> = inaccurate or unsupported.</p></details>' : '') + '</div>' +
+      '<h3>Sort students for tomorrow</h3><table class="tbl"><thead><tr><th>Score</th><th>Level</th><th>Next step</th></tr></thead><tbody>' +
+      '<tr><td>' + m + '–' + total + '</td><td>Mastered</td><td>Extension: replay at the Legend level or write a second evidence response; peer helper.</td></tr>' +
+      '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
+      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review guided notes, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
+      '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
+  }
   function answerLines(r) {
     var out = [], code = finalCode(r);
     r.stages.forEach(function (s, i) {
@@ -316,11 +365,12 @@
       '<div class="actions"><a class="btn primary" href="#play-' + r.id + '">' + ICONS.play + 'View as student</a>' +
       '<button class="btn" data-do="html">' + ICONS.down + 'Download for Canvas (.html)</button>' +
       '<button class="btn" data-do="copy">' + ICONS.copy + 'Copy HTML</button>' +
+      '<a class="btn" href="#teach-' + r.id + '">' + ICONS.play + 'Mini-lesson presenter</a>' +
+      '<button class="btn" data-do="guide">' + ICONS.down + '60-min facilitation guide PDF</button>' +
       '<button class="btn" data-do="exit">' + ICONS.down + 'Exit ticket PDF</button>' +
-      '<button class="btn" data-do="guide">' + ICONS.down + 'Facilitation guide PDF</button>' +
       '<button class="btn star' + (on ? ' on' : '') + '" data-pick="' + r.id + '" aria-pressed="' + on + '">' + (on ? ICONS.star : ICONS.starOff) + (on ? 'In My Picks' : 'Add to My Picks') + '</button></div>' +
       '<textarea class="code" id="copybox" hidden readonly aria-label="Room HTML"></textarea>' +
-      '<div class="layout"><nav class="toc" aria-label="On this page"><a href="#s-glance" data-jump>At a glance</a><a href="#s-game" data-jump>Game, levels &amp; supports</a><a href="#s-lesson" data-jump>Mini-lesson</a><a href="#s-run" data-jump>Running the activity</a><a href="#s-key" data-jump>Answer key</a><a href="#s-exit" data-jump>Exit ticket</a><a href="#s-res" data-jump>Teacher resources</a><a href="#s-canvas" data-jump>Add to Canvas</a></nav><div>';
+      '<div class="layout"><nav class="toc" aria-label="On this page"><a href="#s-glance" data-jump>60-minute plan</a><a href="#s-warm" data-jump>1. Warm-up</a><a href="#s-lesson" data-jump>2. Mini-lesson</a><a href="#s-run" data-jump>3. Activity</a><a href="#s-game" data-jump>Levels &amp; supports</a><a href="#s-debrief" data-jump>4. Debrief</a><a href="#s-key" data-jump>Answer key</a><a href="#s-exit" data-jump>5. Exit ticket</a><a href="#s-res" data-jump>Teacher resources</a><a href="#s-canvas" data-jump>Add to Canvas</a></nav><div>';
 
     // At a glance
     html += '<section class="sec" id="s-glance"><h2>At a glance</h2><dl class="glance">' +
@@ -328,29 +378,19 @@
       '<div><dt>Structure</dt><dd>' + r.stages.length + ' ' + FORMATS[r.format].node.toLowerCase() + 's · ' + puzzleCount(r) + ' puzzles</dd></div><div><dt>Prep</dt><dd>None. Devices only.</dd></div>' +
       '<div><dt>Final code</dt><dd class="codebig">' + esc(code) + '</dd></div><div><dt>Theme</dt><dd>' + esc(themeOf(r).name) + '</dd></div><div><dt>Hands-on pieces</dt><dd>' + interactiveCount(r) + ' interactive items</dd></div><div><dt>Grouping</dt><dd>Solo or pairs</dd></div><div><dt>Standard</dt><dd>' + esc(s.code) + '</dd></div></dl>' + handsOnList(r) +
       '<p><b>Learning target:</b> ' + esc(L.target) + '</p>' +
-      '<div class="timeline">' +
-      '<div><span class="when">0:00–0:12</span><h3>Mini-lesson</h3><p>Hook, teach, model, and a quick check (below).</p></div>' +
-      '<div><span class="when">0:12–0:42</span><h3>' + esc(r.formatLabel) + '</h3><p>Students play ' + esc(r.title) + ' and earn a completion code.</p></div>' +
-      '<div><span class="when">0:42–0:50</span><h3>Debrief and exit ticket</h3><p>Discuss 2 debrief questions, then students complete the exit ticket.</p></div></div></section>';
+      planTable(r) + '</section>';
 
-    html += gameSection(r);
-
-    // Lesson
-    html += '<section class="sec" id="s-lesson"><h2>Mini-lesson: teach this first</h2><p class="lede">About 10–12 minutes. Project this page or the guide PDF. No materials needed beyond your board.</p>' +
-      '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>' +
-      '<div class="timeline">' +
-      '<div><span class="when">2 min</span><h3>Hook</h3><p>' + esc(r.hook || L.hook) + '</p></div>' +
-      '<div><span class="when">5 min</span><h3>Teach</h3><ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' +
-      '<div><span class="when">3 min</span><h3>Model it</h3><p>' + esc(L.model) + '</p></div>' +
-      '<div><span class="when">2 min</span><h3>Check for understanding</h3><p>' + esc(L.check) + '</p></div></div>' +
-      '<div class="callout warn"><h3 style="margin:0">Watch for these misconceptions</h3><ul>' + L.misconceptions.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></section>';
+    // Warm-up and mini-lesson
+    html += warmSection(r) + lessonSection(r, L);
 
     // Running
-    html += '<section class="sec" id="s-run"><h2>Running the activity</h2><h3>Launch</h3><p>' +
+    html += '<section class="sec" id="s-run"><h2><span class="step">3</span>' + esc(r.formatLabel) + ' <span class="when">0:20–0:48 · 28 min</span></h2><h3>Launch</h3><p>' +
       'Project the start screen and read the story aloud. Students type their name, which appears on their completion certificate. Progress saves automatically in the browser, so a student who closes the tab can pick up where they left off on the same device.</p>' +
       '<h3>Tips for this ' + esc(r.formatLabel.toLowerCase()) + '</h3><ul>' + runTips(r).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-      '<h3>Differentiation</h3><ul>' + DIFFERENTIATION.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-      '<h3>Debrief questions</h3><ol>' + L.debrief.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></section>';
+      '<h3>Differentiation</h3><ul>' + DIFFERENTIATION.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></section>';
+    html += gameSection(r);
+    html += '<section class="sec" id="s-debrief"><h2><span class="step">4</span>Debrief <span class="when">0:48–0:52 · 4 min</span></h2><ol>' + L.debrief.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' +
+      (lessonOf(r) ? '<div class="callout"><b>Close the loop:</b> return to warm-up question 3. ' + esc(lessonOf(r).warmup[2][1]) + '</div>' : '') + '</section>';
 
     // Key
     html += '<section class="sec" id="s-key"><h2>Answer key</h2><p class="lede">Open a ' + FORMATS[r.format].node.toLowerCase() + ' to see its answers. The final code is <span class="codebig">' + esc(code) + '</span>.</p>' +
@@ -360,13 +400,19 @@
       }).join('') + '</section>';
 
     // Exit ticket
-    html += '<section class="sec" id="s-exit"><h2>Exit ticket</h2><p class="lede">A one-page PDF with name and date lines, ' + r.exit.length + ' questions, and a confidence scale. Page 2 is your answer key.</p>' +
-      '<div class="ticket"><ol>' + r.exit.map(function (q) {
-        return '<li><b>' + esc(q.q) + '</b>' + (q.choices ? '<ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol>' : '<br><span class="ans">Look for: ' + esc(q.answer) + '</span>') + '</li>';
-      }).join('') + '</ol></div><div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF</button></div></section>';
+    html += exitSection(r);
 
     // Resources
-    html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><p class="lede">Free resources for reteaching or extending ' + esc(s.code) + '. Links open in a new tab.</p><div class="res">' +
+    html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
+      [['1', 'Warm-up worksheet', 'Printable warm-up with notebook expectations. Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
+       ['2', 'Mini-lesson presenter', 'Project it: 4 steps, each with an interactive tool and a class quick check.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
+       ['2', 'Guided notes', 'Fill-in notes, vocabulary, and "try it" problems that follow the presenter step by step.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
+       ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
+       ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
+       ['All', '60-minute facilitation guide', 'Everything above in one printable teacher guide.', '<button class="btn" data-do="guide">' + ICONS.down + 'PDF</button>']].map(function (x) {
+        return '<div class="made-row"><span class="step">' + x[0] + '</span><div><b>' + x[1] + '</b><span>' + x[2] + '</span></div><div class="made-act">' + x[3] + '</div></div>';
+      }).join('') + '</div>' +
+      '<h3>Extra resources for reteaching or extending</h3><div class="res">' +
       s.resources.concat(r.resources || []).map(function (x) {
         return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener"><small>' + esc(x.type || 'Resource') + '</small><b>' + esc(x.name) + '</b><span>' + esc(x.note) + '</span></a>';
       }).join('') + '</div></section>';
@@ -377,7 +423,7 @@
       '<li>Click <b>Download for Canvas (.html)</b>. You get one file with everything inside it.</li>' +
       '<li>In your Canvas course, go to <b>Files</b> and upload it.</li>' +
       '<li>Create an <b>Assignment</b> (or a Page or Module item). In the editor, choose <b>Insert → Document → Course Documents</b> and pick the file. Students click the link to open the room in a new tab.</li>' +
-      '<li>Set the submission type to <b>Text Entry</b> and ask students to paste their completion code, or <b>File Upload</b> for a screenshot of their certificate.</li></ol>' +
+      '<li>Set the submission type to <b>Text Entry</b>. Students tap <b>Copy my work</b> on the final screen and paste the block (name, level, completion code, stats, and any written evidence).</li></ol>' +
       '<p class="lede">Canvas\'s page editor removes scripts, so pasting the HTML code into a Canvas page will not work. Uploading the file does.</p></div>' +
       '<div class="method"><h3>Option 2: Embed it in a page <span class="badge">Needs a hosted site</span></h3>' +
       (embed ? '<p>This site is online, so you can embed the room right inside a Canvas Page. In the Rich Content Editor, click the <b>&lt;/&gt;</b> HTML view and paste:</p><textarea class="code" readonly id="embedcode">&lt;iframe src="' + esc(embed) + '" width="100%" height="820" style="border:0" title="' + esc(r.title) + '" allowfullscreen&gt;&lt;/iframe&gt;</textarea><div><button class="btn" data-do="embed">' + ICONS.copy + 'Copy embed code</button></div>'
@@ -396,6 +442,31 @@
   }
 
   var overlay = null;
+  function lessonOf(r) { return (window.CX_LESSONS || {})[r.std]; }
+  function lessonRoom(r) {
+    var X = lessonOf(r), s = STD[r.std];
+    return {
+      id: 'lesson-' + r.std, title: s.title, grade: r.grade, subject: r.subject, standard: s.code, format: 'escape', game: 'locks',
+      theme: r.theme, vocab: s.lesson.vocab, story: '', finale: '', wrapUp: 'Students should have their guided notes filled in. Launch ' + r.title + ' next.',
+      stages: X.steps.map(function (st, i) {
+        var tool = st.tool && !st.tool.sim ? st.tool : null;
+        return {
+          title: st.t,
+          content: '<p class="ep-say"><b>Teach:</b> ' + esc(st.say) + '</p><p class="ep-notebox"><b>Students:</b> ' + esc(st.do) + '<br><b>Guided notes:</b> ' + esc(st.note.replace(/\[([^\]]+)\]/g, '____')) + '</p>',
+          visual: tool, sim: st.tool && st.tool.sim ? st.tool.sim : null, cards: st.cards, puzzles: [st.check]
+        };
+      })
+    };
+  }
+  function openPresenter(r) {
+    closePlayer();
+    overlay = document.createElement('div');
+    overlay.className = 'cx-play';
+    overlay.innerHTML = '<div class="cx-play-scroll"><div id="cx-mount"></div></div>';
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    EscapePlayer(overlay.querySelector('#cx-mount'), lessonRoom(r), { preview: true, teach: true, onExit: function () { location.hash = 'room-' + r.id; } });
+  }
   function openPlayer(r) {
     closePlayer();
     overlay = document.createElement('div');
@@ -431,6 +502,11 @@
   function route() {
     var h = location.hash.replace(/^#/, '');
     var m;
+    if ((m = h.match(/^teach-(.+)$/)) && BY_ID[m[1]] && lessonOf(BY_ID[m[1]])) {
+      if (!lastRoute || !/^room-|^$/.test(lastRoute)) renderRoom(BY_ID[m[1]]);
+      openPresenter(BY_ID[m[1]]);
+      lastRoute = h; return;
+    }
     if ((m = h.match(/^play-(.+)$/)) && BY_ID[m[1]]) {
       if (!lastRoute || !/^room-|^$/.test(lastRoute)) renderRoom(BY_ID[m[1]]);
       openPlayer(BY_ID[m[1]]);
@@ -471,10 +547,13 @@
       var act = t.getAttribute('data-do');
       if (act === 'html') { download(slug(r) + '.html', standaloneHTML(r), 'text/html'); toast('Downloaded. Upload this file to Canvas Files.'); }
       else if (act === 'copy') copyText(standaloneHTML(r), 'HTML copied. Paste it into a new .html file.', $('#copybox'));
-      else if (act === 'exit') { download(slug(r) + '-exit-ticket.pdf', CrossroadsPDF.exitTicket(r, STD[r.std]), 'application/pdf'); toast('Exit ticket PDF downloaded.'); }
+      else if (act === 'exit') { download(slug(r) + '-exit-ticket.pdf', CrossroadsPDF.exitTicket(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Exit ticket PDF downloaded.'); }
+      else if (act === 'warm') { download(slug(r) + '-warm-up.pdf', CrossroadsPDF.warmup(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Warm-up worksheet downloaded.'); }
+      else if (act === 'notes') { download(slug(r) + '-guided-notes.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Guided notes downloaded.'); }
+      else if (act === 'noteskey') { download(slug(r) + '-guided-notes-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Guided notes key downloaded.'); }
       else if (act === 'guide') {
         var gr = Object.assign({}, r, { runTips: runTips(r), finalCode: finalCode(r) });
-        download(slug(r) + '-facilitation-guide.pdf', CrossroadsPDF.guide(gr, STD[r.std], answerLines(r)), 'application/pdf'); toast('Facilitation guide PDF downloaded.');
+        download(slug(r) + '-facilitation-guide.pdf', CrossroadsPDF.guide(gr, STD[r.std], answerLines(r), lessonOf(r)), 'application/pdf'); toast('Facilitation guide PDF downloaded.');
       }
       else if (act === 'embed') copyText($('#embedcode').value, 'Embed code copied.', $('#embedcode'));
     }
@@ -489,7 +568,7 @@
     }
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && overlay) { var m = location.hash.match(/^#play-(.+)$/); if (m) location.hash = 'room-' + m[1]; }
+    if (e.key === 'Escape' && overlay) { var m = location.hash.match(/^#(?:play|teach)-(.+)$/); if (m) location.hash = 'room-' + m[1]; }
   });
 
   function measureTop() { var t = document.querySelector('.top'); if (t) document.documentElement.style.setProperty('--toph', t.offsetHeight + 'px'); }
