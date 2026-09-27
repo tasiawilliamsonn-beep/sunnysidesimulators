@@ -323,7 +323,7 @@ SUNNY_MODELS.wordLab = function (M) {
   var tiles = K.el('<div class="sn-panel"></div>'); M.el.appendChild(tiles);
   var logB = K.el('<div class="sn-panel"></div>'); M.el.appendChild(logB);
   function key() { return [slot.p, slot.r, slot.s].filter(Boolean).join('+'); }
-  function forge() { var k = key(); if (!slot.r) { M.toast('Every word needs a ROOT.', true); return; } if (cfg.words[k]) { forged[k] = true; var o = { forged: Object.keys(forged).length }; o['w_' + k.replace(/\+/g, '_')] = true; var tk = cfg.targets[ti]; if (tk && tk[1] === k) { o['target_' + ti] = true; M.toast('🎯 Target word forged!'); } M.set(o); } else M.toast('"' + k.replace(/\+/g, '') + '" isn\'t a real English word. Try a different combination.', true); draw(); }
+  function forge() { var k = key(); if (!slot.r && !(slot.p && slot.s)) { M.toast('Add a root, or a prefix and a suffix.', true); return; } if (cfg.words[k]) { forged[k] = true; var o = { forged: Object.keys(forged).length }; o['w_' + k.replace(/\+/g, '_')] = true; var tk = cfg.targets[ti]; if (tk && tk[1] === k) { o['target_' + ti] = true; M.toast('🎯 Target word forged!'); } M.set(o); } else M.toast('"' + k.replace(/\+/g, '') + '" isn\'t a real English word. Try a different combination.', true); draw(); }
   function draw() {
     var tk = cfg.targets[ti];
     goal.innerHTML = '<b>🎯 Word order ' + (ti + 1) + ' of ' + cfg.targets.length + ':</b> Forge a word that means <b>"' + K.esc(tk[0]) + '"</b>. <button type="button" class="sn-b sm ghost" data-next>Next order ▶</button>';
@@ -386,4 +386,165 @@ SUNNY_MODELS.idiomStreet = function (M) {
   }
   report(); draw();
   return { auto: function () { PP.forEach(function (p, i) { got[i] = true; }); report(); draw(); } };
+};
+
+/* ================================================================== */
+/*                       GRADE 6 ELA MODELS                            */
+/* ================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* Inference Case Board: text clue + what I know → inference            */
+/* cfg: { passage, clues:[..], know:[..], infs:[..], links:[[c,k,i]] }   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.inferenceCase = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var P = K.passage(cfg.passage.paragraphs); M.def.passageText = P.text;
+  var pick = { c: null, k: null, i: null }, pinned = [], view = 'read';
+  M.el.innerHTML = '';
+  M.el.appendChild(K.el('<style>.ib-board{background:#c8a27a;background-image:radial-gradient(#b08968 1px,transparent 1px);background-size:14px 14px;border-radius:12px;padding:10px;position:relative}.ib-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.ib-col h4{margin:0 0 6px;color:#fff;text-shadow:0 1px 2px #0006;font-size:.8em;text-transform:uppercase;letter-spacing:.06em}.ib-card{display:block;width:100%;text-align:left;background:#fffbe6;border:0;border-radius:4px;padding:7px 9px;margin:0 0 7px;box-shadow:0 3px 6px #0003;cursor:pointer;font-size:.86em;position:relative}.ib-card::before{content:"📌";position:absolute;top:-9px;left:45%}.ib-card.sel{outline:3px solid #e03131}.ib-card.used{opacity:.55}@media(max-width:700px){.ib-cols{grid-template-columns:1fr}}</style>'));
+  var tabs = K.seg([['read', '📖 Case file (text)'], ['board', '🧵 Evidence board']], view, function (v) { view = v; draw(); });
+  var bar = K.el('<div class="sn-ctrls"></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var area = K.el('<div></div>'); M.el.appendChild(area);
+  function report() { var st = { pinned: pinned.length, right: pinned.filter(function (p) { return p.ok; }).length }; st.allRight = st.right >= cfg.links.length; M.set(st); }
+  function draw() {
+    if (view === 'read') { area.innerHTML = '<article class="sn-read-pass"><h3>' + K.esc(cfg.passage.title) + '</h3><div class="sn-by">' + K.esc(cfg.passage.genre || '') + '</div>' + P.html + '<div style="text-align:center"><button type="button" class="sn-b primary sm" data-read>✓ I read the case file</button></div></article>'; area.querySelector('[data-read]').addEventListener('click', function () { M.set('read', true); view = 'board'; tabs.set('board'); draw(); }); return; }
+    function col(key, title, list) { return '<div class="ib-col"><h4>' + title + '</h4>' + list.map(function (t, i) { var used = pinned.some(function (p) { return p.ok && p[key] === i; }); return '<button type="button" class="ib-card' + (pick[key] === i ? ' sel' : '') + (used ? ' used' : '') + '" data-k="' + key + '" data-i="' + i + '">' + K.esc(t) + '</button>'; }).join('') + '</div>'; }
+    area.innerHTML = '<div class="ib-board"><div class="ib-cols">' + col('c', '🔎 Text clue (what the text says)', cfg.clues) + col('k', '🧠 What I already know', cfg.know) + col('i', '💡 Inference (what I figure out)', cfg.infs) + '</div><div style="text-align:center"><button type="button" class="sn-b primary" data-pin>🧵 Pin these three together</button></div></div><div class="sn-panel" style="margin-top:8px"><b>Solved links: ' + pinned.filter(function (p) { return p.ok; }).length + ' of ' + cfg.links.length + '</b>' + pinned.filter(function (p) { return p.ok; }).map(function (p) { return '<div style="font-size:.9em;margin-top:4px">🔎 ' + K.esc(cfg.clues[p.c]) + ' + 🧠 ' + K.esc(cfg.know[p.k]) + ' → 💡 <b>' + K.esc(cfg.infs[p.i]) + '</b></div>'; }).join('') + '</div>';
+    area.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('click', function () { var k = b.getAttribute('data-k'), i = +b.getAttribute('data-i'); pick[k] = pick[k] === i ? null : i; draw(); }); });
+    area.querySelector('[data-pin]').addEventListener('click', function () { if (pick.c == null || pick.k == null || pick.i == null) { M.toast('Pick one card from EACH column.', true); return; } var ok = cfg.links.some(function (l) { return l[0] === pick.c && l[1] === pick.k && l[2] === pick.i; }); if (pinned.some(function (p) { return p.c === pick.c && p.k === pick.k && p.i === pick.i; })) { M.toast('Already pinned.'); return; } pinned.push({ c: pick.c, k: pick.k, i: pick.i, ok: ok }); M.toast(ok ? '✓ Strong inference: the clue and your knowledge support it.' : '✗ Those don\'t connect. Does the clue + the knowledge really lead to that inference?', !ok); pick = { c: null, k: null, i: null }; report(); draw(); });
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.read) M.set('read', true); if (c.allRight || c.right) cfg.links.forEach(function (l) { pinned.push({ c: l[0], k: l[1], i: l[2], ok: true }); }); report(); view = 'board'; draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Evidence Strength Meter: strong, weak, or doesn't support            */
+/* cfg: { claim, passage?, cards:[[quote, 0 strong|1 weak|2 none, why]] } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.evidenceMeter = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var C = cfg.cards, place = C.map(function () { return -1; }), sel = -1;
+  if (cfg.passage) { var P = K.passage(cfg.passage.paragraphs); M.def.passageText = P.text; }
+  M.el.innerHTML = '';
+  var claim = K.el('<div class="sn-panel" style="border:3px solid var(--sn-acc)"><span class="sn-note">CLAIM</span><div style="font-size:1.15em;font-weight:800">' + K.esc(cfg.claim) + '</div></div>'); M.el.appendChild(claim);
+  if (cfg.passage) { var det = K.el('<details class="sn-panel"><summary><b>📖 Read the text: ' + K.esc(cfg.passage.title) + '</b></summary><div class="sn-read-pass" style="margin-top:6px">' + P.html + '</div></details>'); det.addEventListener('toggle', function () { if (det.open) M.set('read', true); }); M.el.appendChild(det); }
+  var area = K.el('<div></div>'); M.el.appendChild(area);
+  var Z = [['💪 STRONG: directly proves the claim', '#d3f9d8', '#2b8a3e'], ['🤏 WEAK: related, but doesn\'t prove it', '#fff3bf', '#e67700'], ['🚫 DOESN\'T SUPPORT the claim', '#ffe3e3', '#c92a2a']];
+  function report() { var st = { placed: place.filter(function (p) { return p >= 0; }).length, right: C.filter(function (c, i) { return place[i] === c[1]; }).length }; st.allRight = st.right === C.length; M.set(st); }
+  function draw() {
+    var h = '<p class="sn-note">Tap an evidence card, then tap the meter zone where it belongs.</p><div class="sb-pool">' + C.map(function (c, i) { return place[i] < 0 ? '<button type="button" class="sb-card' + (sel === i ? ' sel' : '') + '" data-c="' + i + '">“' + K.esc(c[0]) + '”</button>' : ''; }).join('') + '</div>';
+    h += '<svg viewBox="0 0 300 70" class="sn-svg" style="max-width:420px;margin:8px auto" aria-hidden="true"><path d="M20 65 A130 130 0 0 1 280 65" fill="none" stroke="#dee2e6" stroke-width="18"/><path d="M20 65 A130 130 0 0 1 100 12" fill="none" stroke="#ff8787" stroke-width="18"/><path d="M100 12 A130 130 0 0 1 200 12" fill="none" stroke="#ffd43b" stroke-width="18"/><path d="M200 12 A130 130 0 0 1 280 65" fill="none" stroke="#69db7c" stroke-width="18"/></svg>';
+    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' + Z.map(function (z, zi) { return '<div data-z="' + zi + '" role="button" tabindex="0" style="background:' + z[1] + ';border:2px solid ' + z[2] + ';border-radius:10px;padding:8px;min-height:120px;display:flex;flex-direction:column;gap:5px;cursor:pointer"><b style="font-size:.8em;color:' + z[2] + '">' + z[0] + '</b>' + C.map(function (c, i) { return place[i] === zi ? '<button type="button" class="sb-card" data-c="' + i + '" style="font-size:.8em">“' + K.esc(c[0]) + '”</button>' : ''; }).join('') + '</div>'; }).join('') + '</div><div class="sn-row"><button type="button" class="sn-b sm" data-chk>Check the meter</button><span class="sn-note" data-msg></span></div>';
+    area.innerHTML = h;
+    area.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); var i = +b.getAttribute('data-c'); if (place[i] >= 0) { place[i] = -1; sel = i; } else sel = sel === i ? -1 : i; report(); draw(); }); });
+    area.querySelectorAll('[data-z]').forEach(function (z) { function drop() { if (sel < 0) return; place[sel] = +z.getAttribute('data-z'); sel = -1; report(); draw(); } z.addEventListener('click', drop); z.addEventListener('keydown', function (e) { if (e.key === 'Enter') drop(); }); });
+    area.querySelector('[data-chk]').addEventListener('click', function () { var bad = C.map(function (c, i) { return place[i] >= 0 && place[i] !== c[1] ? c[2] : null; }).filter(Boolean); area.querySelector('[data-msg]').textContent = bad.length ? '✗ ' + bad[0] : '✓ The meter agrees so far!'; if (bad.length) { C.forEach(function (c, i) { if (place[i] >= 0 && place[i] !== c[1]) place[i] = -1; }); report(); setTimeout(draw, 1400); } });
+  }
+  M.el.appendChild(K.el('<style>.sb-pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px dashed var(--sn-line);border-radius:10px;min-height:44px}.sb-card{border:2px solid var(--sn-ink);background:#fff;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:.88em;text-align:left;font-family:Georgia,serif}.sb-card.sel{background:#ffe066}</style>'));
+  report(); draw();
+  return { auto: function () { C.forEach(function (c, i) { place[i] = c[1]; }); M.set('read', true); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Argument Tree: claim, reasons, evidence, and unsupported claims       */
+/* cfg: { passage:{title, paragraphs}, cards:[[text, role]] } roles: claim, r1, r2, e1, e2, x */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.argumentTree = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var P = K.passage(cfg.passage.paragraphs); M.def.passageText = P.text;
+  var C = cfg.cards, place = C.map(function () { return null; }), sel = -1, view = 'read';
+  var SL = [['claim', '🎯 Claim'], ['r1', 'Reason 1'], ['r2', 'Reason 2'], ['e1', 'Evidence for reason 1'], ['e2', 'Evidence for reason 2'], ['x', '🚫 Unsupported / not relevant']];
+  M.el.innerHTML = '';
+  var tabs = K.seg([['read', '📖 Read the op-ed'], ['tree', '🌳 Build the argument tree']], view, function (v) { view = v; draw(); });
+  var bar = K.el('<div class="sn-ctrls"></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var area = K.el('<div></div>'); M.el.appendChild(area);
+  function report() { var st = { placed: place.filter(Boolean).length, right: C.filter(function (c, i) { return place[i] === c[1]; }).length }; st.allRight = st.right === C.length; st.claimRight = C.some(function (c, i) { return c[1] === 'claim' && place[i] === 'claim'; }); M.set(st); }
+  function slot(k, label, style) { return '<div data-s="' + k + '" role="button" tabindex="0" style="border:2px solid var(--sn-line);border-radius:10px;padding:6px;min-height:56px;background:' + (style || 'var(--sn-bg)') + ';cursor:pointer;display:flex;flex-direction:column;gap:4px"><b style="font-size:.75em;text-transform:uppercase;letter-spacing:.05em">' + label + '</b>' + C.map(function (c, i) { return place[i] === k ? '<button type="button" class="sb-card" data-c="' + i + '" style="font-size:.8em">' + K.esc(c[0]) + '</button>' : ''; }).join('') + '</div>'; }
+  function draw() {
+    if (view === 'read') { area.innerHTML = '<article class="sn-read-pass"><h3>' + K.esc(cfg.passage.title) + '</h3><div class="sn-by">' + K.esc(cfg.passage.genre || 'Opinion article') + '</div>' + P.html + '<div style="text-align:center"><button type="button" class="sn-b primary sm" data-read>✓ I finished reading</button></div></article>'; area.querySelector('[data-read]').addEventListener('click', function () { M.set('read', true); view = 'tree'; tabs.set('tree'); draw(); }); return; }
+    area.innerHTML = '<p class="sn-note">Tap a sentence card, then tap its place in the tree.</p><div class="sb-pool">' + C.map(function (c, i) { return !place[i] ? '<button type="button" class="sb-card' + (sel === i ? ' sel' : '') + '" data-c="' + i + '">' + K.esc(c[0]) + '</button>' : ''; }).join('') + '</div>' +
+      '<div style="display:grid;gap:8px;margin-top:8px">' + slot('claim', '🎯 Claim (the writer\'s main argument)', '#f3f0ff') + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' + slot('r1', 'Reason 1', '#e7f5ff') + slot('r2', 'Reason 2', '#e7f5ff') + slot('e1', 'Evidence for reason 1', '#ebfbee') + slot('e2', 'Evidence for reason 2', '#ebfbee') + '</div>' + slot('x', '🚫 Unsupported claim or not relevant', '#fff5f5') + '</div><div class="sn-row"><button type="button" class="sn-b sm" data-chk>Check the tree</button><span class="sn-note" data-msg></span></div>';
+    area.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); var i = +b.getAttribute('data-c'); if (place[i]) { place[i] = null; sel = i; } else sel = sel === i ? -1 : i; report(); draw(); }); });
+    area.querySelectorAll('[data-s]').forEach(function (z) { function drop() { if (sel < 0) return; place[sel] = z.getAttribute('data-s'); sel = -1; report(); draw(); } z.addEventListener('click', drop); z.addEventListener('keydown', function (e) { if (e.key === 'Enter') drop(); }); });
+    area.querySelector('[data-chk]').addEventListener('click', function () { var wrong = C.filter(function (c, i) { return place[i] && place[i] !== c[1]; }).length; area.querySelector('[data-msg]').textContent = wrong ? wrong + ' card(s) are misplaced and went back to the pile.' : '✓ Looks right so far!'; if (wrong) { C.forEach(function (c, i) { if (place[i] && place[i] !== c[1]) place[i] = null; }); report(); setTimeout(draw, 900); } });
+  }
+  M.el.appendChild(K.el('<style>.sb-pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px dashed var(--sn-line);border-radius:10px;min-height:44px}.sb-card{border:2px solid var(--sn-ink);background:#fff;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:.86em;text-align:left}.sb-card.sel{background:#ffe066}</style>'));
+  report(); draw();
+  return { auto: function () { C.forEach(function (c, i) { place[i] = c[1]; }); M.set('read', true); report(); view = 'tree'; draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Debate Judge: score two speeches on reasons and evidence            */
+/* cfg: { topic, speeches:[{name, paragraphs}], criteria:[..], key:[[scores...],[scores...]], winner } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.debateJudge = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var SP = cfg.speeches, cur = 0, sc = SP.map(function () { return cfg.criteria.map(function () { return null; }); }), winner = null, read = {};
+  M.def.passageText = SP.map(function (s) { return K.passage(s.paragraphs).text; }).join(' ');
+  M.el.innerHTML = '';
+  var top = K.el('<div class="sn-panel"><b>🎤 Debate topic:</b> ' + K.esc(cfg.topic) + '</div>'); M.el.appendChild(top);
+  var tabs = K.seg(SP.map(function (s, i) { return [String(i), '🗣 ' + s.name]; }), '0', function (v) { cur = +v; read[cur] = true; M.set('readAll', Object.keys(read).length === SP.length); draw(); });
+  var bar = K.el('<div class="sn-ctrls"></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var row = K.el('<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:10px;align-items:start"></div>'), pass = K.el('<article class="sn-read-pass"></article>'), card = K.el('<div class="sn-panel"></div>');
+  row.appendChild(pass); row.appendChild(card); M.el.appendChild(row);
+  read[0] = true;
+  function report() { var st = { scored: sc.every(function (r) { return r.every(function (x) { return x != null; }); }), winner: winner, winnerRight: winner === cfg.winner, readAll: Object.keys(read).length === SP.length }; var close = true; sc.forEach(function (r, i) { r.forEach(function (x, j) { if (x == null || Math.abs(x - cfg.key[i][j]) > 1) close = false; }); }); st.fair = close; st.total0 = sc[0].reduce(function (a, b) { return a + (b || 0); }, 0); st.total1 = sc[1].reduce(function (a, b) { return a + (b || 0); }, 0); M.set(st); }
+  function draw() {
+    var s = SP[cur]; pass.innerHTML = '<h3>' + K.esc(s.name) + '</h3>' + K.passage(s.paragraphs).html;
+    card.innerHTML = '<h3>📋 Judge\'s scorecard: ' + K.esc(s.name) + '</h3>' + cfg.criteria.map(function (c, j) { return '<div style="margin:6px 0"><div style="font-size:.9em;font-weight:700">' + K.esc(c) + '</div><div class="sn-seg">' + [0, 1, 2].map(function (v) { return '<button type="button" data-j="' + j + '" data-v="' + v + '"' + (sc[cur][j] === v ? ' class="on"' : '') + '>' + ['0 missing', '1 some', '2 strong'][v] + '</button>'; }).join('') + '</div></div>'; }).join('') + '<p><b>Total: ' + sc[cur].reduce(function (a, b) { return a + (b || 0); }, 0) + ' / ' + cfg.criteria.length * 2 + '</b></p><div class="sn-row"><b class="sn-note">Winner:</b>' + SP.map(function (x, i) { return '<button type="button" class="sn-b sm' + (winner === i ? ' on' : '') + '" data-win="' + i + '">' + K.esc(x.name) + '</button>'; }).join('') + '</div>';
+    card.querySelectorAll('[data-j]').forEach(function (b) { b.addEventListener('click', function () { sc[cur][+b.getAttribute('data-j')] = +b.getAttribute('data-v'); report(); draw(); }); });
+    card.querySelectorAll('[data-win]').forEach(function (b) { b.addEventListener('click', function () { winner = +b.getAttribute('data-win'); report(); draw(); }); });
+  }
+  report(); draw();
+  return { auto: function () { SP.forEach(function (s, i) { read[i] = true; sc[i] = cfg.key[i].slice(); }); winner = cfg.winner; report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Connotation Spectrum: place words from negative to positive          */
+/* cfg: { sets:[{context, words:[[w, -1|0|1]]}] }                         */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.connotation = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var SETS = cfg.sets, cur = 0, place = SETS.map(function (s) { return s.words.map(function () { return null; }); }), sel = -1;
+  M.el.innerHTML = '';
+  var tabs = K.seg(SETS.map(function (s, i) { return [String(i), 'Set ' + (i + 1)]; }), '0', function (v) { cur = +v; sel = -1; draw(); });
+  var bar = K.el('<div class="sn-ctrls"><b class="sn-note">Word sets:</b></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var area = K.el('<div></div>'); M.el.appendChild(area);
+  function report() { var st = {}; var all = true; SETS.forEach(function (s, si) { var ok = s.words.every(function (w, i) { return place[si][i] === w[1]; }); st['set_' + si] = ok; if (!ok) all = false; }); st.allRight = all; M.set(st); }
+  function draw() {
+    var s = SETS[cur], Z = [[-1, '😠 Negative', '#ffe3e3'], [0, '😐 Neutral', '#f1f3f5'], [1, '😊 Positive', '#d3f9d8']];
+    area.innerHTML = '<div class="sn-panel"><b>Context:</b> ' + K.esc(s.context) + '<br><span class="sn-note">These words have similar meanings (denotation) but different feelings (connotation).</span></div><div class="sb-pool">' + s.words.map(function (w, i) { return place[cur][i] == null ? '<button type="button" class="sb-card' + (sel === i ? ' sel' : '') + '" data-c="' + i + '">' + K.esc(w[0]) + '</button>' : ''; }).join('') + '</div><div style="height:14px;border-radius:8px;margin:10px 0;background:linear-gradient(90deg,#ff8787,#dee2e6,#69db7c)"></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' + Z.map(function (z) { return '<div data-z="' + z[0] + '" role="button" tabindex="0" style="background:' + z[2] + ';border:2px solid var(--sn-line);border-radius:10px;padding:8px;min-height:110px;display:flex;flex-direction:column;gap:5px;cursor:pointer"><b style="font-size:.85em">' + z[1] + '</b>' + s.words.map(function (w, i) { return place[cur][i] === z[0] ? '<button type="button" class="sb-card" data-c="' + i + '">' + K.esc(w[0]) + '</button>' : ''; }).join('') + '</div>'; }).join('') + '</div><div class="sn-row"><button type="button" class="sn-b sm" data-chk>Check</button><span class="sn-note" data-msg></span></div>';
+    area.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); var i = +b.getAttribute('data-c'); if (place[cur][i] != null) { place[cur][i] = null; sel = i; } else sel = sel === i ? -1 : i; report(); draw(); }); });
+    area.querySelectorAll('[data-z]').forEach(function (z) { function drop() { if (sel < 0) return; place[cur][sel] = +z.getAttribute('data-z'); sel = -1; report(); draw(); } z.addEventListener('click', drop); z.addEventListener('keydown', function (e) { if (e.key === 'Enter') drop(); }); });
+    area.querySelector('[data-chk]').addEventListener('click', function () { var wrong = s.words.filter(function (w, i) { return place[cur][i] != null && place[cur][i] !== w[1]; }).length; area.querySelector('[data-msg]').textContent = wrong ? wrong + ' word(s) have a different feeling than where you put them.' : '✓ Nice ear for connotation!'; if (wrong) { s.words.forEach(function (w, i) { if (place[cur][i] != null && place[cur][i] !== w[1]) place[cur][i] = null; }); report(); setTimeout(draw, 1000); } });
+  }
+  M.el.appendChild(K.el('<style>.sb-pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px dashed var(--sn-line);border-radius:10px;min-height:44px}.sb-card{border:2px solid var(--sn-ink);background:#fff;border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:700}.sb-card.sel{background:#ffe066}</style>'));
+  report(); draw();
+  return { auto: function () { SETS.forEach(function (s, si) { s.words.forEach(function (w, i) { place[si][i] = w[1]; }); }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Tone Mixer: word choices change the tone of a paragraph              */
+/* cfg: { text: 'with {0} slots', slots:[[neg, neutral, pos]], missions:[['positive', 1] ...] } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.toneMixer = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var choice = cfg.slots.map(function () { return 1; }), mi = 0;
+  M.el.innerHTML = '';
+  var mission = K.el('<div class="sn-panel" aria-live="polite"></div>'); M.el.appendChild(mission);
+  var pass = K.el('<article class="sn-read-pass" style="font-size:1.15em;line-height:2.1"></article>'); M.el.appendChild(pass);
+  var meter = K.svgEl('svg', { viewBox: '0 0 400 110', class: 'sn-svg', role: 'img', 'aria-label': 'Tone meter' }); meter.style.maxWidth = '420px'; meter.style.margin = '0 auto'; M.el.appendChild(meter);
+  function tone() { var v = choice.reduce(function (a, c) { return a + (c - 1); }, 0); return v / cfg.slots.length; }
+  function report() { var t = tone(), m = cfg.missions[mi], st = { tone: K.round(t, 2), mission: mi, words: choice.map(function (c, i) { return cfg.slots[i][c]; }) }; var ok = m[1] > 0 ? t >= 0.99 : m[1] < 0 ? t <= -0.99 : Math.abs(t) < 0.01; st.match = ok; if (ok) st['m_' + mi] = true; M.set(st); }
+  function draw() {
+    var m = cfg.missions[mi];
+    mission.innerHTML = '<b>🎛 Mission ' + (mi + 1) + ':</b> Change the word choices so the paragraph sounds <b>' + K.esc(m[0]) + '</b>. <button type="button" class="sn-b sm ghost" data-mnext>Next mission ▶</button>';
+    mission.querySelector('[data-mnext]').addEventListener('click', function () { mi = (mi + 1) % cfg.missions.length; report(); draw(); });
+    var n = 0; pass.innerHTML = K.esc(cfg.text).replace(/\{(\d+)\}/g, function (_, k) { k = +k; return '<button type="button" class="sn-b sm" data-slot="' + k + '" style="font-family:Georgia,serif;font-size:1em;background:' + ['#ffe3e3', '#f1f3f5', '#d3f9d8'][choice[k]] + '">' + K.esc(cfg.slots[k][choice[k]]) + ' ▾</button>'; });
+    pass.querySelectorAll('[data-slot]').forEach(function (b) { b.addEventListener('click', function () { var k = +b.getAttribute('data-slot'); choice[k] = (choice[k] + 1) % 3; report(); draw(); }); });
+    var t = tone(), ang = t * 70;
+    meter.innerHTML = '<path d="M40 100 A160 160 0 0 1 360 100" fill="none" stroke="#dee2e6" stroke-width="16"/><path d="M40 100 A160 160 0 0 1 120 30" fill="none" stroke="#ff8787" stroke-width="16"/><path d="M280 30 A160 160 0 0 1 360 100" fill="none" stroke="#69db7c" stroke-width="16"/><line x1="200" y1="100" x2="' + (200 + Math.sin(ang * Math.PI / 180) * 80) + '" y2="' + (100 - Math.cos(ang * Math.PI / 180) * 80) + '" stroke="#1d2433" stroke-width="5" stroke-linecap="round"/><circle cx="200" cy="100" r="8" fill="#1d2433"/><text x="40" y="20" font-size="12" font-weight="800" fill="#c92a2a">NEGATIVE</text><text x="360" y="20" font-size="12" font-weight="800" fill="#2b8a3e" text-anchor="end">POSITIVE</text><text x="200" y="20" font-size="12" font-weight="800" text-anchor="middle">NEUTRAL</text>';
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^m_(\d)$/); if (mm) { mi = +mm[1]; var tgt = cfg.missions[mi][1]; choice = choice.map(function () { return tgt + 1; }); report(); } } draw(); } };
 };
