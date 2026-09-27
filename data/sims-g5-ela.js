@@ -198,3 +198,280 @@ SUNNY_SIMS.push({
     { tag: 'challenge', levels: ['legend'], title: 'Legend: write a fable', sheet: 6, q: { type: 'text', q: 'Write a 3-sentence fable with animals that teaches: "Being kind to others comes back to you." Do not state the lesson directly.', min: 25, need: [{ words: ['kind', 'help', 'helped', 'share', 'shared'], label: 'Shows kindness' }, { words: ['later', 'then', 'next', 'when'], label: 'Shows it coming back later' }] } }
   ]
 });
+
+/* ======================= Main ideas & text structure ======================= */
+SUNNY_SIMS.push({
+  id: 'g5-ela-structure-lab', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.3.2',
+  title: 'Text Structure Lab', model: 'structureLab', minutes: 25, icon: '🦋',
+  setup: { items: [
+    { title: 'A Monarch\'s Life', structure: 'chronology', text: 'A monarch\'s life begins as an egg no bigger than a pinhead. [[First]], a tiny caterpillar hatches and eats its own eggshell. [[Next]], it munches milkweed leaves for about two weeks. [[After]] that, it hangs upside down and forms a green case called a chrysalis. [[Finally]], about ten days [[later]], an adult butterfly climbs out.' },
+    { title: 'Monarch or Viceroy?', structure: 'compare', text: 'Monarchs and viceroys look [[alike]] at first glance. [[Both]] have orange wings with black veins and white spots. [[However]], a viceroy has an extra black line across its back wings. Viceroys are also smaller. [[Unlike]] monarchs, viceroys do not migrate thousands of miles.' },
+    { title: 'Why Monarchs Are Disappearing', structure: 'cause', text: 'Many fields where milkweed once grew have been turned into roads and farms. [[Because]] monarch caterpillars can eat only milkweed, they have less food. [[As a result]], fewer caterpillars survive to become butterflies, [[so]] monarch numbers have dropped in many places.' },
+    { title: 'Helping the Monarchs', structure: 'problem', text: 'The biggest [[problem]] for monarchs is a shortage of milkweed. One [[solution]] is simple: plant it! Schools across Indiana are building butterfly gardens to [[solve]] this problem. When students plant milkweed, monarchs have places to lay eggs again.' },
+    { title: 'The Amazing Monarch', structure: 'description', text: 'Monarchs are [[known for]] their bright orange wings, which warn birds that they taste bad. They have several amazing traits. [[For example]], they can fly up to 100 miles in a day. They also have special body parts, [[such as]] taste sensors on their feet.' }
+  ] },
+  place: 'Sunnyside Reading Room · Nonfiction Lab',
+  mission: 'Authors organize information in different ways, and signal words are the clues. Read five paragraphs about monarch butterflies, tap the signal words, and match each paragraph to the graphic organizer that fits its structure.',
+  question: 'How do signal words reveal how an informational text is organized?',
+  takeaway: 'Informational texts use structures: chronology (first, next, finally), compare and contrast (both, however, unlike), cause and effect (because, as a result, so), problem and solution (problem, solution, solve), and description (for example, such as). Knowing the structure helps you find and remember the main ideas.',
+  vocab: [['Text structure', 'How an author organizes information.'], ['Signal words', 'Words that give clues about the structure.'], ['Chronology', 'Time order.'], ['Graphic organizer', 'A drawing that shows how ideas connect.']],
+  warmup: { style: 'Signal word sort', prompt: 'Which structure does each signal word suggest?', items: [['"As a result"', 'Cause and effect.'], ['"Similarly"', 'Compare and contrast.'], ['"Then" and "finally"', 'Chronology.']] },
+  steps: [
+    { tag: 'explore', title: 'First paragraph', text: 'Paragraph 1 is open. Tap the words that signal how it is organized.', goal: { text: 'Find all the signal words in ¶ 1 without tapping more than 2 extra words.', button: 'Check my signal words', check: function (s) { return s.sigAll_0 && (s.wrong_0 || 0) <= 2; }, why: function (s) { return (s.wrong_0 || 0) > 2 ? 'You tapped words that are not signal words. Tap them again to remove them.' : 'Look for time-order words.'; } },
+      q: { type: 'mc', q: 'Which structure do "first, next, after, finally, later" signal?', choices: ['Chronology (sequence)', 'Compare and contrast', 'Problem and solution'], answer: 0 } },
+    { tag: 'test', title: 'All five paragraphs', sheet: 1, goal: { text: 'Find the signal words in EVERY paragraph.', check: { allSignals: true } } },
+    { tag: 'test', title: 'Match the organizers', sheet: 2, goal: { text: 'Choose the organizer that fits each paragraph.', button: 'Check', check: { allOrganizers: true }, why: function (s) { return (s.orgCount || 0) + ' of 5 are right. Use the signal words as clues.'; } },
+      q: { type: 'table', q: 'Record each paragraph\'s structure and one signal word.', rowHead: 'Paragraph', cols: [{ label: 'Structure', value: function (s, r) { return r.st; }, accept: [] }], rows: [{ label: '¶2 Monarch or Viceroy?', st: 'compare and contrast' }, { label: '¶3 Why Monarchs Are Disappearing', st: 'cause and effect' }, { label: '¶4 Helping the Monarchs', st: 'problem and solution' }], tip: 'Type: chronology, compare and contrast, cause and effect, problem and solution, or description.' } },
+    { tag: 'reason', title: 'Tricky one', sheet: 3, q: { type: 'mc', q: '¶ 4 has the word "when." Why is it problem and solution, not chronology?', choices: ['The paragraph is mostly about a problem and how people fix it', '"When" always means chronology', 'It has no signal words'], answer: 0 } },
+    { tag: 'reason', title: 'Structure → main idea', sheet: 4, q: { type: 'mc', q: 'What is the main idea of ¶ 3?', choices: ['Losing milkweed has caused monarch numbers to drop', 'Roads are important', 'Caterpillars are picky eaters', 'Farms grow food'], answer: 0 } },
+    { tag: 'write', title: 'Write with a structure', sheet: 5, q: { type: 'text', q: 'Write 3 sentences about your morning routine using CHRONOLOGY. Use at least three signal words.', rows: 3, min: 20, need: [{ words: ['first'], label: 'Uses "first"' }, { words: ['next', 'then', 'after'], label: 'Uses "next/then/after"' }, { words: ['finally', 'last', 'lastly'], label: 'Uses "finally/last"' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: rewrite a structure', sheet: 6, q: { type: 'text', q: 'Rewrite the idea of ¶ 3 as a PROBLEM AND SOLUTION paragraph (2 to 3 sentences).', min: 20, need: [{ words: ['problem'], label: 'Names the problem' }, { words: ['solution', 'solve', 'fix', 'help', 'plant'], label: 'Gives a solution' }] } },
+    { tag: 'explain', title: 'Why it matters', sheet: 7, q: { type: 'text', q: 'Explain how knowing a text\'s structure helps a reader.', rows: 2, need: [{ words: ['signal', 'organized', 'structure'], label: 'Mentions structure or signal words' }, { words: ['understand', 'find', 'remember', 'main idea', 'follow'], label: 'Explains how it helps' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-wetlands-main-ideas', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2',
+  title: 'Main Idea Organizer: Wetlands', model: 'organizer', minutes: 25, icon: '🦆',
+  setup: {
+    passage: { title: 'Wetlands: Nature\'s Sponges', genre: 'Informational article', paragraphs: [
+      "Wetlands are areas where water covers the soil for all or part of the year. Marshes, swamps, and bogs are all kinds of wetlands. Indiana once had millions of acres of wetlands, but most have been drained for farms and cities.",
+      "Wetlands work like giant sponges. {k1|During heavy rains, they soak up extra water and release it slowly, which helps prevent floods.} {k2|Wetland plants also trap mud and pollution, so the water that flows out is cleaner than the water that flowed in.}",
+      "Wetlands are also some of the busiest homes on Earth. {k3|Frogs, turtles, and dragonflies spend their whole lives there.} {k4|Many ducks and geese stop at wetlands to rest and eat during their long migrations.} Some people think wetlands smell bad, but that smell comes from plants breaking down and feeding the soil.",
+      "Protecting wetlands protects people and animals alike. When we save a wetland, we keep our water clean, our towns safer from floods, and our wildlife healthy."
+    ] },
+    ideas: ['Wetlands help control floods and clean water.', 'Wetlands are important homes for animals.'],
+    details: [['They soak up rain and release it slowly.', 0], ['Plants trap mud and pollution.', 0], ['Frogs and turtles live there their whole lives.', 1], ['Migrating ducks and geese rest and eat there.', 1], ['Some people think wetlands smell bad.', -1], ['Marshes, swamps, and bogs are wetlands.', -1]]
+  },
+  place: 'Sunnyside Reading Room · Nature Desk',
+  mission: 'The Sunnyside Nature Center is making a poster about wetlands and needs the two biggest ideas from this article, each supported by key details. Read, mark the key details, and build the organizer.',
+  question: 'How do key details support two or more main ideas in an informational text?',
+  takeaway: 'A text can have more than one main idea. Each main idea is supported by key details: facts, examples, and descriptions that prove it. Details that are interesting but don\'t support a main idea can be left out of a summary.',
+  vocab: [['Main idea', 'The most important point the author makes about a topic.'], ['Key detail', 'A fact or example that supports a main idea.'], ['Wetland', 'Land covered by water for all or part of the year.'], ['Migration', 'A long seasonal trip that animals make.']],
+  warmup: { style: 'Topic vs. main idea', prompt: 'Label T for topic or MI for main idea.', items: [['Wetlands', 'Topic.'], ['Wetlands protect towns from flooding.', 'Main idea.'], ['Frogs', 'Topic (a detail).']] },
+  steps: [
+    { tag: 'read', title: 'Read the article', goal: { text: 'Read "Wetlands: Nature\'s Sponges" and press ✓ I finished reading.', check: { read: true } }, q: { type: 'mc', q: 'What is the TOPIC of the article?', choices: ['Wetlands', 'Ducks', 'Floods', 'Farms'], answer: 0 } },
+    { tag: 'explore', title: 'Mark key details', sheet: 1, goal: { text: 'Tap at least 4 sentences that are key details.', check: { nKeys: { gte: 4 } } } },
+    { tag: 'test', title: 'Build the organizer', sheet: 2, goal: { text: 'Sort every detail card under the right main idea (or the trash).', check: { allRight: true } },
+      q: { type: 'mc', q: 'Why does "Some people think wetlands smell bad" go in the trash?', choices: ['It doesn\'t support either main idea', 'It is false', 'It is the main idea'], answer: 0 } },
+    { tag: 'reason', title: 'Two main ideas', sheet: 3, q: { type: 'multi', q: 'Which TWO sentences state the article\'s main ideas?', choices: ['Wetlands help control floods and keep water clean.', 'Wetlands are homes for many animals.', 'Indiana once had millions of acres of wetlands.', 'Dragonflies live in wetlands.'], answer: [0, 1] } },
+    { tag: 'write', title: 'Explain a main idea (CER)', sheet: 4, q: { type: 'write', q: 'Choose one main idea and prove it with a key detail from the text.', parts: [
+      { label: 'Main idea', starter: 'One main idea of the article is that wetlands', min: 8, need: [{ words: ['flood', 'clean', 'water', 'home', 'animals', 'wildlife'], label: 'States a main idea' }] },
+      { label: 'Key detail', starter: 'The text states, "', min: 8, quote: true },
+      { label: 'Explain', starter: 'This detail supports the main idea because', min: 10, need: [{ words: ['because', 'shows', 'proves'], label: 'Explains the connection' }] }] } },
+    { tag: 'write', title: 'Summarize', sheet: 5, q: { type: 'text', q: 'Write a 2-sentence summary of the article that includes BOTH main ideas.', rows: 3, min: 18, max: 50, need: [{ words: ['flood', 'clean', 'sponge', 'water'], label: 'Main idea 1' }, { words: ['animal', 'home', 'wildlife', 'frog', 'duck', 'bird'], label: 'Main idea 2' }], avoid: [['smell', 'Leaves out the minor "smell" detail']] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: author\'s purpose', sheet: 6, q: { type: 'mc', q: 'Why does the author include the last paragraph?', choices: ['To connect both main ideas and persuade readers to protect wetlands', 'To describe frogs', 'To tell a story'], answer: 0 } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-news-desk', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2',
+  title: 'Sunnyside News Desk', model: 'newsDesk', minutes: 20, icon: '📰',
+  setup: { articles: [
+    { headlines: ['Students Plant Carrots', 'School Garden Feeds 40 Families', 'It Rained in June', 'Mr. Lee Likes Gardens'], best: 1, paragraphs: ['Sunnyside Elementary\'s fifth graders harvested more than 300 pounds of vegetables from their school garden this summer. Instead of taking the food home, the students donated all of it to the Sunnyside Food Pantry.', '"We wanted to help families who need fresh food," said student Ava Martin. Thanks to the donation, about 40 families received tomatoes, carrots, and green beans each week. Next year, the class plans to double the size of the garden.'] },
+    { headlines: ['A New Crosswalk on Maple Street', 'Students\' Letters Bring Safer Crosswalk', 'Cars Are Loud', 'The Mayor Has a Dog'], best: 1, paragraphs: ['For years, students crossing Maple Street to get to school had to dodge fast cars. So Ms. Ortiz\'s class wrote letters to the city council explaining the danger and suggesting a crosswalk with flashing lights.', 'Last month, the council agreed. The new crosswalk opened on Monday, and the students cut the ribbon. "We learned that our voices matter," said Liam Chen.'] },
+    { headlines: ['Library Gets a Robot', 'Robot Helper Makes Library Books Easier to Find', 'Robots Are Scary', 'Library Is Open Tuesdays'], best: 1, paragraphs: ['The Sunnyside Public Library has a new helper named Page. The small robot rolls through the aisles and uses a scanner to find books that are on the wrong shelf.', 'Librarians say Page has found more than 500 misplaced books in its first month, so visitors can find what they need faster. Kids can also ask Page for book suggestions on its touch screen.'] }
+  ] },
+  place: 'Sunnyside Reading Room · The Sunnyside Sun Newsroom',
+  mission: 'You are the editor of The Sunnyside Sun. Three stories are ready to print, but they need headlines. A great headline captures the MAIN idea, not just a detail. Pick the best headlines, then write your own.',
+  question: 'How can we identify and state the main idea of an informational text?',
+  takeaway: 'The main idea is what the whole text is mostly about. A strong headline (or main idea statement) covers the whole article, not just one detail, and doesn\'t add opinions or off-topic facts.',
+  vocab: [['Headline', 'The title of a news article that tells the main idea.'], ['Main idea', 'What a text is mostly about.'], ['Detail', 'A smaller piece of information that supports the main idea.'], ['Editor', 'The person who checks and improves writing.']],
+  warmup: { style: 'Headline makeover', prompt: 'Improve each weak headline.', items: [['"Dogs" (article about a dog shelter finding homes for 100 pets)', '"Shelter Finds Homes for 100 Dogs."'], ['Is "It was sunny" a good headline for a story about a charity race?', 'No, it is a detail, not the main idea.'], ['What makes a headline strong?', 'It tells what the whole article is about.']] },
+  steps: [
+    { tag: 'explore', title: 'Story 1', goal: { text: 'Read Story 1 and pick the headline that tells its main idea.', check: { h_0: true } }, q: { type: 'mc', q: 'Why is "Students Plant Carrots" a weak headline?', choices: ['It is only a detail; the story is about donating food', 'It is false', 'It is too long'], answer: 0 } },
+    { tag: 'test', title: 'All the stories', sheet: 1, goal: { text: 'Pick the best headline for all three stories.', check: { allRight: true } } },
+    { tag: 'reason', title: 'Editor\'s rule', sheet: 2, q: { type: 'sort', q: 'Sort the headlines for Story 3.', bins: ['Main idea', 'Just a detail', 'Opinion or off-topic'], items: [['Robot Helper Makes Library Books Easier to Find', 0], ['Library Is Open Tuesdays', 1], ['Robots Are Scary', 2], ['Page Has a Touch Screen', 1]] } },
+    { tag: 'write', title: 'Write a headline', sheet: 3, q: { type: 'text', q: 'Write your OWN headline for Story 2 (5–10 words) that captures the main idea.', min: 5, max: 10, need: [{ words: ['student', 'students', 'kids', 'class', 'letter', 'letters'], label: 'Includes who' }, { words: ['crosswalk', 'safe', 'safer', 'street'], label: 'Includes what changed' }] } },
+    { tag: 'write', title: 'Main idea statement', sheet: 4, q: { type: 'text', q: 'Write one sentence that states the main idea of Story 1 and include ONE key detail.', rows: 2, min: 12, number: true, need: [{ words: ['garden', 'vegetables', 'food'], label: 'Names the garden or food' }, { words: ['donate', 'donated', 'gave', 'families', 'pantry'], label: 'Includes the donation' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: lead sentence', sheet: 5, q: { type: 'text', q: 'Reporters start with a "lead" that answers who, what, when, and where. Write a lead sentence for Story 3.', min: 15, need: [{ words: ['library'], label: 'Where' }, { words: ['robot', 'page'], label: 'What' }, { words: ['month', 'new', 'now', 'first'], label: 'When' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-bee-texts', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2 · 5.RN.4.3',
+  title: 'Two Texts, One Topic: Bees', model: 'twoTexts', minutes: 25, icon: '🐝',
+  setup: {
+    a: { title: 'Busy Bees', genre: 'Science article', paragraphs: ['A honeybee hive can hold 50,000 bees, and every bee has a job. Worker bees collect nectar and pollen, build wax honeycomb, and guard the entrance. The queen bee lays up to 2,000 eggs a day.', 'Bees are important pollinators. As a bee moves from flower to flower, pollen sticks to its fuzzy body and spreads to other flowers. This helps plants make fruits and seeds. About one out of every three bites of food we eat depends on pollinators like bees.'] },
+    b: { title: 'A Beekeeper\'s Diary', genre: 'Personal narrative', paragraphs: ['June 3: I opened the hive this morning wearing my white suit and veil. The bees buzzed around me like a gentle storm. I watched worker bees carry yellow pollen on their back legs, packed like tiny saddlebags.', 'June 20: Today I harvested my first honey! My grandfather taught me to smoke the hive so the bees stay calm. I only take extra honey so the bees have enough for winter. Tasting it, I thought about the thousands of flowers they visited to make each spoonful.'] },
+    facts: [['Worker bees collect pollen.', 1], ['A hive can hold 50,000 bees.', 0], ['The beekeeper wears a white suit and veil.', 2], ['Bees help plants make fruits and seeds.', 0], ['Honey is made from many flower visits.', 1], ['The writer\'s grandfather taught beekeeping.', 2], ['A third of our food depends on pollinators.', 0], ['Beekeepers leave honey for the bees in winter.', 2]]
+  },
+  place: 'Sunnyside Reading Room · Research Table',
+  mission: 'You\'re researching honeybees for a class report. You found a science article and a beekeeper\'s diary. Compare what each text tells you, sort the facts into a Venn diagram, and explain what you learn from reading both.',
+  question: 'How can two texts on the same topic give different information and points of view?',
+  takeaway: 'Different texts on one topic can share some facts but also give unique information. A science article gives facts and data; a personal narrative gives experiences and feelings. Reading both gives a fuller understanding.',
+  vocab: [['Point of view', 'Whose eyes a text is told through.'], ['Firsthand account', 'Written by someone who was there (the diary).'], ['Secondhand account', 'Written by someone reporting facts (the article).'], ['Venn diagram', 'Overlapping circles for comparing.']],
+  warmup: { style: 'Firsthand or secondhand?', prompt: 'Label F or S.', items: [['A diary of a trip to the zoo', 'F.'], ['An encyclopedia entry about zoos', 'S.'], ['Why might a diary include feelings?', 'The writer experienced it.']] },
+  steps: [
+    { tag: 'read', title: 'Read both texts', goal: { text: 'Open and read both texts (use the tabs).', check: { read_a: true, read_b: true } }, q: { type: 'mc', q: 'How are the two texts different?', choices: ['One gives science facts; the other tells a beekeeper\'s experience', 'They are the same', 'Both are poems'], answer: 0 } },
+    { tag: 'test', title: 'Fill the Venn diagram', sheet: 1, goal: { text: 'Sort every fact into the correct part of the Venn diagram.', check: { allRight: true } } },
+    { tag: 'reason', title: 'Point of view', sheet: 2, q: { type: 'mc', q: 'Which sentence shows the diary is a FIRSTHAND account?', choices: ['"I opened the hive this morning wearing my white suit."', '"A hive can hold 50,000 bees."', '"Bees are important pollinators."'], answer: 0 } },
+    { tag: 'reason', title: 'What each adds', sheet: 3, q: { type: 'multi', q: 'What does the diary add that the article does not? Choose all.', choices: ['How it feels to be near a hive', 'How a beekeeper harvests honey', 'How many eggs the queen lays', 'Why beekeepers leave some honey'], answer: [0, 1, 3] } },
+    { tag: 'write', title: 'Compare in writing', sheet: 4, q: { type: 'write', q: 'Compare the two texts. What do you learn from reading BOTH?', parts: [
+      { label: 'Both texts', starter: 'Both texts explain that', min: 8, need: [{ words: ['bee', 'bees', 'pollen', 'honey', 'flower'], label: 'Names a shared idea' }] },
+      { label: 'Only the article', starter: 'Only the article tells', min: 8, need: [{ words: ['50,000', '2,000', 'third', 'pollinat', 'fruit', 'seeds', 'jobs'], label: 'Names an article-only fact' }] },
+      { label: 'Only the diary', starter: 'Only the diary shows', min: 8, need: [{ words: ['suit', 'feel', 'grandfather', 'harvest', 'winter', 'smoke', 'experience'], label: 'Names a diary-only detail' }] }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: which is better?', sheet: 5, q: { type: 'text', q: 'For a science report, which text is more useful, and why? Give one reason and one quote.', min: 18, quote: true, need: [{ words: ['article', 'diary'], label: 'Chooses a text' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-creek-report', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2 · 5.RN.3.2',
+  title: 'Creek Clean-Up Brief', model: 'reader', minutes: 20, icon: '🏞️',
+  setup: { title: 'Saving Sunnyside Creek', genre: 'Informational article', img: '🏞️', tools: [['problem', '🟨 Problem'], ['cause', '🟦 Cause'], ['solution', '🟩 Solution']], paragraphs: [
+    "Last spring, fifth graders at Sunnyside Elementary noticed something wrong with Sunnyside Creek. {p1|The water looked cloudy, and there were far fewer minnows than the year before.}",
+    "The students tested the water and walked the banks with a local scientist. {c1|They discovered that rain was washing litter and fertilizer from nearby lawns into the creek.} {c2|The fertilizer made green algae grow so fast that it used up oxygen the fish needed.}",
+    "The class decided to take action. {s1|They organized a Saturday clean-up that removed more than 200 pounds of trash.} {s2|They also asked neighbors to plant native flowers along the banks, because the roots soak up rainwater before it reaches the creek.}",
+    "By fall, the water was clearer, and the minnows were coming back. The students plan to test the creek every season to make sure it stays healthy."
+  ] },
+  place: 'Sunnyside Reading Room · Environmental Desk',
+  mission: 'The city council wants a short brief about how students saved Sunnyside Creek. Read the article, color-code the problem, its causes, and the solutions, then write the brief.',
+  question: 'How do problem-solution and cause-effect structures organize an informational text?',
+  takeaway: 'Many informational texts explain a problem, its causes, and the solutions. Marking each part helps you understand how ideas connect and makes it easier to summarize.',
+  vocab: [['Problem', 'Something that needs fixing.'], ['Cause', 'Why something happens.'], ['Effect', 'What happens as a result.'], ['Solution', 'A way to fix a problem.'], ['Native plants', 'Plants that grow naturally in an area.']],
+  warmup: { style: 'Cause → effect', prompt: 'Finish each cause-effect chain.', items: [['It rained all night, so...', 'the playground was muddy.'], ['Because the store ran out of milk,...', 'we bought juice.'], ['Name one problem at school and a possible solution.', 'Any reasoned pair.']] },
+  steps: [
+    { tag: 'read', title: 'Read the article', goal: { text: 'Read and press ✓ I finished reading.', check: { read: true } } },
+    { tag: 'explore', title: 'Color-code it', sheet: 1, goal: { text: 'Highlight the problem (🟨), two causes (🟦), and two solutions (🟩).', button: 'Check my colors', check: function (s) { var P = s.hl_problem || [], C = s.hl_cause || [], So = s.hl_solution || []; return P.indexOf('p1') >= 0 && C.indexOf('c1') >= 0 && C.indexOf('c2') >= 0 && So.indexOf('s1') >= 0 && So.indexOf('s2') >= 0; }, why: function (s) { return 'Check each color. Problem: what was wrong? Causes: WHY was it happening? Solutions: what did students DO?'; } } },
+    { tag: 'reason', title: 'Cause and effect chain', sheet: 2, q: { type: 'order', q: 'Put the cause-effect chain in order.', items: ['Rain washes fertilizer into the creek', 'Algae grows very fast', 'Algae uses up oxygen', 'Fewer fish can survive'] } },
+    { tag: 'reason', title: 'Why flowers?', sheet: 2, q: { type: 'mc', q: 'How do native flowers help the creek?', choices: ['Their roots soak up rainwater before it carries pollution to the creek', 'They make the creek smell nice', 'Fish eat them'], answer: 0 } },
+    { tag: 'write', title: 'Write the brief', sheet: 3, q: { type: 'write', q: 'Write a brief for the city council.', parts: [
+      { label: 'Problem', starter: 'The problem was that', min: 8, need: [{ words: ['cloudy', 'fish', 'minnows', 'polluted', 'dirty'], label: 'Names the problem' }] },
+      { label: 'Causes', starter: 'This happened because', min: 10, need: [{ words: ['fertilizer', 'litter', 'trash'], label: 'Names a cause' }, { words: ['algae', 'oxygen', 'rain'], label: 'Explains how it hurt the creek' }] },
+      { label: 'Solutions', starter: 'To solve it, students', min: 10, need: [{ words: ['clean', 'trash', 'litter'], label: 'Names the clean-up' }, { words: ['flowers', 'plants', 'native'], label: 'Names the planting' }] }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: evidence it worked', sheet: 4, q: { type: 'text', q: 'What evidence shows the solutions worked? Quote the text.', min: 10, quote: true, need: [{ words: ['clearer', 'coming back', 'minnows'], label: 'Uses the results' }] } }
+  ]
+});
+
+/* ======================= Vocabulary & figurative language ======================= */
+SUNNY_SIMS.push({
+  id: 'g5-ela-clue-decoder', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.1',
+  title: 'Context Clue Decoder', model: 'clueDecoder', minutes: 20, icon: '🔍',
+  setup: { items: [
+    { s: 'The [[arid]] desert had not seen rain in months, so the ground was cracked and dry.', clue: ['dry', 'rain', 'cracked'], type: 'synonym', choices: ['very dry', 'very cold', 'crowded'], answer: 0 },
+    { s: 'A [[botanist]], a scientist who studies plants, visited our class to talk about seeds.', clue: ['scientist', 'studies', 'plants'], type: 'definition', choices: ['a plant scientist', 'a bus driver', 'a painter'], answer: 0 },
+    { s: 'Unlike her timid brother, who hid behind the couch, Rosa was bold and marched right up to the stage.', clue: ['unlike', 'hid'], type: 'antonym', choices: ['shy and fearful', 'loud and brave', 'tall'], answer: 0, target: 'timid' },
+    { s: 'The market sold many kinds of [[produce]], such as apples, spinach, carrots, and pears.', clue: ['apples', 'spinach', 'carrots', 'pears', 'such'], type: 'example', choices: ['fruits and vegetables', 'toys', 'machines'], answer: 0 },
+    { s: 'After running the whole race, Marcus was so [[famished]] that he ate three sandwiches in five minutes.', clue: ['ate', 'three', 'sandwiches', 'running'], type: 'inference', choices: ['extremely hungry', 'very happy', 'sleepy'], answer: 0 }
+  ] },
+  place: 'Sunnyside Reading Room · Word Detective Agency',
+  mission: 'Five mystery words have shown up in library books. Crack each case by finding the context clues, naming the type of clue, and testing the meaning in the sentence.',
+  question: 'How can context clues help us figure out unknown words?',
+  takeaway: 'Context clues are the words around an unknown word. They can give a definition, a synonym (same meaning), an antonym (opposite, with words like "unlike"), examples ("such as"), or a general sense of the situation. Test a meaning by substituting it into the sentence.',
+  vocab: [['Context clue', 'Hints in the nearby words that help you figure out a word.'], ['Synonym', 'A word with the same meaning.'], ['Antonym', 'A word with the opposite meaning.'], ['Substitute', 'Put one word in place of another to test it.']],
+  warmup: { style: 'Guess the word', prompt: 'Use the clue to guess the meaning.', items: [['The puppy was so exhausted, so tired, that it fell asleep in its bowl.', 'Very tired (synonym clue).'], ['Unlike the noisy cafeteria, the library was serene.', 'Calm and quiet (antonym clue).'], ['What words often signal an example clue?', '"Such as," "for example," "like."']] },
+  steps: [
+    { tag: 'explore', title: 'Case 1', goal: { text: 'Solve Case 1: find a clue word, name the clue type, and choose the meaning.', check: { solved_0: true } }, q: { type: 'mc', q: 'Which clue helped the most with "arid"?', choices: ['"had not seen rain" and "dry"', '"desert" only', '"months"'], answer: 0 } },
+    { tag: 'test', title: 'Crack all five cases', sheet: 1, goal: { text: 'Solve all 5 cases.', check: { allSolved: true } },
+      q: { type: 'table', q: 'Record each case.', rowHead: 'Word', cols: [{ label: 'Clue type', value: function (s, r) { return r.t; } }], rows: [{ label: 'botanist', t: 'definition' }, { label: 'timid', t: 'antonym' }, { label: 'produce', t: 'example' }], tip: 'Type the clue type: definition, synonym, antonym, example, or inference.' } },
+    { tag: 'reason', title: 'Signal words', sheet: 2, q: { type: 'sort', q: 'Which clue type does each signal word or phrase suggest?', bins: ['Definition', 'Antonym', 'Example'], items: [['which means', 0], ['unlike', 1], ['such as', 2], ['but', 1], ['for example', 2], [', a (noun) that…,', 0]] } },
+    { tag: 'write', title: 'Use the words', sheet: 3, q: { type: 'text', q: 'Write one sentence using "famished" and one using "arid." Include a context clue in each!', rows: 3, min: 16, need: [{ words: ['famished'], label: 'Uses famished' }, { words: ['arid'], label: 'Uses arid' }, { words: ['hungry', 'ate', 'eat', 'food', 'dry', 'rain', 'desert', 'water'], label: 'Includes context clues' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: write a clue', sheet: 4, q: { type: 'text', q: 'Write a sentence for the word "gregarious" (friendly, likes being with others) that uses an ANTONYM clue.', min: 12, need: [{ words: ['gregarious'], label: 'Uses the word' }, { words: ['unlike', 'but', 'however', 'instead', 'while'], label: 'Uses an antonym signal' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-word-forge', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.4',
+  title: 'Greek & Latin Word Forge', model: 'wordLab', minutes: 20, icon: '🔨',
+  setup: {
+    prefixes: [['re', 'again, back'], ['pre', 'before'], ['in', 'not'], ['trans', 'across'], ['tele', 'far']],
+    roots: [['port', 'carry'], ['vis', 'see'], ['dict', 'say'], ['aud', 'hear'], ['graph', 'write'], ['spect', 'look']],
+    suffixes: [['able', 'able to be'], ['ible', 'able to be'], ['ion', 'act of'], ['ator', 'one who'], ['er', 'one who']],
+    words: { 'port+able': 'able to be carried', 'trans+port': 'to carry across', 're+port': 'to carry back news', 'port+er': 'one who carries bags', 'vis+ible': 'able to be seen', 'in+vis+ible': 'not able to be seen', 'vis+ion': 'the act of seeing', 'pre+dict': 'to say something before it happens', 'dict+ion': 'the way someone says words', 'aud+ible': 'able to be heard', 'in+aud+ible': 'not able to be heard', 'tele+graph': 'a machine that writes messages far away', 'spect+ator': 'one who watches', 're+vis+ion': 'the act of seeing again (to improve writing)' },
+    targets: [['able to be carried', 'port+able'], ['not able to be seen', 'in+vis+ible'], ['to say something before it happens', 'pre+dict'], ['one who watches', 'spect+ator'], ['able to be heard', 'aud+ible']]
+  },
+  place: 'Sunnyside Reading Room · Word Forge',
+  mission: 'The Word Forge builds English words from Greek and Latin parts. Fill word orders by combining prefixes, roots, and suffixes, and discover how knowing word parts unlocks thousands of words.',
+  question: 'How do Greek and Latin roots and affixes help us figure out word meanings?',
+  takeaway: 'Many English words are built from parts. The root carries the core meaning (port = carry), a prefix changes it (trans = across), and a suffix changes how it\'s used (able = able to be). Knowing a few parts helps you figure out many new words.',
+  vocab: [['Root', 'The main part of a word that carries its meaning.'], ['Prefix', 'A part added to the front of a word.'], ['Suffix', 'A part added to the end of a word.'], ['Affix', 'A prefix or a suffix.']],
+  warmup: { style: 'Break it apart', prompt: 'Split each word into parts and guess the meaning.', items: [['rewrite', 're + write = write again.'], ['unhappy', 'un + happy = not happy.'], ['teacher', 'teach + er = one who teaches.']] },
+  steps: [
+    { tag: 'explore', title: 'First order', goal: { text: 'Forge a word that means "able to be carried."', check: { target_0: true } }, q: { type: 'mc', q: 'Which part means "carry"?', choices: ['port', 'able', 'trans'], answer: 0 } },
+    { tag: 'test', title: 'Fill the orders', sheet: 1, goal: { text: 'Forge the words for orders 2 through 5 (use Next order).', check: { target_1: true, target_2: true, target_3: true, target_4: true } },
+      q: { type: 'table', q: 'Record each word and its parts.', rowHead: 'Meaning', cols: [{ label: 'Word', value: function (s, r) { return r.w; } }], rows: [{ label: 'not able to be seen', w: 'invisible' }, { label: 'to say before it happens', w: 'predict' }, { label: 'one who watches', w: 'spectator' }] } },
+    { tag: 'explore', title: 'Free forge', sheet: 2, goal: { text: 'Forge at least 8 real words in total.', check: { forged: { gte: 8 } } } },
+    { tag: 'reason', title: 'Use the parts', sheet: 3, q: { type: 'mc', q: 'Using word parts, what does "inaudible" most likely mean?', choices: ['not able to be heard', 'able to be seen', 'one who hears'], answer: 0 } },
+    { tag: 'reason', title: 'New word', sheet: 3, q: { type: 'mc', q: 'You\'ve never seen "import." Using "im = into" and "port = carry," what does it mean?', choices: ['to carry goods into a country', 'to be very important', 'to leave a port'], answer: 0 } },
+    { tag: 'write', title: 'Explain a word', sheet: 4, q: { type: 'text', q: 'Choose a word you forged. Explain how its parts give its meaning, and use it in a sentence.', rows: 3, min: 16, need: [{ words: ['means', 'mean', 'meaning'], label: 'Explains what the parts mean' }, { words: ['port', 'vis', 'dict', 'aud', 'graph', 'spect'], label: 'Names a root' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: word family', sheet: 5, q: { type: 'text', q: 'List four words that share the root "port" and explain how each connects to "carry."', min: 20, need: [{ words: ['transport', 'portable', 'report', 'porter', 'import', 'export', 'support'], label: 'Lists port words' }, { words: ['carry', 'carries', 'carried'], label: 'Connects to "carry"' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-figurative-poem', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.3.3',
+  title: 'Figurative Language Translator', model: 'figTranslator', minutes: 20, icon: '🎨',
+  setup: { title: 'Saturday at Sunnyside Park', by: 'A Sunnyside original poem', lines: [
+    { id: 'f1', t: 'The morning sun was a golden coin', type: 'metaphor' }, 'tossed high above the trees.',
+    { id: 'f2', t: 'The wind whispered secrets to the leaves', type: 'personification' }, 'and tickled the grass with its breeze.', '',
+    { id: 'f3', t: 'My little brother ran as fast as a rocket', type: 'simile' }, 'to reach the swings before me.',
+    { id: 'f4', t: '"I\'ve waited a million years!" he cried,', type: 'hyperbole' }, 'as happy as could be.', '',
+    { id: 'f5', t: 'When storm clouds rolled in, Dad said, "Let\'s hit the road,"', type: 'idiom' }, 'and we raced home, soaked but free.'
+  ] },
+  place: 'Sunnyside Reading Room · Poetry Corner',
+  mission: 'This poem is packed with figurative language: words that mean more than they say. Identify each type, then translate the lines into plain, literal language so a younger reader can understand.',
+  question: 'How do similes, metaphors, personification, idioms, and hyperbole create meaning?',
+  takeaway: 'Figurative language compares or exaggerates to create pictures in the reader\'s mind. Similes compare with "like" or "as"; metaphors say one thing IS another; personification gives human actions to things; hyperbole exaggerates; idioms are sayings whose meaning differs from the literal words.',
+  vocab: [['Simile', 'A comparison using like or as.'], ['Metaphor', 'A comparison that says one thing IS another.'], ['Personification', 'Giving human qualities to non-human things.'], ['Hyperbole', 'A huge exaggeration.'], ['Idiom', 'A saying with a meaning different from its words.']],
+  warmup: { style: 'Name that figure', prompt: 'Identify each type.', items: [['"My backpack weighs a ton."', 'Hyperbole.'], ['"The classroom was a zoo."', 'Metaphor.'], ['"The alarm clock screamed."', 'Personification.']] },
+  steps: [
+    { tag: 'read', title: 'Tag the poem', sheet: 1, goal: { text: 'Tag all five highlighted-able lines with the correct type.', check: { allRight: true } } },
+    { tag: 'reason', title: 'Simile vs. metaphor', sheet: 2, q: { type: 'mc', q: 'How is "The morning sun was a golden coin" different from "ran as fast as a rocket"?', choices: ['The first says the sun IS a coin (metaphor); the second uses "as" (simile)', 'They are both similes', 'Neither compares anything'], answer: 0 } },
+    { tag: 'write', title: 'Translate: personification', sheet: 3, q: { type: 'text', q: 'Translate "The wind whispered secrets to the leaves" into literal language.', rows: 2, min: 6, need: [{ words: ['wind'], label: 'Mentions the wind' }, { words: ['soft', 'quiet', 'gentle', 'lightly', 'rustl', 'blew', 'moved'], label: 'Says what really happened' }], avoid: [['whisper', 'Doesn\'t just repeat "whispered"']] } },
+    { tag: 'write', title: 'Translate: hyperbole & idiom', sheet: 4, q: { type: 'write', q: 'Translate each line literally.', parts: [
+      { label: '"I\'ve waited a million years!"', min: 5, need: [{ words: ['long', 'forever', 'wait', 'waited'], label: 'Explains he waited a long time' }], avoid: [['million', 'Removes the exaggeration']] },
+      { label: '"Let\'s hit the road."', min: 4, need: [{ words: ['leave', 'go', 'home', 'going'], label: 'Explains the real meaning (leave)' }] }] } },
+    { tag: 'reason', title: 'Why use it?', sheet: 5, q: { type: 'mc', q: 'Why might the poet say the sun was "a golden coin" instead of "the sun was bright"?', choices: ['It creates a vivid picture of how shiny and round the sun looked', 'Coins are worth money', 'It is easier to understand'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: write your own', sheet: 6, q: { type: 'text', q: 'Write two lines about lunchtime: one simile and one personification.', min: 14, need: [{ words: ['like', 'as'], label: 'Includes a simile' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-idiom-street', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.3.3',
+  title: 'Idiom Street', model: 'idiomStreet', minutes: 15, icon: '🏘️',
+  setup: { people: [
+    { who: 'The mail carrier', emoji: '👮', says: 'It\'s raining cats and dogs out here!', literal: '🌧🐱🐶', choices: ['Animals are falling from the sky', 'It is raining very hard', 'The pets are wet'], answer: 1 },
+    { who: 'The baker', emoji: '👨‍🍳', says: 'This cake recipe is a piece of cake.', literal: '🍰🧩', choices: ['The recipe is made of cake', 'The recipe is very easy', 'The recipe is delicious'], answer: 1 },
+    { who: 'The coach', emoji: '🧢', says: 'Break a leg at the game tonight!', literal: '🦵💥', choices: ['Good luck!', 'Be careful not to fall', 'Run very fast'], answer: 0 },
+    { who: 'Grandma', emoji: '👵', says: 'I\'m feeling under the weather today.', literal: '☁️🧍', choices: ['She is standing under clouds', 'She feels a little sick', 'She loves rainy days'], answer: 1 },
+    { who: 'The librarian', emoji: '📚', says: 'Don\'t spill the beans about the surprise party!', literal: '🫘🫗', choices: ['Don\'t drop the snacks', 'Don\'t tell the secret', 'Don\'t cook beans'], answer: 1 }
+  ] },
+  place: 'Sunnyside Reading Room · Idiom Street',
+  mission: 'The people of Idiom Street keep saying strange things! Visit each neighbor, compare the silly literal picture with what they really mean, and build an idiom dictionary.',
+  question: 'How do we figure out what an idiom really means?',
+  takeaway: 'An idiom is a saying whose meaning is different from the literal meaning of its words. Use the situation (context) to figure it out: "It\'s raining cats and dogs" means it is raining very hard.',
+  vocab: [['Idiom', 'A saying whose meaning differs from its words.'], ['Literal', 'Exactly what the words say.'], ['Figurative', 'Not meant word for word.'], ['Context', 'The situation around the words.']],
+  warmup: { style: 'Draw it literally', prompt: 'Sketch the literal meaning, then write the real meaning.', items: [['"Hold your horses."', 'Wait / be patient.'], ['"Cold feet."', 'Being nervous about doing something.'], ['"Once in a blue moon."', 'Very rarely.']] },
+  steps: [
+    { tag: 'explore', title: 'Visit the neighbors', sheet: 1, goal: { text: 'Visit every neighbor and choose what each one REALLY means.', check: { allSolved: true } } },
+    { tag: 'record', title: 'Idiom dictionary', sheet: 2, q: { type: 'sort', q: 'Match each idiom to its meaning.', bins: ['Easy', 'Good luck', 'A little sick', 'Keep a secret'], items: [['a piece of cake', 0], ['break a leg', 1], ['under the weather', 2], ['don\'t spill the beans', 3]] } },
+    { tag: 'reason', title: 'Use context', sheet: 3, q: { type: 'mc', q: '"My brother has cold feet about the diving board." Using context, what does "cold feet" mean?', choices: ['He is nervous about jumping', 'His feet are freezing', 'He forgot his shoes'], answer: 0 } },
+    { tag: 'write', title: 'Idiom in a story', sheet: 4, q: { type: 'text', q: 'Write 2 sentences that use one idiom from Idiom Street correctly. Make the context show its meaning.', rows: 3, min: 14, need: [{ words: ['piece of cake', 'break a leg', 'under the weather', 'spill the beans', 'raining cats and dogs'], label: 'Uses an idiom from the street' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: explain an idiom', sheet: 5, q: { type: 'text', q: 'Explain why an English learner might be confused by "spill the beans," and how context helps.', min: 14, need: [{ words: ['literal', 'words', 'beans'], label: 'Explains the literal confusion' }, { words: ['context', 'situation', 'clue'], label: 'Explains how context helps' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-ela-pumpkin-words', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.1',
+  title: 'Vocabulary in Action: The Pumpkin Regatta', model: 'reader', minutes: 20, icon: '🎃',
+  setup: { title: 'The Great Pumpkin Regatta', genre: 'Informational article', img: '🎃🚣', tools: [['word', '🟪 Tricky word'], ['clue', '🟩 Context clue']], paragraphs: [
+    "Every October, a small town holds a {w1|regatta}, a boat race, with a very unusual kind of boat. The racers paddle giant hollowed-out pumpkins across a lake!",
+    "The pumpkins are {w2|colossal}. {c2|Some weigh more than 1,000 pounds, heavier than a grand piano.} Farmers spend all summer caring for them, watering them every day and protecting them from frost.",
+    "Paddling a pumpkin is not easy. The round boats {w3|wobble} and spin, and racers often tip over. {c3|They must keep their balance and paddle with slow, steady strokes, or they will topple into the chilly water.}",
+    "The crowd cheers for every racer, even the ones who end up soaking wet. {c4|For the town, the regatta is a jubilant celebration, full of laughter, music, and joy.}"
+  ] },
+  place: 'Sunnyside Reading Room · Word Wall',
+  mission: 'The Pumpkin Regatta article has four tricky words. Mark each word and its context clue, figure out the meanings, and prove you can use the words in your own writing.',
+  question: 'How do context clues in a real text help us understand new vocabulary?',
+  takeaway: 'Authors often place clues near tricky words: a definition after a comma (regatta, a boat race), a comparison (heavier than a grand piano), or a description of what happens. Reading around the word helps you figure it out.',
+  vocab: [['Regatta', 'A boat race.'], ['Colossal', 'Extremely large.'], ['Topple', 'To fall over.'], ['Jubilant', 'Full of great joy.']],
+  warmup: { style: 'Guess and check', prompt: 'Guess each meaning, then check after reading.', items: [['colossal', 'Very large.'], ['jubilant', 'Very happy.'], ['wobble', 'Move unsteadily side to side.']] },
+  steps: [
+    { tag: 'read', title: 'Read the article', goal: { text: 'Read and press ✓ I finished reading.', check: { read: true } } },
+    { tag: 'explore', title: 'Mark the clues', sheet: 1, goal: { text: 'Use 🟩 Context clue to highlight the clue sentences for "colossal," "wobble," and "jubilant."', button: 'Check', check: function (s) { var c = s.hl_clue || []; return c.indexOf('c2') >= 0 && c.indexOf('c3') >= 0 && c.indexOf('c4') >= 0; }, no: 'Each clue is right next to the tricky word.' } },
+    { tag: 'record', title: 'Word meanings', sheet: 2, q: { type: 'sort', q: 'Match each word to its meaning.', bins: ['a boat race', 'extremely large', 'move unsteadily', 'full of joy'], items: [['regatta', 0], ['colossal', 1], ['wobble', 2], ['jubilant', 3]] } },
+    { tag: 'reason', title: 'Which clue?', sheet: 3, q: { type: 'mc', q: 'What kind of clue helps with "regatta"?', choices: ['A definition right after the word ("a boat race")', 'An antonym', 'An example list'], answer: 0 } },
+    { tag: 'write', title: 'Use them', sheet: 4, q: { type: 'text', q: 'Write a short paragraph (3 sentences) about a fun event, using "colossal" and "jubilant" correctly.', rows: 4, min: 25, need: [{ words: ['colossal'], label: 'Uses colossal' }, { words: ['jubilant'], label: 'Uses jubilant' }] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: explain with a quote', sheet: 5, q: { type: 'text', q: 'Explain how the author helps you understand "colossal." Quote the clue.', min: 14, quote: true, need: [{ words: ['heavy', 'big', 'large', 'weigh', 'piano'], label: 'Connects the clue to the meaning' }] } }
+  ]
+});

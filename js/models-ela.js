@@ -174,3 +174,216 @@ SUNNY_MODELS.themeMatch = function (M) {
   report(); draw();
   return { auto: function (st) { var c = st.goal.check || {}; if (c.allRight || c.right) T.forEach(function (t, i) { match[i] = t.theme; }); if (c.evAll) T.forEach(function (t, i) { tags[i + ':' + Ps[i].sentences[0].id] = 1; }); report(); draw(); } };
 };
+
+/* ------------------------------------------------------------------ */
+/* Text Structure Lab: find signal words, match the organizer shape    */
+/* cfg: { items:[{title, text (with [[signal]] words), structure}] }     */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.structureLab = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var IT = cfg.items, cur = 0, taps = {}, org = {};
+  var SH = [['chronology', '⏳ Timeline', 'Sequence / chronology'], ['compare', '⚖️ Venn diagram', 'Compare and contrast'], ['cause', '➡️ Cause → effect', 'Cause and effect'], ['problem', '🔧 Problem → solution', 'Problem and solution'], ['description', '🕸 Web', 'Description']];
+  M.def.passageText = IT.map(function (x) { return x.text.replace(/\[\[|\]\]/g, ''); }).join(' ');
+  M.el.innerHTML = '';
+  var tabs = K.seg(IT.map(function (x, i) { return [String(i), '¶ ' + (i + 1)]; }), '0', function (v) { cur = +v; draw(); });
+  var bar = K.el('<div class="sn-ctrls"><b class="sn-note">Paragraph:</b></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var pass = K.el('<article class="sn-read-pass"></article>'); M.el.appendChild(pass);
+  var shapes = K.el('<div class="sn-panel"></div>'); M.el.appendChild(shapes);
+  function signals(i) { var out = []; IT[i].text.replace(/\[\[([^\]]+)\]\]/g, function (_, w) { out.push(w.toLowerCase()); }); return out; }
+  function report() { var st = {}; var allSig = true, allOrg = true; IT.forEach(function (x, i) { var sig = signals(i), t = taps[i] || {}, got = Object.keys(t).filter(function (k) { return t[k] && t[k].sig; }).length, wrong = Object.keys(t).filter(function (k) { return t[k] && !t[k].sig; }).length; st['sig_' + i] = got; st['wrong_' + i] = wrong; st['sigAll_' + i] = got >= sig.length; if (got < sig.length) allSig = false; st['org_' + i] = org[i] === x.structure; if (org[i] !== x.structure) allOrg = false; }); st.allSignals = allSig; st.allOrganizers = allOrg; st.orgCount = IT.filter(function (x, i) { return org[i] === x.structure; }).length; M.set(st); }
+  function draw() {
+    var x = IT[cur], t = taps[cur] = taps[cur] || {}, n = 0;
+    var html = x.text.replace(/\[\[([^\]]+)\]\]|([A-Za-z’']+)/g, function (m, sig, w) { var word = sig || w, id = n++, on = t[id]; return '<span class="sn-w' + (on ? ' on' : '') + '" data-w="' + id + '" data-sig="' + (sig ? 1 : 0) + '" role="button" tabindex="0">' + K.esc(word) + '</span>'; });
+    pass.innerHTML = '<h3>' + K.esc(x.title) + '</h3><div class="sn-by">Tap the SIGNAL WORDS: the words that show how the ideas are organized.</div><p style="line-height:2">' + html + '</p>';
+    pass.querySelectorAll('.sn-w').forEach(function (sp) { sp.style.borderBottom = 'none'; function hit() { var id = sp.getAttribute('data-w'); if (t[id]) delete t[id]; else t[id] = { sig: sp.getAttribute('data-sig') === '1' }; sp.classList.toggle('on'); report(); } sp.addEventListener('click', hit); sp.addEventListener('keydown', function (e) { if (e.key === 'Enter') hit(); }); });
+    shapes.innerHTML = '<h3>Which organizer fits ¶ ' + (cur + 1) + '?</h3><div class="sn-row">' + SH.map(function (s) { return '<button type="button" class="sn-b sm' + (org[cur] === s[0] ? ' on' : '') + '" data-o="' + s[0] + '">' + s[1] + '<br><small>' + s[2] + '</small></button>'; }).join('') + '</div>';
+    shapes.querySelectorAll('[data-o]').forEach(function (b) { b.addEventListener('click', function () { org[cur] = b.getAttribute('data-o'); report(); draw(); }); });
+  }
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; IT.forEach(function (x, i) { taps[i] = {}; var n = 0; x.text.replace(/\[\[([^\]]+)\]\]|([A-Za-z’']+)/g, function (m, sig) { if (sig) taps[i][n] = { sig: true }; n++; }); org[i] = x.structure; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Main Idea Organizer: sort details under two main ideas              */
+/* cfg: { passage, ideas:[..], details:[[text, ideaIdx or -1]] }         */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.organizer = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var P = K.passage(cfg.passage.paragraphs), D = cfg.details, place = D.map(function () { return -2; }), sel = -1, tags = {};
+  M.def.passageText = P.text;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start"></div>');
+  var pass = K.el('<article class="sn-read-pass"><h3>' + K.esc(cfg.passage.title) + '</h3><div class="sn-by">' + K.esc(cfg.passage.genre || '') + ' · <span class="sn-note">Tap sentences to mark key details.</span></div>' + P.html + '<div style="text-align:center"><button type="button" class="sn-b primary sm" data-read>✓ I finished reading</button></div></article>');
+  var web = K.el('<div class="sn-panel"></div>');
+  row.appendChild(pass); row.appendChild(web); M.el.appendChild(row);
+  pass.querySelectorAll('.sn-s').forEach(function (sp) { sp.setAttribute('tabindex', '0'); function hit() { var id = sp.getAttribute('data-sid'); if (tags[id]) delete tags[id]; else tags[id] = 1; sp.classList.toggle('h-key'); report(); } sp.addEventListener('click', hit); sp.addEventListener('keydown', function (e) { if (e.key === 'Enter') hit(); }); });
+  pass.querySelector('[data-read]').addEventListener('click', function () { M.set('read', true); });
+  function report() { var st = { placed: place.filter(function (p) { return p > -2; }).length, right: D.filter(function (d, i) { return place[i] === d[1]; }).length, keys: Object.keys(tags) }; st.allRight = st.right === D.length; st.nKeys = st.keys.length; M.set(st); }
+  function draw() {
+    var cols = cfg.ideas.map(function (idea, ii) { return '<div class="sb-col" data-col="' + ii + '" role="button" tabindex="0" style="border-color:' + ['#1971c2', '#e8590c'][ii] + '"><h4 style="color:' + ['#1971c2', '#e8590c'][ii] + '">Main idea ' + (ii + 1) + '</h4><b style="font-size:.9em">' + K.esc(idea) + '</b>' + D.map(function (d, i) { return place[i] === ii ? '<button type="button" class="sb-card" data-c="' + i + '" style="font-size:.8em">' + K.esc(d[0]) + '</button>' : ''; }).join('') + '</div>'; }).join('') + '<div class="sb-col trash" data-col="-1" role="button" tabindex="0"><h4>🗑 Not a key detail</h4>' + D.map(function (d, i) { return place[i] === -1 ? '<button type="button" class="sb-card" data-c="' + i + '" style="font-size:.8em">' + K.esc(d[0]) + '</button>' : ''; }).join('') + '</div>';
+    web.innerHTML = '<h3>🕸 Main idea organizer</h3><p class="sn-note">Tap a detail card, then tap the main idea it supports.</p><div class="sb-pool">' + D.map(function (d, i) { return place[i] === -2 ? '<button type="button" class="sb-card' + (sel === i ? ' sel' : '') + '" data-c="' + i + '">' + K.esc(d[0]) + '</button>' : ''; }).join('') + '</div><div style="display:grid;gap:8px;margin-top:8px">' + cols + '</div><div class="sn-row"><button type="button" class="sn-b sm" data-chk>Check</button><span class="sn-note" data-msg></span></div>';
+    web.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); var i = +b.getAttribute('data-c'); if (place[i] > -2) { place[i] = -2; sel = i; } else sel = sel === i ? -1 : i; report(); draw(); }); });
+    web.querySelectorAll('[data-col]').forEach(function (c) { function drop() { if (sel < 0) return; place[sel] = +c.getAttribute('data-col'); sel = -1; report(); draw(); } c.addEventListener('click', drop); c.addEventListener('keydown', function (e) { if (e.key === 'Enter') drop(); }); });
+    web.querySelector('[data-chk]').addEventListener('click', function () { var wrong = D.filter(function (d, i) { return place[i] > -2 && place[i] !== d[1]; }).length; web.querySelector('[data-msg]').textContent = wrong ? wrong + ' card(s) don\'t belong there. They went back to the pile.' : '✓ So far so good!'; if (wrong) { D.forEach(function (d, i) { if (place[i] > -2 && place[i] !== d[1]) place[i] = -2; }); report(); setTimeout(draw, 900); } });
+  }
+  M.el.appendChild(K.el('<style>.sb-pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px dashed var(--sn-line);border-radius:10px;min-height:44px}.sb-card{border:2px solid var(--sn-ink);background:#fff;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:.88em;text-align:left}.sb-card.sel{background:#ffe066}.sb-col{border:2px solid var(--sn-line);border-radius:10px;padding:6px;min-height:70px;background:var(--sn-bg);display:flex;flex-direction:column;gap:5px;cursor:pointer}.sb-col h4{margin:0;font-size:.75em;text-transform:uppercase;letter-spacing:.06em}.sb-col.trash{background:#fff5f5;border-style:dashed}</style>'));
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.read) M.set('read', true); if (c.allRight || c.right) D.forEach(function (d, i) { place[i] = d[1]; }); if (c.nKeys) P.sentences.slice(0, (c.nKeys.gte || 3)).forEach(function (s2) { tags[s2.id] = 1; }); M.set('read', true); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* News Desk: choose the headline that captures the main idea          */
+/* cfg: { articles:[{title?, paragraphs, headlines:[..], best}] }        */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.newsDesk = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var A = cfg.articles, cur = 0, pick = {};
+  M.def.passageText = A.map(function (a) { return K.passage(a.paragraphs).text; }).join(' ');
+  M.el.innerHTML = '';
+  var tabs = K.seg(A.map(function (a, i) { return [String(i), '📰 Story ' + (i + 1)]; }), '0', function (v) { cur = +v; draw(); });
+  var bar = K.el('<div class="sn-ctrls"></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var paper = K.el('<article class="sn-read-pass" style="background:#fbfaf6;border:3px double #495057"></article>'); M.el.appendChild(paper);
+  function report() { var st = { picked: Object.keys(pick).length, right: A.filter(function (a, i) { return pick[i] === a.best; }).length }; st.allRight = st.right === A.length; A.forEach(function (a, i) { st['h_' + i] = pick[i] === a.best; }); M.set(st); }
+  function draw() {
+    var a = A[cur], P = K.passage(a.paragraphs);
+    paper.innerHTML = '<div style="text-align:center;font-family:Georgia,serif;font-weight:800;letter-spacing:.1em;border-bottom:2px solid #1d2433;margin-bottom:6px">THE SUNNYSIDE SUN · ' + (cur + 1) + '</div><h2 style="font-family:Georgia,serif;margin:.2em 0">' + (pick[cur] != null ? K.esc(a.headlines[pick[cur]]) : '<span class="sn-note">[ headline goes here ]</span>') + '</h2>' + P.html + '<div class="sn-panel" style="font-family:var(--sn-font)"><b>Pick the headline that tells the MAIN idea:</b>' + a.headlines.map(function (h, i) { return '<button type="button" class="sn-ch" data-h="' + i + '" style="width:100%;margin:4px 0;' + (pick[cur] === i ? 'border-color:var(--sn-acc);background:#f3f0ff' : '') + '"><span>' + K.esc(h) + '</span></button>'; }).join('') + '</div>';
+    paper.querySelectorAll('[data-h]').forEach(function (b) { b.addEventListener('click', function () { pick[cur] = +b.getAttribute('data-h'); var ok = pick[cur] === a.best; M.toast(ok ? '✓ The editor approves: that headline covers the main idea.' : '✗ The editor says: that headline is too narrow, off topic, or just a detail.', !ok); report(); draw(); }); });
+  }
+  report(); draw();
+  return { auto: function (st) { A.forEach(function (a, i) { pick[i] = a.best; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Two Texts, One Topic: sort facts into a Venn diagram                 */
+/* cfg: { a:{title, paragraphs}, b:{...}, facts:[[text, 0 a-only | 1 both | 2 b-only]] } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.twoTexts = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var F = cfg.facts, place = F.map(function () { return -1; }), sel = -1, tab = 'a';
+  var PA = K.passage(cfg.a.paragraphs), PB = K.passage(cfg.b.paragraphs); M.def.passageText = PA.text + ' ' + PB.text;
+  M.el.innerHTML = '';
+  var tabs = K.seg([['a', '📄 ' + cfg.a.title], ['b', '📄 ' + cfg.b.title], ['venn', '⭕ Venn diagram']], tab, function (v) { tab = v; if (v !== 'venn') M.set('read_' + v, true); draw(); });
+  var bar = K.el('<div class="sn-ctrls"></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var area = K.el('<div></div>'); M.el.appendChild(area);
+  function report() { var st = { placed: place.filter(function (p) { return p >= 0; }).length, right: F.filter(function (f, i) { return place[i] === f[1]; }).length }; st.allRight = st.right === F.length; M.set(st); }
+  function draw() {
+    if (tab !== 'venn') { var src = tab === 'a' ? cfg.a : cfg.b, P = tab === 'a' ? PA : PB; area.innerHTML = '<article class="sn-read-pass"><h3>' + K.esc(src.title) + '</h3><div class="sn-by">' + K.esc(src.genre || '') + '</div>' + P.html + '</article>'; return; }
+    var zones = [['Only in ' + cfg.a.title, 0, '#d0ebff'], ['In BOTH', 1, '#d3f9d8'], ['Only in ' + cfg.b.title, 2, '#ffe8cc']];
+    area.innerHTML = '<p class="sn-note">Tap a fact card, then tap where it goes.</p><div class="sb-pool">' + F.map(function (f, i) { return place[i] < 0 ? '<button type="button" class="sb-card' + (sel === i ? ' sel' : '') + '" data-c="' + i + '">' + K.esc(f[0]) + '</button>' : ''; }).join('') + '</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:10px">' + zones.map(function (z, zi) { return '<div data-col="' + z[1] + '" role="button" tabindex="0" style="background:' + z[2] + ';border:3px solid #495057;border-radius:' + (zi === 0 ? '999px 0 0 999px' : zi === 2 ? '0 999px 999px 0' : '0') + ';min-height:200px;padding:12px ' + (zi === 1 ? '8' : '28') + 'px;display:flex;flex-direction:column;gap:5px;cursor:pointer"><b style="font-size:.8em;text-align:center">' + K.esc(z[0]) + '</b>' + F.map(function (f, i) { return place[i] === z[1] ? '<button type="button" class="sb-card" data-c="' + i + '" style="font-size:.78em">' + K.esc(f[0]) + '</button>' : ''; }).join('') + '</div>'; }).join('') + '</div><div class="sn-row"><button type="button" class="sn-b sm" data-chk>Check</button><span class="sn-note" data-msg></span></div>';
+    area.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); var i = +b.getAttribute('data-c'); if (place[i] >= 0) { place[i] = -1; sel = i; } else sel = sel === i ? -1 : i; report(); draw(); }); });
+    area.querySelectorAll('[data-col]').forEach(function (c) { function drop() { if (sel < 0) return; place[sel] = +c.getAttribute('data-col'); sel = -1; report(); draw(); } c.addEventListener('click', drop); c.addEventListener('keydown', function (e) { if (e.key === 'Enter') drop(); }); });
+    area.querySelector('[data-chk]').addEventListener('click', function () { var wrong = F.filter(function (f, i) { return place[i] >= 0 && place[i] !== f[1]; }).length; area.querySelector('[data-msg]').textContent = wrong ? wrong + ' fact(s) are in the wrong place. Check both texts again.' : '✓ Looking good!'; if (wrong) { F.forEach(function (f, i) { if (place[i] >= 0 && place[i] !== f[1]) place[i] = -1; }); report(); setTimeout(draw, 900); } });
+  }
+  M.el.appendChild(K.el('<style>.sb-pool{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px dashed var(--sn-line);border-radius:10px;min-height:44px}.sb-card{border:2px solid var(--sn-ink);background:#fff;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:.88em;text-align:left}.sb-card.sel{background:#ffe066}</style>'));
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; M.set({ read_a: true, read_b: true }); if (c.allRight || c.right) F.forEach(function (f, i) { place[i] = f[1]; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Context Clue Decoder: find the clue, name its type, test the meaning */
+/* cfg: { items:[{s: 'sentence with [[word]]', clue:[words], type, choices:[..], answer}] } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.clueDecoder = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var IT = cfg.items, cur = 0, st = IT.map(function () { return { taps: {}, type: null, mean: null }; });
+  var TYPES = [['definition', 'Definition'], ['synonym', 'Synonym'], ['antonym', 'Antonym'], ['example', 'Example'], ['inference', 'General sense']];
+  M.def.passageText = IT.map(function (x) { return x.s.replace(/\[\[|\]\]/g, ''); }).join(' ');
+  M.el.innerHTML = '';
+  var tabs = K.seg(IT.map(function (x, i) { return [String(i), 'Case ' + (i + 1)]; }), '0', function (v) { cur = +v; draw(); });
+  var bar = K.el('<div class="sn-ctrls"><b class="sn-note">🔍 Word cases:</b></div>'); bar.appendChild(tabs.el); M.el.appendChild(bar);
+  var card = K.el('<div class="sn-panel" style="font-size:1.05em"></div>'); M.el.appendChild(card);
+  function word(i) { return (IT[i].s.match(/\[\[([^\]]+)\]\]/) || [])[1]; }
+  function report() { var o = {}; var solved = 0; IT.forEach(function (x, i) { var s = st[i], clueHit = Object.keys(s.taps).some(function (k) { return x.clue.map(function (c) { return c.toLowerCase(); }).indexOf(s.taps[k]) >= 0; }); o['clue_' + i] = clueHit; o['type_' + i] = s.type === x.type; o['mean_' + i] = s.mean === x.answer; o['solved_' + i] = clueHit && s.type === x.type && s.mean === x.answer; if (o['solved_' + i]) solved++; }); o.solved = solved; o.allSolved = solved === IT.length; M.set(o); }
+  function draw() {
+    var x = IT[cur], s = st[cur], w = word(cur), n = 0;
+    var sent = x.s.replace(/\[\[([^\]]+)\]\]|([A-Za-z’'-]+)/g, function (m, target, wd) { if (target) return '<mark style="background:#d0bfff;border-radius:4px;padding:0 3px;font-weight:800">' + K.esc(target) + '</mark>'; var id = n++; return '<span class="sn-w' + (s.taps[id] ? ' on' : '') + '" data-w="' + id + '" data-t="' + K.esc(wd.toLowerCase()) + '" role="button" tabindex="0" style="border-bottom:none">' + K.esc(wd) + '</span>'; });
+    var test = s.mean != null ? x.s.replace(/\[\[[^\]]+\]\]/, '<u><b>' + K.esc(x.choices[s.mean]) + '</b></u>') : '';
+    card.innerHTML = '<h3>Case ' + (cur + 1) + ': What does <mark style="background:#d0bfff">' + K.esc(w) + '</mark> mean?</h3><p style="font-family:Georgia,serif;font-size:1.15em;line-height:2">' + sent + '</p><p class="sn-note">1) Tap the words that give you a CLUE. 2) Name the clue type. 3) Pick the meaning and test it in the sentence.</p>' +
+      '<div class="sn-row"><b class="sn-note">Clue type:</b>' + TYPES.map(function (t) { return '<button type="button" class="sn-b sm' + (s.type === t[0] ? ' on' : '') + '" data-ty="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="sn-row"><b class="sn-note">Meaning:</b>' + x.choices.map(function (c, i) { return '<button type="button" class="sn-b sm' + (s.mean === i ? ' on' : '') + '" data-m="' + i + '">' + K.esc(c) + '</button>'; }).join('') + '</div>' + (test ? '<div class="sn-idea"><span>Substitution test: does it still make sense?</span>' + test + '</div>' : '');
+    card.querySelectorAll('.sn-w').forEach(function (sp) { function hit() { var id = sp.getAttribute('data-w'); if (s.taps[id]) delete s.taps[id]; else s.taps[id] = sp.getAttribute('data-t'); sp.classList.toggle('on'); report(); } sp.addEventListener('click', hit); sp.addEventListener('keydown', function (e) { if (e.key === 'Enter') hit(); }); });
+    card.querySelectorAll('[data-ty]').forEach(function (b) { b.addEventListener('click', function () { s.type = b.getAttribute('data-ty'); report(); draw(); }); });
+    card.querySelectorAll('[data-m]').forEach(function (b) { b.addEventListener('click', function () { s.mean = +b.getAttribute('data-m'); report(); draw(); }); });
+  }
+  report(); draw();
+  return { auto: function (stp) { IT.forEach(function (x, i) { var n = 0; x.s.replace(/\[\[([^\]]+)\]\]|([A-Za-z’'-]+)/g, function (m, t, wd) { if (t) return; if (x.clue.map(function (c) { return c.toLowerCase(); }).indexOf(wd.toLowerCase()) >= 0) st[i].taps[n] = wd.toLowerCase(); n++; }); st[i].type = x.type; st[i].mean = x.answer; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Word Forge: build words from prefixes, roots, and suffixes          */
+/* cfg: { prefixes:[[p, meaning]], roots:[[r, meaning]], suffixes:[[s, meaning]], words:{'in+vis+ible': 'meaning'}, targets:[[clue, key]] } */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.wordLab = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var slot = { p: '', r: '', s: '' }, forged = {}, ti = 0;
+  M.el.innerHTML = '';
+  M.el.appendChild(K.el('<style>.wf-tiles{display:flex;flex-wrap:wrap;gap:6px}.wf-t{border:2px solid;border-radius:8px;padding:5px 9px;cursor:pointer;font-weight:800;background:#fff;text-align:center;line-height:1.1}.wf-t small{display:block;font-weight:600;font-size:.72em;color:var(--sn-soft)}.wf-t.p{border-color:#1971c2}.wf-t.r{border-color:#e8590c}.wf-t.s{border-color:#2b8a3e}.wf-t.on{background:#ffe066}.wf-anvil{display:flex;gap:6px;align-items:center;justify-content:center;background:#343a40;border-radius:12px;padding:14px;color:#fff;font-size:1.6em;font-weight:800;flex-wrap:wrap}.wf-slot{min-width:80px;border:3px dashed #adb5bd;border-radius:8px;padding:4px 10px;text-align:center}</style>'));
+  var goal = K.el('<div class="sn-panel" aria-live="polite"></div>'); M.el.appendChild(goal);
+  var anvil = K.el('<div class="wf-anvil"></div>'); M.el.appendChild(anvil);
+  var tiles = K.el('<div class="sn-panel"></div>'); M.el.appendChild(tiles);
+  var logB = K.el('<div class="sn-panel"></div>'); M.el.appendChild(logB);
+  function key() { return [slot.p, slot.r, slot.s].filter(Boolean).join('+'); }
+  function forge() { var k = key(); if (!slot.r) { M.toast('Every word needs a ROOT.', true); return; } if (cfg.words[k]) { forged[k] = true; var o = { forged: Object.keys(forged).length }; o['w_' + k.replace(/\+/g, '_')] = true; var tk = cfg.targets[ti]; if (tk && tk[1] === k) { o['target_' + ti] = true; M.toast('🎯 Target word forged!'); } M.set(o); } else M.toast('"' + k.replace(/\+/g, '') + '" isn\'t a real English word. Try a different combination.', true); draw(); }
+  function draw() {
+    var tk = cfg.targets[ti];
+    goal.innerHTML = '<b>🎯 Word order ' + (ti + 1) + ' of ' + cfg.targets.length + ':</b> Forge a word that means <b>"' + K.esc(tk[0]) + '"</b>. <button type="button" class="sn-b sm ghost" data-next>Next order ▶</button>';
+    goal.querySelector('[data-next]').addEventListener('click', function () { ti = (ti + 1) % cfg.targets.length; draw(); });
+    anvil.innerHTML = ['p', 'r', 's'].map(function (k) { return '<span class="wf-slot">' + (slot[k] || '<small style="font-size:.5em;color:#adb5bd">' + { p: 'prefix', r: 'root', s: 'suffix' }[k] + '</small>') + '</span>'; }).join('<span>+</span>') + '<button type="button" class="sn-b primary" data-forge>🔨 Forge</button><button type="button" class="sn-b sm ghost" data-clear style="color:#fff">Clear</button>';
+    anvil.querySelector('[data-forge]').addEventListener('click', forge); anvil.querySelector('[data-clear]').addEventListener('click', function () { slot = { p: '', r: '', s: '' }; draw(); });
+    function row(list, k, cls, title) { return '<h4 style="margin:.4em 0">' + title + '</h4><div class="wf-tiles">' + list.map(function (x) { return '<button type="button" class="wf-t ' + cls + (slot[k] === x[0] ? ' on' : '') + '" data-k="' + k + '" data-v="' + K.esc(x[0]) + '">' + K.esc(x[0]) + '<small>' + K.esc(x[1]) + '</small></button>'; }).join('') + '</div>'; }
+    tiles.innerHTML = row(cfg.prefixes, 'p', 'p', 'Prefixes (front)') + row(cfg.roots, 'r', 'r', 'Roots (the core meaning)') + row(cfg.suffixes, 's', 's', 'Suffixes (end)');
+    tiles.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('click', function () { var k = b.getAttribute('data-k'), v = b.getAttribute('data-v'); slot[k] = slot[k] === v ? '' : v; draw(); }); });
+    logB.innerHTML = '<h3>📒 Word log (' + Object.keys(forged).length + ')</h3>' + (Object.keys(forged).length ? Object.keys(forged).map(function (k) { return '<div><b>' + k.replace(/\+/g, '') + '</b> (' + k.replace(/\+/g, ' + ') + '): ' + K.esc(cfg.words[k]) + '</div>'; }).join('') : '<p class="sn-note">Real words you forge appear here with their meanings.</p>');
+  }
+  draw(); M.set({ forged: 0 });
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^target_(\d+)$/); if (mm) { ti = +mm[1]; var kk = cfg.targets[ti][1].split('+'); var r = cfg.roots.map(function (x) { return x[0]; }); slot = { p: '', r: '', s: '' }; kk.forEach(function (part) { if (r.indexOf(part) >= 0) slot.r = part; else if (cfg.prefixes.map(function (x) { return x[0]; }).indexOf(part) >= 0) slot.p = part; else slot.s = part; }); forge(); } } if (c.forged) Object.keys(cfg.words).slice(0, c.forged.gte || c.forged).forEach(function (k2) { forged[k2] = true; }); M.set('forged', Object.keys(forged).length); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Figurative Language Translator: tag lines in a poem, then translate */
+/* cfg: { title, lines:[text or {t, type, id}], types }                  */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.figTranslator = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var TYPES = cfg.types || [['simile', 'Simile'], ['metaphor', 'Metaphor'], ['personification', 'Personification'], ['idiom', 'Idiom'], ['hyperbole', 'Hyperbole']];
+  var sel = null, tag = {};
+  M.def.passageText = cfg.lines.map(function (l) { return typeof l === 'string' ? l : l.t; }).join(' ');
+  M.el.innerHTML = '';
+  var poem = K.el('<article class="sn-read-pass"></article>'); M.el.appendChild(poem);
+  var tb = K.el('<div class="sn-ctrls"></div>'); M.el.appendChild(tb);
+  function report() { var o = { tagged: Object.keys(tag).length }; var right = 0, figs = cfg.lines.filter(function (l) { return typeof l !== 'string'; }); figs.forEach(function (l) { o['t_' + l.id] = tag[l.id] === l.type; if (tag[l.id] === l.type) right++; }); o.right = right; o.allRight = right === figs.length; M.set(o); }
+  function draw() {
+    poem.innerHTML = '<h3>' + K.esc(cfg.title) + '</h3><div class="sn-by">' + K.esc(cfg.by || '') + ' · <span class="sn-note">Tap a line with figurative language, then choose its type below.</span></div>' + cfg.lines.map(function (l) { if (typeof l === 'string') return '<div>' + (l ? K.esc(l) : '&nbsp;') + '</div>'; var t = tag[l.id]; return '<div class="sn-s' + (sel === l.id ? ' h-evidence' : t ? ' h-key' : '') + '" data-l="' + l.id + '" role="button" tabindex="0">' + K.esc(l.t) + (t ? ' <small style="font-family:var(--sn-font);color:#1971c2;font-weight:800">[' + t + ']</small>' : '') + '</div>'; }).join('');
+    poem.querySelectorAll('[data-l]').forEach(function (d) { function hit() { sel = d.getAttribute('data-l'); draw(); } d.addEventListener('click', hit); d.addEventListener('keydown', function (e) { if (e.key === 'Enter') hit(); }); });
+    tb.innerHTML = '<b class="sn-note">' + (sel ? 'This line is a:' : 'Select a line first.') + '</b>';
+    TYPES.forEach(function (t) { var b = K.btn(t[1], function () { if (!sel) return; tag[sel] = t[0]; var l = cfg.lines.filter(function (x) { return x.id === sel; })[0]; M.toast(l.type === t[0] ? '✓ Yes, that is ' + t[1].toLowerCase() + '.' : '✗ Not quite. Check the clues: does it use like/as? Does a thing act human?', l.type !== t[0]); report(); draw(); }, 'sm'); if (!sel) b.disabled = true; tb.appendChild(b); });
+  }
+  report(); draw();
+  return { auto: function (st) { cfg.lines.forEach(function (l) { if (typeof l !== 'string') tag[l.id] = l.type; }); report(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Idiom Street: literal picture vs. real meaning                       */
+/* cfg: { people:[{who, emoji, says, literal, choices:[..], answer}] }    */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.idiomStreet = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var PP = cfg.people, cur = 0, got = {};
+  M.def.passageText = PP.map(function (p) { return p.says; }).join(' ');
+  M.el.innerHTML = '';
+  var street = K.svgEl('svg', { viewBox: '0 0 700 200', class: 'sn-svg', role: 'img', 'aria-label': 'A town street with people talking' }); M.el.appendChild(street);
+  var card = K.el('<div class="sn-panel" aria-live="polite"></div>'); M.el.appendChild(card);
+  function report() { var o = { solved: Object.keys(got).length }; PP.forEach(function (p, i) { o['i_' + i] = !!got[i]; }); o.allSolved = o.solved === PP.length; M.set(o); }
+  function draw() {
+    var h = '<rect width="700" height="200" fill="#e7f5ff"/><rect y="150" width="700" height="50" fill="#adb5bd"/>';
+    ['#ffc9c9', '#b2f2bb', '#ffec99', '#d0bfff', '#a5d8ff'].forEach(function (c, i) { h += '<rect x="' + (i * 140 + 10) + '" y="40" width="120" height="110" fill="' + c + '" stroke="#495057"/><rect x="' + (i * 140 + 55) + '" y="105" width="30" height="45" fill="#8d6e63"/>'; });
+    PP.forEach(function (p, i) { var x = 70 + i * (560 / Math.max(1, PP.length - 1)); h += '<g class="is-p" data-i="' + i + '" role="button" tabindex="0" aria-label="' + p.who + '"><text x="' + x + '" y="178" font-size="34" text-anchor="middle">' + p.emoji + '</text>' + (got[i] ? '<text x="' + x + '" y="196" font-size="11" text-anchor="middle">✅</text>' : '<text x="' + (x + 16) + '" y="150" font-size="18">💬</text>') + (i === cur ? '<circle cx="' + x + '" cy="166" r="24" fill="none" stroke="#e8590c" stroke-width="3"/>' : '') + '</g>'; });
+    street.innerHTML = h;
+    street.querySelectorAll('.is-p').forEach(function (g) { g.addEventListener('click', function () { cur = +g.getAttribute('data-i'); draw(); }); });
+    var p = PP[cur];
+    card.innerHTML = '<h3>' + p.emoji + ' ' + K.esc(p.who) + ' says: "' + K.esc(p.says) + '"</h3><div style="display:grid;grid-template-columns:1fr 2fr;gap:10px"><div class="sn-idea"><span>If you took it literally…</span><div style="font-size:2.2em">' + p.literal + '</div></div><div><b>What does ' + K.esc(p.who) + ' REALLY mean?</b>' + p.choices.map(function (c, i) { return '<button type="button" class="sn-ch" data-c="' + i + '" style="width:100%;margin:4px 0"><span>' + K.esc(c) + '</span></button>'; }).join('') + '</div></div>';
+    card.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function () { var ok = +b.getAttribute('data-c') === p.answer; if (ok) { got[cur] = true; M.toast('✓ Right! That\'s the real meaning.'); } else M.toast('✗ That\'s the literal (word-for-word) idea. Think about the situation.', true); report(); draw(); }); });
+  }
+  report(); draw();
+  return { auto: function () { PP.forEach(function (p, i) { got[i] = true; }); report(); draw(); } };
+};

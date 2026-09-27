@@ -376,7 +376,7 @@ function SunnySim() {
       setNext(st);
     }
     function setNext(st) {
-      var n = root.querySelector('[data-next]'); if (!n) return;
+      var n = root.querySelector('.sn-card-wrap [data-next]'); if (!n) return;
       var ok = S.done[st.key] || (!st.q && goalMet(st));
       n.disabled = !ok; n.textContent = S.i === steps.length - 1 ? 'Finish ✓' : 'Next →';
       if (ok && !S.done[st.key]) { S.done[st.key] = true; save(); }
@@ -676,7 +676,7 @@ function SunnySim() {
       autoSolve: function () {
         var st = steps[S.i]; if (!st) return false;
         if (st.goal) { if (st.goal.auto) st.goal.auto(M, model); else if (model.auto) model.auto(st); S.goalOK = S.goalOK || {}; S.goalOK[st.key] = true; paintGoal(st); }
-        if (st.q && !S.done[st.key]) { var qh = root.querySelector('[data-q]'); if (!qh.getAttribute('data-built')) { qh.setAttribute('data-built', '1'); buildQ(st, qh); } S.answers[st.key] = st.q.type === 'predict' ? st.q.choices[0] : 'auto'; S.tries[st.key] = S.tries[st.key] || 0; award(st); }
+        if (st.q && !S.done[st.key]) { var qh = root.querySelector('.sn-card-wrap [data-q]'); if (!qh.getAttribute('data-built')) { qh.setAttribute('data-built', '1'); buildQ(st, qh); } S.answers[st.key] = st.q.type === 'predict' ? st.q.choices[0] : 'auto'; S.tries[st.key] = S.tries[st.key] || 0; award(st); }
         setNext(st); return true;
       }
     };
