@@ -10,7 +10,7 @@
   function clean(s) {
     return String(s).replace(/<br\s*\/?>/gi, ' ').replace(/<sup>(.*?)<\/sup>/gi, '^$1').replace(/<[^>]+>/g, '')
       .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-.replace(/→/g, '->').replace(/←/g, '<-').replace(/✓/g, '(correct)').replace(/[−–]/g, '-').replace(/≈/g, '~').replace(/≥/g, '>=').replace(/≤/g, '<=')
+.replace(/[₀-₉]/g, function (c) { return String(c.charCodeAt(0) - 8320); }).replace(/→/g, '->').replace(/←/g, '<-').replace(/✓/g, '(correct)').replace(/[−–]/g, '-').replace(/≈/g, '~').replace(/≥/g, '>=').replace(/≤/g, '<=')
       .replace(/\s+/g, ' ').trim();
   }
   function charCode(ch) {
