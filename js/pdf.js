@@ -351,16 +351,18 @@
       d.table([{ w: 0.06, h: '#' }, { w: 0.47, h: 'Question' }, { w: 0.47, h: 'Look for' }], X.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     }
     d.banner('2. Mini-lesson', c, '0:08–0:20 · 12 min');
-    d.para('Open the Mini-lesson presenter on the room page and project it. Each step has a teacher script, an interactive tool, and a quick check. Students fill in the matching guided notes.', { size: 10.5, gap: 4 });
+    d.para('Project the Lesson presenter from the room page. It runs the whole hour: target and agenda, warm-up with timer, hook vote, 4 teaching steps (key idea, interactive tool, turn and talk, check for understanding), I do / we do / you do, a work-time screen with a timer and expectations, debrief, and the exit ticket. Press N for teacher notes, T to pause the timer, and P to pick a student.', { size: 10.5, gap: 4 });
     d.callout([{ label: 'Hook (1 min):', text: room.hook || L.hook }], c, { size: 10 });
     (X.steps || []).forEach(function (st, i) {
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : 'Visual: ' + (st.tool.caption || st.tool.kind)) : st.cards ? 'Flip cards: ' + st.cards.map(function (x) { return x[0]; }).join(', ') : 'Board and notes';
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       d.sub('Step ' + (i + 1) + ' (3 min): ' + st.t);
-      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', st.do], ['Guided notes', blanks(st.note, true)], ['Quick check', ck.q + '  Answer: ' + ans]], c, { repeat: false });
+      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Guided notes', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
     });
-    d.sub('Model it');
+    d.sub('I do: model (think aloud)');
     d.para(L.model, { size: 10.5 });
+    if (X.wedo) { d.sub('We do: guided practice'); d.para(X.wedo.q, { size: 10.5, bold: true, gap: 2 }); X.wedo.steps.forEach(function (t, k) { d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 10, gap: 1 }); }); d.para('Answer: ' + X.wedo.a, { size: 10.5, gap: 4 }); }
+    if (X.youdo) { var yd = X.youdo; d.sub('You do: independent check (2 min)'); d.para(yd.q + (yd.choices ? '  ' + yd.choices.map(function (c, k) { return '(' + LET[k] + ') ' + c; }).join('  ') : ''), { size: 10.5, gap: 2 }); d.para('Answer: ' + (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + '. Students who miss it: 3-minute reteach at the teacher table, then start the room at the Explorer level.', { size: 10.5, gap: 4 }); }
     d.callout(L.misconceptions.map(function (m) { return { label: 'Misconception:', text: m }; }), [0.8, 0.45, 0.1], { size: 10 });
     d.banner('3. ' + room.formatLabel + ': ' + room.title, c, '0:20–0:48 · 28 min');
     d.para('Launch: project the start screen, read the story aloud, and assign mission levels (Explorer = extra support, Agent = on level, Legend = challenge). Students can open Supports any time for read-aloud, bigger text, a word bank, and a scratch pad.', { size: 10.5, gap: 4 });

@@ -4,7 +4,7 @@ const ctx = { window: {} }; vm.createContext(ctx);
 const dir = path.join(__dirname, '..', 'data');
 // Same order as index.html: standards, base rooms, fx upgrades, then apply-fx merges them.
 const all = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
-const files = ['standards.js', ...all.filter(f => /^g\d-/.test(f)), ...all.filter(f => /^fx-/.test(f)), 'lessons.js', 'tasks.js', 'apply-fx.js'];
+const files = ['standards.js', ...all.filter(f => /^g\d-/.test(f)), ...all.filter(f => /^fx-/.test(f)), 'lessons.js', 'lessons-plus.js', 'tasks.js', 'apply-fx.js'];
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(dir, f), 'utf8'), ctx, { filename: f });
 for (const f of ['themes.js', 'kit.js', 'player.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', f), 'utf8'), ctx, { filename: f });
 const STD = {}; ctx.window.CX_STANDARDS.forEach(s => STD[s.id] = s);
@@ -53,8 +53,11 @@ for (const s of ctx.window.CX_STANDARDS) {
   if (!X.warmup || X.warmup.length < 3) err(r, 'warm-up needs 3 questions');
   if (!X.steps || X.steps.length < 4) err(r, 'mini-lesson needs 4 steps');
   (X.steps || []).forEach((st, i) => { for (const k of ['t', 'say', 'note', 'do', 'check']) if (!st[k]) err(r, `step ${i} missing ${k}`); if (st.note && !/\[/.test(st.note)) err(r, `step ${i} note has no [blank]`); });
+  if (!X.talk || X.talk.length < (X.steps || []).length) err(r, 'needs a turn-and-talk for every step');
+  if (!X.wedo || !X.wedo.steps || !X.wedo.a) err(r, 'needs we-do practice');
+  if (!X.youdo) err(r, 'needs a you-do check');
   if (!X.exit || !['CER', 'RACE', 'SOURCE', 'MATH'].includes(X.exit.frame) || !X.exit.stim || !X.exit.model || !(X.exit.look || []).length) err(r, 'exit item incomplete');
-  const room = { id: r.id, title: s.title, subject: s.subject, grade: s.grade, format: 'escape', stages: (X.steps || []).map(st => ({ title: st.t, content: '', visual: st.tool && !st.tool.sim ? st.tool : null, puzzles: [st.check] })) };
+  const room = { id: r.id, title: s.title, subject: s.subject, grade: s.grade, format: 'escape', stages: (X.steps || []).map(st => ({ title: st.t, content: '', visual: st.tool && !st.tool.sim ? st.tool : null, puzzles: [st.check] })).concat(X.youdo ? [{ title: 'You do', content: '', puzzles: [X.youdo] }] : []) };
   vm.runInContext('EscapePlayer', ctx)(null, room, { selfTest: true }).forEach(m => err(r, 'self-test ' + m));
 }
 const perStd = {};

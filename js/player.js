@@ -1039,6 +1039,7 @@ function EscapePlayer(mount, room, opts) {
     lk.href = 'https://fonts.googleapis.com/css2?family=' + TH.gf + '&family=Atkinson+Hyperlegible:wght@400;700&display=swap';
     document.head.appendChild(lk);
   }
+  if (opts.stylesOnly) return themeId;
 
   /* ---------- state ---------- */
   var KEY = 'crossroads-escape-v2:' + room.id;

@@ -168,7 +168,7 @@
   function lessonSection(r, L) {
     var X = lessonOf(r);
     var html = '<section class="sec" id="s-lesson"><h2><span class="step">2</span>Mini-lesson <span class="when">0:08–0:20 · 12 min</span></h2>' +
-      '<p class="lede">Project the <a href="#teach-' + r.id + '">mini-lesson presenter</a>. Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
+      '<p class="lede">Project the <a href="#teach-' + r.id + '">lesson presenter</a> (it runs the whole hour, including the warm-up and a work-time timer). Students fill in the <button class="linkbtn" data-do="notes">guided notes</button> as you go (<button class="linkbtn" data-do="noteskey">key</button>).</p>' +
       '<div class="callout"><b>Hook (1 min):</b> ' + esc(r.hook || L.hook) + '</div>' +
       '<h3>Key vocabulary</h3><div class="vocab">' + L.vocab.map(function (v) { return '<div><b>' + esc(v[0]) + '</b>' + esc(v[1]) + '</div>'; }).join('') + '</div>';
     if (X) html += '<div class="steps">' + X.steps.map(function (st, i) {
@@ -176,10 +176,12 @@
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : (st.tool.caption || 'Visual model')) : st.cards ? 'Flip cards' : 'Board and notes';
       return '<div class="stepcard"><div class="stephead"><span class="step">' + (i + 1) + '</span><h3>' + esc(st.t) + '</h3><span class="when">3 min</span></div>' +
         '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc(st.do) + '</dd></div>' +
-        '<div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
+        '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
     }).join('') + '</div>';
     else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
-    html += '<h3>Model it</h3><p>' + esc(L.model) + '</p>' +
+    html += '<h3>I do: model it</h3><p>' + esc(L.model) + '</p>' +
+      (X && X.wedo ? '<h3>We do: guided practice</h3><p><b>' + esc(X.wedo.q) + '</b></p><ol>' + X.wedo.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol><p><span class="ans">Answer: ' + esc(X.wedo.a) + '</span></p>' : '') +
+      (X && X.youdo ? '<h3>You do: independent check</h3><p>' + esc(X.youdo.q) + ' <span class="ans">' + esc(X.youdo.choices ? LETTERS[X.youdo.answer] + ') ' + X.youdo.choices[X.youdo.answer] : X.youdo.answer[0]) + '</span></p><p class="lede">Students who miss it get a 3-minute reteach, then start the room at the Explorer level.</p>' : '') +
       '<div class="callout warn"><h3 style="margin:0">Watch for these misconceptions</h3><ul>' + L.misconceptions.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></section>';
     return html;
   }
@@ -365,7 +367,7 @@
       '<div class="actions"><a class="btn primary" href="#play-' + r.id + '">' + ICONS.play + 'View as student</a>' +
       '<button class="btn" data-do="html">' + ICONS.down + 'Download for Canvas (.html)</button>' +
       '<button class="btn" data-do="copy">' + ICONS.copy + 'Copy HTML</button>' +
-      '<a class="btn" href="#teach-' + r.id + '">' + ICONS.play + 'Mini-lesson presenter</a>' +
+      '<a class="btn" href="#teach-' + r.id + '">' + ICONS.play + 'Lesson presenter</a>' +
       '<button class="btn" data-do="guide">' + ICONS.down + '60-min facilitation guide PDF</button>' +
       '<button class="btn" data-do="exit">' + ICONS.down + 'Exit ticket PDF</button>' +
       '<button class="btn star' + (on ? ' on' : '') + '" data-pick="' + r.id + '" aria-pressed="' + on + '">' + (on ? ICONS.star : ICONS.starOff) + (on ? 'In My Picks' : 'Add to My Picks') + '</button></div>' +
@@ -405,7 +407,7 @@
     // Resources
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
       [['1', 'Warm-up worksheet', 'Printable warm-up with notebook expectations. Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
-       ['2', 'Mini-lesson presenter', 'Project it: 4 steps, each with an interactive tool and a class quick check.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
+       ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
        ['2', 'Guided notes', 'Fill-in notes, vocabulary, and "try it" problems that follow the presenter step by step.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
        ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
@@ -458,14 +460,23 @@
       })
     };
   }
+  var FRAME_SHORT = { CER: 'claim-evidence-reasoning', RACE: 'RACE', SOURCE: 'claim, evidence, and a source check', MATH: 'solve-show-explain' };
+  function presenterData(r) {
+    var X = lessonOf(r), s = STD[r.std], wt = writeTask(r);
+    return {
+      title: s.title, code: s.code, grade: r.grade, subject: r.subject, theme: r.theme, lesson: s.lesson, X: X, hook: r.hook || s.lesson.hook,
+      frame: X.exit ? FRAME_SHORT[X.exit.frame] : 'evidence',
+      room: { title: r.title, formatLabel: r.formatLabel, node: FORMATS[r.format].node, task: wt ? (FRAME_INFO[wt.frame] || [wt.frame])[0] : '' }
+    };
+  }
   function openPresenter(r) {
     closePlayer();
     overlay = document.createElement('div');
-    overlay.className = 'cx-play';
-    overlay.innerHTML = '<div class="cx-play-scroll"><div id="cx-mount"></div></div>';
+    overlay.className = 'cx-play cx-present';
+    overlay.innerHTML = '<div id="cx-mount"></div>';
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
-    EscapePlayer(overlay.querySelector('#cx-mount'), lessonRoom(r), { preview: true, teach: true, onExit: function () { location.hash = 'room-' + r.id; } });
+    LessonPresenter(overlay.querySelector('#cx-mount'), presenterData(r), { onExit: function () { location.hash = 'room-' + r.id; } });
   }
   function openPlayer(r) {
     closePlayer();
@@ -574,6 +585,6 @@
   function measureTop() { var t = document.querySelector('.top'); if (t) document.documentElement.style.setProperty('--toph', t.offsetHeight + 'px'); }
   window.addEventListener('resize', measureTop); measureTop();
 
-  window.CX = { ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode, runTips: runTips };
+  window.CX = { presenterData: presenterData, ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode, runTips: runTips };
   route();
 })();
