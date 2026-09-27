@@ -167,3 +167,321 @@ SUNNY_SIMS.push({
     { tag: 'explain', title: 'Explain the rule', sheet: 6, q: { type: 'text', q: 'Explain how to use melting and boiling points to predict if a substance is a solid, liquid, or gas.', rows: 3, need: [{ words: ['below', 'less', 'lower', 'under'], label: 'Below melting point → solid' }, { words: ['between'], label: 'Between the points → liquid' }, { words: ['above', 'higher', 'more than', 'over'], label: 'Above boiling point → gas' }] } }
   ]
 });
+
+/* ======================= 6.PS.3–4: Energy ======================= */
+SUNNY_SIMS.push({
+  id: 'g6-sci-skate-park', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.3',
+  title: 'Energy Skate Park', model: 'skatePark', minutes: 25, icon: '🛹',
+  place: 'Sunnyside Skate Park',
+  mission: 'The skate park is designing a new ramp. Drop skaters from different heights, watch the energy bar graph, and find out what controls a skater\'s speed and why skaters eventually stop.',
+  question: 'How do potential and kinetic energy change as a skater rides a ramp?',
+  takeaway: 'At the top, the skater has the most gravitational potential energy (PE). Going down, PE changes into kinetic energy (KE), so the skater is fastest at the bottom. Without friction, total energy stays the same. With friction, some energy becomes thermal energy, so the skater slows and stops.',
+  vocab: [['Potential energy (PE)', 'Stored energy because of position, like height.'], ['Kinetic energy (KE)', 'Energy of motion.'], ['Thermal energy', 'Energy of moving particles, felt as heat.'], ['Conservation of energy', 'Energy is not created or destroyed, only changed.'], ['Joule (J)', 'The unit of energy.']],
+  warmup: { style: 'Would you rather?', prompt: 'Choose and explain with the word "energy".', items: [['Ride a sled down a tall hill or a short hill?', 'Tall hill: more potential energy becomes more speed.'], ['Where is a swing moving fastest?', 'At the bottom.'], ['Why does a ball bounce lower each time?', 'Some energy turns into heat and sound.']] },
+  steps: [
+    { tag: 'explore', title: 'First ride', goal: { text: 'Drag the skater up the ramp and let go (or press a Drop button).', check: { released: true } },
+      q: { type: 'mc', q: 'Watch the bar graph. Where is the skater\'s kinetic energy greatest?', choices: ['At the bottom of the ramp', 'At the top', 'It is the same everywhere'], answer: 0 } },
+    { tag: 'observe', title: 'Energy swap', sheet: 1, q: { type: 'mc', q: 'As the skater goes UP the other side, what happens?', choices: ['KE changes back into PE and the skater slows down', 'PE and KE both grow', 'Energy disappears'], answer: 0 } },
+    { tag: 'predict', title: 'Predict', sheet: 2, q: { type: 'predict', q: 'If you drop the skater from twice as high, the top speed will...', choices: ['double', 'increase, but less than double', 'stay the same'] } },
+    { tag: 'record', title: 'Height vs speed', sheet: 2, text: 'Friction OFF, 50 kg, U-ramp. Use the Drop buttons.',
+      q: { type: 'table', q: 'Record the top speed for each drop height.', rowHead: 'Drop height', cols: [{ label: 'Top speed', unit: 'm/s', value: function (s, r) { return Math.round(Math.sqrt(2 * 9.8 * r.h) * 10) / 10; }, tol: 0.25 }],
+        rows: [{ label: '2 m', h: 2, when: function (s) { return s.startH === 2 && s.released; } }, { label: '4 m', h: 4, when: function (s) { return s.startH === 4 && s.released; } }, { label: '8 m', h: 8, when: function (s) { return s.startH === 8 && s.released; } }], hint: 'Read "Top speed" after the skater passes the bottom.' } },
+    { tag: 'reason', title: 'Find the pattern', sheet: 3, q: { type: 'mc', q: 'You predicted: {{pred:s2}}. Going from 2 m to 8 m (4 times higher), the speed...', choices: ['doubled (about 6 → 12.5 m/s)', 'became 4 times faster', 'stayed the same'], answer: 0, why: 'Kinetic energy grows with speed × speed. 4× the energy only needs 2× the speed.' } },
+    { tag: 'test', title: 'Heavier skater', sheet: 4, goal: { text: 'Drop the **100 kg** skater from 4 m (friction off).', check: { mass: 100, startH: 4, released: true } },
+      q: { type: 'mc', q: 'The heavier skater had twice the energy. What about the speed?', choices: ['The same speed: more mass means more energy, but the same speed', 'Twice as fast', 'Half as fast'], answer: 0 } },
+    { tag: 'test', title: 'Turn on friction', sheet: 5, goal: { text: 'Turn on **Friction** and drop the skater from 6 m. Watch until the skater stops.', check: { friction: true, stopped: true } },
+      q: { type: 'mc', q: 'With friction, where did the skater\'s energy go?', choices: ['It became thermal energy (heat) in the wheels and ramp', 'It was destroyed', 'It turned back into height'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: total energy', sheet: 6, q: { type: 'num', q: 'A skater has 2,000 J of PE at the top. Halfway down, she has 800 J of PE and 150 J of thermal energy. How much KE does she have?', unit: 'J', answer: 1050, work: true } },
+    { tag: 'write', title: 'Ramp report (CER)', sheet: 7, q: { type: 'write', q: 'How do PE and KE change as a skater rides the ramp?', parts: [
+      { label: 'Claim', starter: 'As the skater goes down,', min: 8, need: [{ words: ['potential', 'pe'], label: 'Names potential energy' }, { words: ['kinetic', 'ke'], label: 'Names kinetic energy' }] },
+      { label: 'Evidence', starter: 'When I dropped the skater from', min: 12, number: true, need: [{ words: ['m/s', 'speed'], label: 'Uses speed data' }] },
+      { label: 'Reasoning', starter: 'This shows that energy', min: 12, need: [{ words: ['change', 'transform', 'convert'], label: 'Explains energy changing form' }, { words: ['friction', 'thermal', 'heat'], label: 'Explains friction' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-ramp-energy', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.3',
+  title: 'Ramp & Cup Collisions', model: 'rampKE', minutes: 20, icon: '🎳',
+  place: 'Sunnyside Science Lab · Collision Track',
+  mission: 'A bowling alley designer asks: does a heavier ball or a faster ball knock pins harder? Roll balls of different masses down ramps of different heights into a cup and measure how far the cup slides.',
+  question: 'How do mass and speed affect kinetic energy?',
+  takeaway: 'Kinetic energy depends on both mass and speed. Doubling the mass doubles the kinetic energy. A higher ramp gives more speed, and speed has a bigger effect because KE depends on speed × speed.',
+  vocab: [['Kinetic energy', 'The energy of a moving object: KE = ½ × mass × speed².'], ['Mass', 'How much matter an object has.'], ['Independent variable', 'The one thing you change on purpose.'], ['Dependent variable', 'The thing you measure (cup distance).']],
+  warmup: { style: 'Rank it', prompt: 'Rank from least to most damage in a crash. Explain.', items: [['A bike at 5 mph, a truck at 5 mph, a truck at 30 mph', 'Bike 5, truck 5, truck 30.'], ['Why do trucks need longer to stop than cars?', 'More mass means more kinetic energy.'], ['A softball and a baseball are thrown at the same speed. Which hits harder?', 'The heavier one (more mass).']] },
+  steps: [
+    { tag: 'explore', title: 'First roll', goal: { text: 'Release a 1 kg ball from the 1 m ramp.', check: { d_1_1: { gte: 1 } } }, q: { type: 'num', q: 'How far did the cup move?', unit: 'cm', answer: function (s) { return s.d_1_1; }, tol: 1 } },
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'If you double the ball\'s mass (2 kg), the cup will move...', choices: ['about twice as far', 'about four times as far', 'the same distance'] } },
+    { tag: 'record', title: 'Mass trials', sheet: 1, text: 'Keep the ramp at 1 m.', q: { type: 'table', q: 'Record the cup distance.', rowHead: 'Ball mass', cols: [{ label: 'Cup moved', unit: 'cm', value: function (s, r) { return s['d_1_' + r.m]; }, tol: 1 }], rows: [{ label: '1 kg', m: 1, when: function (s) { return s.d_1_1 != null; } }, { label: '2 kg', m: 2, when: function (s) { return s.d_1_2 != null; } }, { label: '4 kg', m: 4, when: function (s) { return s.d_1_4 != null; } }] } },
+    { tag: 'reason', title: 'Mass pattern', sheet: 2, q: { type: 'mc', q: 'You predicted: {{pred:s1}}. What happens to KE when mass doubles?', choices: ['KE doubles', 'KE stays the same', 'KE is cut in half'], answer: 0 } },
+    { tag: 'record', title: 'Height trials', sheet: 3, text: 'Keep the ball at 1 kg.', q: { type: 'table', q: 'Record the cup distance.', rowHead: 'Ramp height', cols: [{ label: 'Speed', unit: 'm/s', value: function (s, r) { return Math.round(Math.sqrt(14 * r.h) * 10) / 10; }, tol: 0.15 }, { label: 'Cup moved', unit: 'cm', value: function (s, r) { return s['d_' + r.h + '_1']; }, tol: 1 }], rows: [{ label: '0.5 m', h: 0.5, when: function (s) { return s.d_0_5_1 != null || s['d_0.5_1'] != null; } }, { label: '2 m', h: 2, when: function (s) { return s.d_2_1 != null; } }] } },
+    { tag: 'reason', title: 'Speed matters', sheet: 4, q: { type: 'mc', q: 'Which change gave the ball more kinetic energy?', choices: ['Both doubling the mass and a higher ramp increased KE; a 4× higher ramp gave 4× the KE with only 2× the speed', 'Only mass matters', 'Only height matters'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: calculate KE', sheet: 5, q: { type: 'num', q: 'KE = ½ × m × v². What is the KE of a 2 kg ball moving 3 m/s?', unit: 'J', answer: 9, work: true } },
+    { tag: 'write', title: 'Advice for the bowling alley (CER)', sheet: 6, q: { type: 'write', q: 'How do mass and speed affect kinetic energy?', parts: [
+      { label: 'Claim', starter: 'Kinetic energy increases when', min: 8, need: [{ words: ['mass', 'heavier'], label: 'Names mass' }, { words: ['speed', 'faster', 'height'], label: 'Names speed' }] },
+      { label: 'Evidence', starter: 'When the mass doubled, the cup', min: 12, number: true, need: [{ words: ['cm'], label: 'Uses distance data' }] },
+      { label: 'Reasoning', starter: 'The cup moved farther because', min: 10, need: [{ words: ['energy'], label: 'Connects distance to energy' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-coaster', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.3',
+  title: 'Coaster Designer', model: 'coaster', minutes: 20, icon: '🎢',
+  place: 'Sunnyside Amusement Park · Design Office',
+  mission: 'The park wants a coaster with three hills and no motor after the first hill. Design hill heights so the car makes it all the way, with and without friction.',
+  question: 'How does energy decide whether a coaster can make it over a hill?',
+  takeaway: 'A coaster car\'s total energy comes from the height of the first hill. It can only climb a hill if it has enough energy to reach that height. Friction turns some energy into heat, so later hills must be lower than the first one by a safe margin.',
+  vocab: [['Potential energy', 'Stored energy from height.'], ['Kinetic energy', 'Energy of motion.'], ['Friction', 'A force that turns motion energy into heat.'], ['Design constraint', 'A rule your design must follow.']],
+  warmup: { style: 'Real-world riddle', prompt: 'Answer with energy words.', items: [['Why is the first hill of a coaster always the tallest?', 'It gives the car all its energy.'], ['Could a coaster car climb a hill taller than where it started (no motor)?', 'No: it doesn\'t have enough energy.'], ['Where does the car go fastest?', 'At the lowest point.']] },
+  steps: [
+    { tag: 'explore', title: 'Test the starting design', goal: { text: 'Launch the car with no friction.', check: { launched: true, fric: 0 } }, q: { type: 'mc', q: 'Did the car make it over hills 2 and 3?', choices: ['Yes, both are lower than the start hill', 'No'], answer: 0 } },
+    { tag: 'test', title: 'Break the rule', sheet: 1, goal: { text: 'Make hill 2 TALLER than the start hill and launch.', check: function (s) { var h = (s.hills || '').split('/').map(Number); return s.launched && h[1] > h[0] && s.madeIt === false; } },
+      q: { type: 'mc', q: 'What happened, and why?', choices: ['The car rolled back: it didn\'t have enough energy to climb higher than the start', 'It went faster', 'It flew off the track'], answer: 0 } },
+    { tag: 'test', title: 'Add friction', sheet: 2, goal: { text: 'Set hills to 30, 30, 20 with **Some friction** and launch.', check: function (s) { return s.hills === '30/30/20' && s.fric > 0 && s.madeIt === false; } },
+      q: { type: 'mc', q: 'Hill 2 was the same height as the start, but the car still didn\'t make it. Why?', choices: ['Friction turned some energy into heat, so it had less than it started with', 'The car got heavier', 'Hill 2 moved'], answer: 0 } },
+    { tag: 'test', title: 'Design a winner', sheet: 3, goal: { text: 'With **Some friction**, design hills so the car makes it all the way.', check: function (s) { return s.madeIt === true && s.fric > 0; } },
+      q: { type: 'text', q: 'Describe your winning design (the three heights) and why it works.', number: true, need: [{ words: ['lower', 'shorter', 'less', 'smaller'], label: 'Later hills are lower' }, { words: ['energy', 'friction'], label: 'Explains with energy or friction' }] } },
+    { tag: 'reason', title: 'Rank the designs', sheet: 4, q: { type: 'sort', q: 'With friction, sort each design (start / hill 2 / hill 3).', bins: ['Makes it', 'Rolls back'], items: [['40 / 30 / 20', 0], ['30 / 35 / 20', 1], ['35 / 30 / 25', 0], ['25 / 25 / 25', 1], ['40 / 20 / 38', 1]] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: energy math', sheet: 5, q: { type: 'num', q: 'A 500 kg car starts at 40 m (PE = m × 9.8 × h). What is its PE at the top in joules?', unit: 'J', answer: 196000, work: true } },
+    { tag: 'write', title: 'Design memo (CER)', sheet: 6, q: { type: 'write', q: 'What rule should the park follow when designing hills?', parts: [
+      { label: 'Claim', starter: 'Each hill must be', min: 6, need: [{ words: ['lower', 'shorter', 'less', 'smaller'], label: 'States the design rule' }] },
+      { label: 'Evidence', starter: 'When I tested', min: 12, number: true, need: [{ words: ['rolled back', 'made it', 'm'], label: 'Uses test results' }] },
+      { label: 'Reasoning', starter: 'This is because', min: 12, need: [{ words: ['potential', 'energy'], label: 'Explains using energy' }, { words: ['friction', 'heat', 'thermal'], label: 'Accounts for friction' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-spoon-conduction', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.4',
+  title: 'Spoon Conduction Test', model: 'conduction', minutes: 20, icon: '🥄',
+  place: 'Sunnyside Café · Kitchen Lab',
+  mission: 'The café needs new stirring spoons that won\'t burn hands. Put metal, wooden, and plastic spoons in hot cocoa, track the handle temperatures, and watch the butter pats.',
+  question: 'Why do some materials conduct thermal energy better than others?',
+  takeaway: 'Conduction is heat transfer by direct contact: fast-moving particles bump neighbors and pass energy along. Metals are good conductors, so a metal handle heats up quickly. Wood and plastic are insulators; energy moves through them slowly.',
+  vocab: [['Conduction', 'Heat transfer by direct contact between particles.'], ['Conductor', 'A material that transfers heat well (metals).'], ['Insulator', 'A material that transfers heat poorly (wood, plastic, foam).'], ['Thermal equilibrium', 'When touching objects reach the same temperature.']],
+  warmup: { style: 'Notice & wonder', prompt: 'Think about your kitchen.', items: [['Why do pots have plastic or wooden handles?', 'Those materials are insulators; they don\'t get hot quickly.'], ['A metal bench feels colder than a wood bench on the same day. Why?', 'Metal conducts heat away from your hand faster.'], ['What do you wonder about hot and cold?', 'Any real question.']] },
+  steps: [
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'Which spoon\'s butter will melt first?', choices: ['Metal', 'Wooden', 'Plastic'] } },
+    { tag: 'test', title: 'Run the test', sheet: 1, goal: { text: 'Put the spoons in the cocoa and run for 10 minutes.', check: { time: { gte: 10 } } },
+      q: { type: 'table', q: 'Record the handle temperatures at 5 minutes (read the graph).', rowHead: 'Spoon', cols: [{ label: 'At 5 min', unit: '°C', value: function (s, r) { return s['t5_' + r.k]; }, tol: 1.1 }], rows: [{ label: 'Metal', k: 'metal' }, { label: 'Wooden', k: 'wood' }, { label: 'Plastic', k: 'plastic' }] } },
+    { tag: 'reason', title: 'Conductor or insulator?', sheet: 2, q: { type: 'sort', q: 'Sort the materials.', bins: ['Conductor', 'Insulator'], items: [['Metal spoon', 0], ['Wooden spoon', 1], ['Plastic spoon', 1], ['Copper pot bottom', 0], ['Foam cup', 1], ['Oven mitt', 1]] } },
+    { tag: 'explain', title: 'Particle explanation', sheet: 3, q: { type: 'mc', q: 'How did thermal energy travel up the metal spoon?', choices: ['Fast particles in the cocoa bumped spoon particles, which bumped their neighbors up the handle', 'Hot air blew up the spoon', 'The cocoa climbed the spoon'], answer: 0 } },
+    { tag: 'reason', title: 'Equilibrium', sheet: 3, q: { type: 'mc', q: 'If you waited a very long time, what would happen to the cocoa and the metal spoon?', choices: ['They would reach the same temperature, then cool to room temperature', 'The spoon would get hotter than the cocoa', 'Nothing would change'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: best spoon', sheet: 4, q: { type: 'mc', q: 'The café wants a spoon that stirs well AND is safe to hold. What design is best?', choices: ['Metal bowl with a wooden or plastic handle', 'All metal', 'All foam'], answer: 0 } },
+    { tag: 'write', title: 'Recommendation (CER)', sheet: 5, q: { type: 'write', q: 'Which spoon should the café buy, and why?', parts: [
+      { label: 'Claim', starter: 'The café should buy', min: 6, need: [{ words: ['wood', 'plastic'], label: 'Recommends an insulator' }] },
+      { label: 'Evidence', starter: 'After 5 minutes, the metal handle was', min: 12, number: true, need: [{ words: ['°c', 'degrees', 'c'], label: 'Uses temperature data' }] },
+      { label: 'Reasoning', starter: 'This is because', min: 10, need: [{ words: ['conduct', 'insulat'], label: 'Uses conductor/insulator' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-cocoa-cups', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.4',
+  title: 'Keep It Hot: Cup Test', model: 'cooling', minutes: 20, icon: '☕',
+  place: 'Sunnyside Café · Taste Test Table',
+  mission: 'Customers complain their cocoa gets cold too fast. Test four cups side by side, with and without lids, and pick the cup that keeps cocoa hot the longest.',
+  question: 'Which materials slow thermal energy transfer, and why?',
+  takeaway: 'Thermal energy always moves from hotter to colder objects. Insulators like foam slow conduction, so cocoa stays hot longer. A lid also slows convection and evaporation from the top. Metal cups lose heat fastest because metal is a good conductor.',
+  vocab: [['Insulator', 'A material that slows heat transfer.'], ['Convection', 'Heat transfer by moving liquid or gas (warm rises, cool sinks).'], ['Rate', 'How fast something changes.'], ['Room temperature', 'About 20 °C; things cool toward it.']],
+  warmup: { style: 'Estimation station', prompt: 'Estimate, then explain.', items: [['Hot cocoa starts at 80 °C. What temperature will it reach if left for a whole day?', 'Room temperature, about 20 °C.'], ['Does a thermos keep things hot or cold?', 'Both: it slows heat transfer in either direction.'], ['Why do we put lids on pots?', 'To keep heat and steam from escaping.']] },
+  steps: [
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'Which cup will keep cocoa hottest after 20 minutes?', choices: ['Foam cup', 'Ceramic mug', 'Glass cup', 'Metal cup'] } },
+    { tag: 'test', title: 'Race the cups', sheet: 1, goal: { text: 'Run the test WITHOUT lids for 30 minutes.', check: { time: { gte: 30 }, lid: false } },
+      q: { type: 'table', q: 'Record the temperatures at 20 minutes (no lids).', rowHead: 'Cup', cols: [{ label: 'At 20 min', unit: '°C', value: function (s, r) { return s['t20_' + r.k]; }, tol: 1.1 }], rows: [{ label: 'Foam', k: 'foam' }, { label: 'Ceramic', k: 'ceramic' }, { label: 'Metal', k: 'metal' }] } },
+    { tag: 'reason', title: 'Read the graph', sheet: 2, q: { type: 'mc', q: 'All four lines curve and level off. Why do they level off?', choices: ['They approach room temperature, so heat transfer slows', 'The cups run out of cocoa', 'The thermometer breaks'], answer: 0 } },
+    { tag: 'test', title: 'Add lids', sheet: 3, goal: { text: 'Reset, turn ON lids, and run 30 minutes.', check: { time: { gte: 30 }, lid: true } },
+      q: { type: 'num', q: 'What was the foam cup\'s temperature at 20 minutes WITH a lid?', unit: '°C', answer: function (s) { return s.t20_foam_lid; }, tol: 1.1 } },
+    { tag: 'reason', title: 'Why lids help', sheet: 3, q: { type: 'mc', q: 'Why did lids keep every cup hotter?', choices: ['They stop warm air and steam from rising away (convection/evaporation)', 'Lids make the cocoa heavier', 'Lids add heat'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: iced drinks', sheet: 4, q: { type: 'mc', q: 'For an ICED drink, which cup keeps it cold longest, and why?', choices: ['Foam: insulators slow heat from the warm room getting IN', 'Metal: it is cold to touch', 'It doesn\'t matter for cold drinks'], answer: 0 } },
+    { tag: 'write', title: 'Café recommendation (CER)', sheet: 5, q: { type: 'write', q: 'Which cup should the café use?', parts: [
+      { label: 'Claim', starter: 'The café should use', min: 6, need: [{ words: ['foam'], label: 'Names the best cup' }] },
+      { label: 'Evidence', starter: 'After 20 minutes,', min: 12, number: true, need: [{ words: ['°c', 'degrees', 'c'], label: 'Uses temperature data' }, { words: ['lid'], label: 'Uses the lid data' }] },
+      { label: 'Reasoning', starter: 'Foam works because', min: 10, need: [{ words: ['insulat', 'slow'], label: 'Explains insulation' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-heat-stations', std: 'g6-sci-energy', subject: 'science', grade: 6, code: '6.PS.4',
+  title: 'Three Ways Heat Moves', model: 'heatWays', minutes: 25, icon: '🔥',
+  place: 'Sunnyside Science Lab · Heat Stations',
+  mission: 'Visit three lab stations (a frying pan, a pot of water, and a heat lamp) and discover the three ways thermal energy moves: conduction, convection, and radiation.',
+  question: 'How does thermal energy move by conduction, convection, and radiation?',
+  takeaway: 'Conduction moves heat through direct contact (pan to handle). Convection moves heat as warm liquid or gas rises and cool sinks, making currents (water in a pot). Radiation moves heat as waves through space or air, with no contact needed (heat lamp, the Sun); dark surfaces absorb more.',
+  vocab: [['Conduction', 'Heat moving through touching particles.'], ['Convection', 'Heat moving through currents in liquids and gases.'], ['Radiation', 'Heat moving as waves (infrared light) through space.'], ['Absorb', 'Take in energy.']],
+  warmup: { style: 'Quick sort', prompt: 'Which kind of heat transfer? Guess and explain.', items: [['Feeling warm standing in sunshine', 'Radiation.'], ['A metal slide burning your legs in summer', 'Conduction.'], ['Warm air rising from a heater vent', 'Convection.']] },
+  steps: [
+    { tag: 'test', title: 'Station 1: frying pan', sheet: 1, goal: { text: 'Turn on the burner at the frying pan until the metal handle gets hot (above 60 °C).', check: { hotHandle: true } },
+      q: { type: 'mc', q: 'The handle never touched the flame. How did it get hot?', choices: ['Conduction: particles passed energy along the metal', 'Radiation from the flame only', 'Convection currents in the metal'], answer: 0 } },
+    { tag: 'test', title: 'Station 2: pot of water', sheet: 2, goal: { text: 'Go to the pot and turn on the burner. Watch the colored particles.', check: { sawCurrents: true } },
+      q: { type: 'mc', q: 'What pattern did the warm (orange) and cool (blue) water make?', choices: ['A current: warm water rises, cool water sinks', 'All the water stayed still', 'Warm water sank to the bottom'], answer: 0 } },
+    { tag: 'test', title: 'Station 3: heat lamp', sheet: 3, goal: { text: 'Turn on the heat lamp until the black can passes 40 °C.', check: { blackHot: true } },
+      q: { type: 'table', q: 'Record both cans.', rowHead: 'Can', cols: [{ label: 'Temperature', unit: '°C', value: function (s, r) { return s[r.k]; }, tol: 1.1 }], rows: [{ label: 'Black can', k: 'black' }, { label: 'White can', k: 'white' }] } },
+    { tag: 'reason', title: 'No contact needed', sheet: 3, q: { type: 'mc', q: 'The lamp never touched the cans and there was no current of air. How did energy reach them?', choices: ['Radiation: waves travel through the air', 'Conduction through the table', 'Convection from the cans'], answer: 0 } },
+    { tag: 'reason', title: 'Sort real examples', sheet: 4, q: { type: 'sort', q: 'Sort each example.', bins: ['Conduction', 'Convection', 'Radiation'], items: [['Ironing a shirt', 0], ['Hot air balloon rising', 1], ['Sunburn', 2], ['Ice melting in your hand', 0], ['Sea breeze', 1], ['Warmth from a campfire across the circle', 2]] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: all three', sheet: 5, q: { type: 'text', q: 'A pot of soup on a campfire. Describe where conduction, convection, AND radiation happen.', min: 18, need: [{ words: ['conduct'], label: 'Conduction example' }, { words: ['convect'], label: 'Convection example' }, { words: ['radiat'], label: 'Radiation example' }] } },
+    { tag: 'write', title: 'Station summary (CER)', sheet: 6, q: { type: 'write', q: 'Why did the black can heat up more than the white can?', parts: [
+      { label: 'Claim', starter: 'The black can heated more because', min: 6, need: [{ words: ['absorb', 'dark', 'black'], label: 'Dark colors absorb more' }] },
+      { label: 'Evidence', starter: 'Under the lamp, the black can reached', min: 10, number: true, need: [{ words: ['white'], label: 'Compares with the white can' }] },
+      { label: 'Reasoning', starter: 'Radiation', min: 10, need: [{ words: ['wave', 'radiat'], label: 'Explains radiation' }, { words: ['reflect', 'absorb'], label: 'Explains absorb vs reflect' }] }] } }
+  ]
+});
+
+/* ======================= 6.ESS: Gravity and the Earth–Sun–Moon system ======================= */
+SUNNY_SIMS.push({
+  id: 'g6-sci-moon-calendar', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.1',
+  title: 'Lunar Calendar Lab', model: 'moonPhase', minutes: 20, icon: '🌔',
+  place: 'Sunnyside Observatory · Calendar Room',
+  mission: 'Ancient calendars were based on the Moon. Use the Earth–Moon model to predict phases, explain the cycle with the Sun–Earth–Moon positions, and plan a night-sky viewing party for the darkest skies.',
+  question: 'How does the relative position of the Sun, Earth, and Moon cause lunar phases?',
+  takeaway: 'Half the Moon is always lit by the Sun. As the Moon orbits Earth every 29.5 days, the angle between the Sun, Earth, and Moon changes, so we see more or less of the lit half. At new moon the Moon is between Earth and the Sun; at full moon Earth is between.',
+  vocab: [['Lunar cycle', 'One full set of phases, about 29.5 days.'], ['Waxing / waning', 'The lit part we see growing / shrinking.'], ['Gibbous', 'More than half lit.'], ['Model', 'A representation that helps explain how something works.']],
+  warmup: { style: 'Predict the picture', prompt: 'Sketch what the Moon looks like, then answer.', items: [['Draw a first quarter moon. Which side is lit (for us in Indiana)?', 'The right half.'], ['Last night was a full moon. About how many days until the next new moon?', 'About 15 days.'], ['Is the far side of the Moon always dark?', 'No: it is lit during a new moon.']] },
+  steps: [
+    { tag: 'explore', title: 'Set up the model', goal: { text: 'Drag the Moon to a **First quarter** position.', check: { phaseIdx: 2 } },
+      q: { type: 'mc', q: 'At first quarter, what angle do the Sun, Earth, and Moon make?', choices: ['A right angle (90°)', 'A straight line', 'The Moon is behind the Sun'], answer: 0 } },
+    { tag: 'test', title: 'Line them up', sheet: 1, goal: { text: 'Show a **Full moon**.', check: { phaseIdx: 4 } },
+      q: { type: 'mc', q: 'At full moon, what is the order in a line?', choices: ['Sun – Earth – Moon', 'Sun – Moon – Earth', 'Earth – Sun – Moon'], answer: 0 } },
+    { tag: 'record', title: 'Phase calendar', sheet: 2, q: { type: 'table', q: 'Starting from new moon (day 0), record the phase.', rowHead: 'Day', cols: [{ label: 'Phase', value: function (s) { return s.phase; } }],
+      rows: [{ label: 'Day 4', when: { phaseIdx: 1 } }, { label: 'Day 11', when: { phaseIdx: 3 } }, { label: 'Day 18', when: { phaseIdx: 5 } }, { label: 'Day 26', when: { phaseIdx: 7 } }], tip: 'Use +1 day from the new moon. Type the phase name.' } },
+    { tag: 'reason', title: 'Always half lit', sheet: 3, q: { type: 'mc', q: 'At a waning crescent, how much of the WHOLE Moon is lit by the Sun?', choices: ['Half, as always', 'A small sliver', 'None'], answer: 0, why: 'The Sun always lights half the Moon. We just see only a sliver of that lit half from Earth.' } },
+    { tag: 'apply', title: 'Plan the viewing party', sheet: 4, q: { type: 'mc', q: 'For the darkest sky to see faint stars, which phase should the party be during?', choices: ['New moon', 'Full moon', 'First quarter'], answer: 0 } },
+    { tag: 'apply', title: 'Count the days', sheet: 4, q: { type: 'num', q: 'A full moon is on March 7. About what date is the next full moon? (Type the day in April.)', unit: 'April', answer: [5, 6], tol: 0.5, work: true } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: why not every month?', sheet: 5, q: { type: 'mc', q: 'The Moon passes between Earth and the Sun every month. Why don\'t we get a solar eclipse every month?', choices: ['The Moon\'s orbit is tilted, so it usually passes above or below the Sun', 'The Sun is too big', 'Clouds block it'], answer: 0 } },
+    { tag: 'write', title: 'Explain the cycle (CER)', sheet: 6, q: { type: 'write', q: 'How do the positions of the Sun, Earth, and Moon cause phases?', parts: [
+      { label: 'Claim', starter: 'Phases happen because', min: 8, need: [{ words: ['position', 'orbit', 'angle', 'moves'], label: 'Names changing positions' }] },
+      { label: 'Evidence', starter: 'In the model, at full moon', min: 12, need: [{ words: ['full', 'new'], label: 'Uses full or new moon positions' }] },
+      { label: 'Reasoning', starter: 'The Sun always lights', min: 10, need: [{ words: ['half'], label: 'Half is always lit' }, { words: ['see', 'from earth', 'view'], label: 'We see different amounts' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-eclipse-lab', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.1',
+  title: 'Eclipse Predictor', model: 'eclipseLab', minutes: 25, icon: '🌑',
+  place: 'Sunnyside Observatory · Eclipse Desk',
+  mission: 'Indiana saw a total solar eclipse in April 2024, and people traveled from all over to see it. Use the Sun–Earth–Moon model to discover when eclipses happen and why they are so rare.',
+  question: 'What has to line up for a solar or lunar eclipse to happen?',
+  takeaway: 'A solar eclipse happens at new moon when the Moon passes directly between the Sun and Earth, casting its shadow on Earth. A lunar eclipse happens at full moon when Earth\'s shadow falls on the Moon. Because the Moon\'s orbit is tilted about 5°, the three usually don\'t line up exactly, so eclipses are rare.',
+  vocab: [['Solar eclipse', 'The Moon blocks the Sun (only at new moon).'], ['Lunar eclipse', 'Earth\'s shadow covers the Moon (only at full moon).'], ['Tilt', 'The Moon\'s orbit is tipped about 5° compared to Earth\'s orbit.'], ['Umbra', 'The darkest part of a shadow.']],
+  warmup: { style: 'Two truths and a lie', prompt: 'Find the lie and fix it.', items: [['A. Solar eclipses happen at new moon. B. Lunar eclipses happen at full moon. C. Eclipses happen every month.', 'C: the tilted orbit makes them rare.'], ['A. It is safe to look at a solar eclipse without special glasses. B. A lunar eclipse can look red. C. Earth\'s shadow causes lunar eclipses.', 'A is false and dangerous: always use eclipse glasses.'], ['A. The Moon is much smaller than the Sun. B. The Moon can block the Sun because it is much closer. C. The Moon makes its own light.', 'C: it reflects sunlight.']] },
+  steps: [
+    { tag: 'explore', title: 'Two views', goal: { text: 'Drag the Moon between Earth and the Sun (new moon).', check: function (s) { return s.phase === 'New moon'; } },
+      q: { type: 'mc', q: 'Was there an eclipse? Look at the side view.', choices: ['It depends: the Moon may pass above or below the Sun', 'Always yes at new moon', 'Never'], answer: 0 } },
+    { tag: 'test', title: 'Find a solar eclipse', sheet: 1, goal: { text: 'Change the time of year and Moon position until you make a **solar eclipse**.', check: { sawSolar: true } },
+      q: { type: 'multi', q: 'What had to be true for the solar eclipse? Choose all.', choices: ['New moon phase', 'The Moon was in line (not above or below)', 'Full moon phase', 'Earth was between the Sun and Moon'], answer: [0, 1] } },
+    { tag: 'test', title: 'Find a lunar eclipse', sheet: 2, goal: { text: 'Make a **lunar eclipse**.', check: { sawLunar: true } },
+      q: { type: 'mc', q: 'During the lunar eclipse, what was blocking sunlight from reaching the Moon?', choices: ['Earth', 'The Moon itself', 'The Sun'], answer: 0 } },
+    { tag: 'test', title: 'A near miss', sheet: 3, goal: { text: 'Find a new or full moon with NO eclipse.', check: { sawMiss: true } },
+      q: { type: 'mc', q: 'Why was there no eclipse this time?', choices: ['The Moon was above or below the Sun–Earth line because of its tilted orbit', 'The Moon was too far away', 'It was cloudy'], answer: 0 } },
+    { tag: 'test', title: 'Remove the tilt', sheet: 4, goal: { text: 'Turn OFF the tilt and check a new moon.', check: { tilt: false, sawSolar: true } },
+      q: { type: 'mc', q: 'If the Moon\'s orbit were NOT tilted, how often would solar eclipses happen?', choices: ['Every new moon (every month)', 'Never', 'Once every 100 years'], answer: 0 } },
+    { tag: 'reason', title: 'Sort eclipse facts', sheet: 5, q: { type: 'sort', q: 'Sort each fact.', bins: ['Solar eclipse', 'Lunar eclipse'], items: [['Happens at new moon', 0], ['Happens at full moon', 1], ['Moon\'s shadow falls on Earth', 0], ['Earth\'s shadow falls on the Moon', 1], ['Needs eclipse glasses to view', 0], ['Moon can look red', 1]] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: who can see it?', sheet: 6, q: { type: 'mc', q: 'Why can everyone on the night side of Earth see a lunar eclipse, but only a narrow path sees a total solar eclipse?', choices: ['Earth\'s shadow covers the whole Moon, but the Moon\'s small shadow only touches a small part of Earth', 'Lunar eclipses last longer', 'Solar eclipses happen at night'], answer: 0 } },
+    { tag: 'write', title: 'Explain the rarity (CER)', sheet: 7, q: { type: 'write', q: 'Why don\'t eclipses happen every month?', parts: [
+      { label: 'Claim', starter: 'Eclipses are rare because', min: 6, need: [{ words: ['tilt', 'tipped', '5'], label: 'Names the tilted orbit' }] },
+      { label: 'Evidence', starter: 'In the model,', min: 12, need: [{ words: ['above', 'below', 'miss'], label: 'Uses the near-miss evidence' }, { words: ['new', 'full'], label: 'Names the phases' }] },
+      { label: 'Reasoning', starter: 'An eclipse only happens when', min: 10, need: [{ words: ['line', 'aligned', 'lined up'], label: 'Explains alignment' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-seasons', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.1',
+  title: 'Reason for the Seasons', model: 'seasonsTilt', minutes: 25, icon: '🍂',
+  place: 'Sunnyside Weather Station',
+  mission: 'Many adults think summer happens because Earth is closer to the Sun. The weather station wants you to test that idea. Move Earth around its orbit, turn the tilt on and off, and collect sunlight evidence for Indiana and Australia.',
+  question: 'What causes Earth\'s seasons?',
+  takeaway: 'Seasons are caused by Earth\'s 23.5° tilt, not its distance from the Sun. When Indiana tilts toward the Sun (June), sunlight hits more directly (concentrated) and days are longer, so it is warmer. At the same time, Australia tilts away and has winter. With no tilt, there would be no seasons.',
+  vocab: [['Axis tilt', 'Earth\'s axis leans 23.5°.'], ['Direct sunlight', 'Light hitting at a high angle, concentrated on a small area.'], ['Hemisphere', 'Half of Earth (northern or southern).'], ['Solstice', 'The longest or shortest day of the year.']],
+  warmup: { style: 'Fix the mistake', prompt: 'Each idea is a common mistake. Correct it.', items: [['"It is summer because Earth is closest to the Sun."', 'Earth is actually closest in January. Tilt causes seasons.'], ['"Everyone on Earth has summer in July."', 'Australia has winter in July.'], ['"The Sun is always straight overhead at noon."', 'In Indiana it never is; the angle changes by season.']] },
+  steps: [
+    { tag: 'explore', title: 'June in Indiana', goal: { text: 'Set the month to **June**.', check: { month: 5, tilt: 23.5 } },
+      q: { type: 'num', q: 'How high is the noon Sun in Indiana in June?', unit: '°', answer: function (s) { return s.alt; }, tol: 1 } },
+    { tag: 'record', title: 'Seasons data', sheet: 1, q: { type: 'table', q: 'Record Indiana\'s data (real tilt).', rowHead: 'Month', cols: [{ label: 'Sun height', unit: '°', value: function (s) { return s.alt; }, tol: 1 }, { label: 'Daylight', unit: 'h', value: function (s) { return s.day; }, tol: 0.15 }],
+      rows: [{ label: 'June', when: { month: 5, tilt: 23.5 } }, { label: 'September', when: { month: 8, tilt: 23.5 } }, { label: 'December', when: { month: 11, tilt: 23.5 } }] } },
+    { tag: 'reason', title: 'Spread-out sunlight', sheet: 2, q: { type: 'mc', q: 'Look at the sunlight panel. Why is December sunlight weaker?', choices: ['The low Sun spreads the same light over a bigger area', 'The Sun makes less light in winter', 'Clouds block it'], answer: 0 } },
+    { tag: 'test', title: 'Check Australia', sheet: 3, goal: { text: 'Set the month to **December** and compare Sydney.', check: { month: 11, tilt: 23.5 } },
+      q: { type: 'mc', q: 'In December, the Sun is high in Sydney but low in Indiana. What season is Sydney having?', choices: ['Summer', 'Winter', 'The same as Indiana'], answer: 0, why: 'If seasons came from distance, both places would have the same season at the same time. They don\'t, so distance can\'t be the cause.' } },
+    { tag: 'test', title: 'Remove the tilt', sheet: 4, goal: { text: 'Choose **No tilt** and move through the months.', check: { tilt: 0 } },
+      q: { type: 'mc', q: 'With no tilt, what happens to Indiana\'s Sun height and daylight across the year?', choices: ['They stay the same every month: no seasons', 'Summer gets hotter', 'Winter lasts all year'], answer: 0 } },
+    { tag: 'reason', title: 'Test the myth', sheet: 5, q: { type: 'mc', q: 'Earth is actually closest to the Sun in early January. What does this tell you about the "distance" idea?', choices: ['Distance does not cause seasons; tilt does', 'Winter should be hottest', 'Earth doesn\'t orbit the Sun'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: equator', sheet: 6, q: { type: 'mc', q: 'Why do places near the equator have almost no seasons?', choices: ['The Sun is high all year there, and day length barely changes', 'They are closer to the Sun', 'The equator has no tilt'], answer: 0 } },
+    { tag: 'write', title: 'Correct the myth (CER)', sheet: 7, q: { type: 'write', q: 'What causes Earth\'s seasons?', parts: [
+      { label: 'Claim', starter: 'Seasons are caused by', min: 6, need: [{ words: ['tilt'], label: 'Names the tilt' }], avoid: [['closer to the sun', 'Avoids the "closer to the Sun" myth']] },
+      { label: 'Evidence', starter: 'In June, Indiana\'s noon Sun was', min: 14, number: true, need: [{ words: ['december', 'winter'], label: 'Compares to December' }, { words: ['sydney', 'australia', 'no tilt'], label: 'Uses Australia or the no-tilt test' }] },
+      { label: 'Reasoning', starter: 'When Indiana tilts toward the Sun,', min: 12, need: [{ words: ['direct', 'concentrated', 'high', 'angle'], label: 'Explains direct sunlight' }, { words: ['longer', 'daylight', 'hours'], label: 'Explains day length' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-newtons-cannon', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.2',
+  title: 'Newton\'s Cannon', model: 'orbitCannon', minutes: 20, icon: '🚀',
+  place: 'Sunnyside Space Center · Launch Pad',
+  mission: 'Isaac Newton imagined a cannon on a mountain so tall it poked out of the air. Fire cannonballs at different speeds to discover how gravity keeps the Moon and satellites in orbit.',
+  question: 'How does gravity keep objects in orbit?',
+  takeaway: 'Gravity pulls every object toward Earth\'s center. A slow cannonball falls and hits the ground. Fast enough (about 8 km/s), it falls around the curve of Earth without hitting it: that is an orbit. Even faster (about 11 km/s) it escapes. The Moon orbits Earth, and Earth orbits the Sun, the same way.',
+  vocab: [['Gravity', 'The force that pulls objects with mass toward each other.'], ['Orbit', 'The curved path of an object around another object.'], ['Velocity', 'Speed in a direction.'], ['Escape velocity', 'The speed needed to break free of a planet\'s gravity.']],
+  warmup: { style: 'Would you rather?', prompt: 'Choose and explain.', items: [['Throw a ball gently or as hard as you can: which lands farther away? Why?', 'Harder: more speed carries it farther before gravity brings it down.'], ['If gravity disappeared, what would the Moon do?', 'Fly off in a straight line.'], ['Do astronauts float because there is no gravity in space?', 'No: they are falling around Earth (in orbit).']] },
+  steps: [
+    { tag: 'explore', title: 'Slow shot', goal: { text: 'Fire at **3 km/s**.', check: { outcome: 'crashed', lastSpeed: 3 } }, q: { type: 'mc', q: 'What happened to the cannonball?', choices: ['Gravity pulled it down and it crashed', 'It went into orbit', 'It flew into space'], answer: 0 } },
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'If you fire faster (6 km/s), the ball will...', choices: ['land farther around Earth', 'land in the same place', 'go straight up'] } },
+    { tag: 'record', title: 'Speed trials', sheet: 1, q: { type: 'table', q: 'Fire at each speed and record the result (crashed, orbit, or escaped).', rowHead: 'Speed', cols: [{ label: 'Result', value: function (s, r) { return s['out_' + r.k]; } }],
+      rows: [{ label: '4 km/s', k: '4', when: function (s) { return !!s.out_4; } }, { label: '6 km/s', k: '6', when: function (s) { return !!s.out_6; } }, { label: '8 km/s', k: '8', when: function (s) { return !!s.out_8; } }, { label: '12 km/s', k: '12', when: function (s) { return !!s.out_12; } }] } },
+    { tag: 'reason', title: 'Falling around Earth', sheet: 2, q: { type: 'mc', q: 'At 8 km/s the ball is still being pulled by gravity. Why doesn\'t it hit Earth?', choices: ['It moves sideways so fast that Earth curves away as it falls', 'Gravity turned off', 'It is above the atmosphere so it stops falling'], answer: 0 } },
+    { tag: 'test', title: 'Turn off gravity', sheet: 3, goal: { text: 'Turn **Gravity OFF** and fire at 8 km/s.', check: { gravity: false, lastSpeed: 8 } },
+      q: { type: 'mc', q: 'Without gravity, what path did the ball take?', choices: ['A straight line into space', 'The same orbit', 'It crashed'], answer: 0, why: 'Without a force pulling it inward, an object keeps moving in a straight line. Gravity is what bends the path into an orbit.' } },
+    { tag: 'apply', title: 'Connect to the Moon', sheet: 4, q: { type: 'mc', q: 'How is the Moon like the 8 km/s cannonball?', choices: ['It is always falling toward Earth but moving sideways fast enough to keep missing', 'It is held up by nothing', 'It is pushed by the Sun'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: the Sun\'s pull', sheet: 5, q: { type: 'mc', q: 'Earth orbits the Sun at about 30 km/s. What would happen if Earth suddenly stopped moving sideways?', choices: ['It would fall toward the Sun', 'It would stay still', 'It would fly away'], answer: 0 } },
+    { tag: 'write', title: 'Explain orbits (CER)', sheet: 6, q: { type: 'write', q: 'How does gravity keep objects in orbit?', parts: [
+      { label: 'Claim', starter: 'Gravity keeps objects in orbit by', min: 6, need: [{ words: ['pull', 'toward'], label: 'Gravity pulls toward the center' }] },
+      { label: 'Evidence', starter: 'At 4 km/s the ball', min: 12, number: true, need: [{ words: ['crash'], label: 'Uses a crash result' }, { words: ['orbit'], label: 'Uses the orbit result' }] },
+      { label: 'Reasoning', starter: 'An orbit happens when', min: 12, need: [{ words: ['fast', 'speed', 'sideways'], label: 'Explains sideways speed' }, { words: ['fall', 'falling', 'curve'], label: 'Explains falling around the curve' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-gravity-lab', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.2',
+  title: 'Gravity Strength Lab', model: 'gravityLab', minutes: 20, icon: '🧲',
+  place: 'Sunnyside Space Center · Physics Wing',
+  mission: 'Mission planners need to know how strongly gravity pulls on objects so astronauts can plan moonwalks and Mars landings. Test how mass and distance change the pull, then weigh a student on four worlds.',
+  question: 'How do mass and distance affect the strength of gravity?',
+  takeaway: 'Every object with mass pulls on every other object. More mass means a stronger pull. More distance means a much weaker pull: twice as far is one-fourth the pull. That is why the Sun (huge mass) holds the planets, and why you weigh less on the Moon (less mass).',
+  vocab: [['Gravitational force', 'The pull between two objects with mass.'], ['Mass', 'The amount of matter (kg).'], ['Weight', 'The pull of gravity on you, in newtons (N).'], ['Inverse square', 'Double the distance → one-fourth the force.']],
+  warmup: { style: 'Estimation station', prompt: 'Estimate and explain.', items: [['On the Moon, would you weigh more, less, or the same as on Earth?', 'Less: about 1/6.'], ['Does your MASS change on the Moon?', 'No, only your weight.'], ['Why doesn\'t your pencil pull you toward it?', 'It does, but the pull is tiny because its mass is tiny.']] },
+  steps: [
+    { tag: 'explore', title: 'First measurement', goal: { text: 'Set Mass A = 1, Mass B = 1, Distance = 1.', check: { m1: 1, m2: 1, d: 1 } }, q: { type: 'num', q: 'What is the gravitational pull?', unit: 'units', answer: 25 } },
+    { tag: 'record', title: 'Mass trials', sheet: 1, q: { type: 'table', q: 'Keep distance = 1 and Mass B = 1. Record the pull.', rowHead: 'Mass A', cols: [{ label: 'Pull', unit: 'units', value: function (s, r) { return s['f_' + r.m + '_1_1']; }, tol: 0.02 }], rows: [{ label: '1×', m: 1, when: function (s) { return s.f_1_1_1 != null; } }, { label: '2×', m: 2, when: function (s) { return s.f_2_1_1 != null; } }, { label: '4×', m: 4, when: function (s) { return s.f_4_1_1 != null; } }] } },
+    { tag: 'reason', title: 'Mass pattern', sheet: 2, q: { type: 'mc', q: 'When Mass A doubled, the pull...', choices: ['doubled', 'stayed the same', 'went down'], answer: 0 } },
+    { tag: 'record', title: 'Distance trials', sheet: 3, q: { type: 'table', q: 'Keep both masses at 1. Record the pull.', rowHead: 'Distance', cols: [{ label: 'Pull', unit: 'units', value: function (s, r) { return s['f_1_1_' + r.d]; }, tol: 0.02 }], rows: [{ label: '1', d: 1, when: function (s) { return s.f_1_1_1 != null; } }, { label: '2', d: 2, when: function (s) { return s.f_1_1_2 != null; } }, { label: '4', d: 4, when: function (s) { return s.f_1_1_4 != null; } }] } },
+    { tag: 'reason', title: 'Distance pattern', sheet: 4, q: { type: 'mc', q: 'When the distance doubled (1 → 2), the pull became...', choices: ['one-fourth as strong', 'half as strong', 'twice as strong'], answer: 0 } },
+    { tag: 'test', title: 'Weigh a student', sheet: 5, goal: { text: 'Weigh the 50 kg student on all four worlds.', check: function (s) { return s.w_Moon != null && s.w_Mars != null && s.w_Earth != null && s.w_Jupiter != null; } },
+      q: { type: 'num', q: 'How many times heavier is the student on Earth than on the Moon? (Round to a whole number.)', unit: 'times', answer: 6, tol: 0.5, work: true } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: predict', sheet: 6, q: { type: 'num', q: 'Two objects pull with 24 units. You triple the distance. What is the new pull?', unit: 'units', answer: 2.67, tol: 0.05, work: true, why: '3× the distance → 1/9 the force. 24 ÷ 9 ≈ 2.67.' } },
+    { tag: 'write', title: 'Mission memo (CER)', sheet: 7, q: { type: 'write', q: 'How do mass and distance affect gravity?', parts: [
+      { label: 'Claim', starter: 'Gravity gets stronger when', min: 8, need: [{ words: ['mass', 'more massive'], label: 'Names mass' }, { words: ['closer', 'distance'], label: 'Names distance' }] },
+      { label: 'Evidence', starter: 'When I doubled the distance,', min: 12, number: true, need: [{ words: ['units', 'pull', 'force'], label: 'Uses force data' }] },
+      { label: 'Reasoning', starter: 'This explains why', min: 10, need: [{ words: ['moon', 'sun', 'planet', 'weigh'], label: 'Applies it to space or weight' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g6-sci-tides', std: 'g6-sci-space', subject: 'science', grade: 6, code: '6.ESS.1–6.ESS.2',
+  title: 'Tide Table Lab', model: 'tidesLab', minutes: 20, icon: '🌊',
+  place: 'Sunnyside Beach Town · Harbor Office',
+  mission: 'The harbor master needs a tide table so boats don\'t get stuck. Use the Earth–Moon model to find out why the ocean rises and falls twice a day, and when the biggest tides happen.',
+  question: 'How does the Moon\'s gravity cause tides?',
+  takeaway: 'The Moon\'s gravity pulls on Earth\'s oceans, making two bulges of water: one facing the Moon and one on the opposite side. As Earth rotates through both bulges, a beach gets two high tides and two low tides each day. When the Sun and Moon line up, tides are extra big (spring tides).',
+  vocab: [['Tide', 'The regular rise and fall of sea level.'], ['High tide / low tide', 'The highest / lowest water level.'], ['Spring tide', 'Extra-big tides when the Sun, Earth, and Moon line up.'], ['Neap tide', 'Smaller tides when the Sun and Moon are at a right angle.']],
+  warmup: { style: 'Notice & wonder', prompt: 'Imagine a day at the beach.', items: [['Your sandcastle was dry at 9 AM but underwater at 3 PM. What happened?', 'The tide came in.'], ['Does a lake in Indiana have noticeable tides?', 'No: tides are only big in oceans.'], ['What do you wonder about the Moon and the ocean?', 'Any real question.']] },
+  steps: [
+    { tag: 'explore', title: 'Ocean bulges', goal: { text: 'Drag the Moon to a new spot and watch the ocean.', check: { movedMoon: true } }, q: { type: 'mc', q: 'Where are the ocean bulges?', choices: ['One facing the Moon and one on the opposite side', 'Only facing the Sun', 'All around Earth evenly'], answer: 0 } },
+    { tag: 'test', title: 'Spin for a day', sheet: 1, goal: { text: 'Spin Earth one full day (Sun\'s pull off).', check: { dayDone: true, sunDay: false } }, q: { type: 'num', q: 'How many high tides did the beach town get in one day?', unit: 'high tides', answer: 2 } },
+    { tag: 'reason', title: 'Why twice?', sheet: 2, q: { type: 'mc', q: 'Why are there TWO high tides each day?', choices: ['Earth rotates through both bulges', 'The Moon goes around Earth twice a day', 'The ocean sloshes'], answer: 0 } },
+    { tag: 'test', title: 'Add the Sun', sheet: 3, goal: { text: 'Turn on the Sun\'s pull, line up the Moon with the Sun (straight line), and spin a day.', check: function (s) { return s.dayDone && s.sunDay && (s.moonDay === 0 || s.moonDay === 180); } },
+      q: { type: 'num', q: 'What was the highest water level?', unit: 'm', answer: function (s) { return s.maxLevel; }, tol: 0.15 } },
+    { tag: 'test', title: 'Right angle', sheet: 3, goal: { text: 'Now put the Moon at a right angle to the Sun (top or bottom) and spin a day.', check: function (s) { return s.dayDone && s.sunDay && (s.moonDay === 90 || s.moonDay === 270); } },
+      q: { type: 'mc', q: 'Compared to when they lined up, the tides were...', choices: ['smaller (neap tides)', 'bigger (spring tides)', 'the same'], answer: 0 } },
+    { tag: 'reason', title: 'Match the phase', sheet: 4, q: { type: 'sort', q: 'Which tides go with which Moon phases?', bins: ['Spring tides (biggest)', 'Neap tides (smallest)'], items: [['New moon', 0], ['Full moon', 0], ['First quarter', 1], ['Third quarter', 1]] } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: tide timing', sheet: 5, q: { type: 'num', q: 'High tide was at 6:00 AM. About when is the next high tide? (Type the PM hour.)', unit: 'PM', answer: 6, tol: 0.5, why: 'Bulges are half a day apart, so about 12 hours later (actually 12 h 25 min, because the Moon moves too).' } },
+    { tag: 'write', title: 'Harbor report (CER)', sheet: 6, q: { type: 'write', q: 'How does the Moon cause tides?', parts: [
+      { label: 'Claim', starter: 'The Moon causes tides because', min: 6, need: [{ words: ['gravity', 'pull'], label: 'Names gravity' }] },
+      { label: 'Evidence', starter: 'In one day, the town had', min: 12, number: true, need: [{ words: ['high tide', 'high'], label: 'Uses the high tide count' }, { words: ['spring', 'neap', 'line', 'sun'], label: 'Uses the Sun comparison' }] },
+      { label: 'Reasoning', starter: 'As Earth rotates,', min: 10, need: [{ words: ['bulge'], label: 'Explains the bulges' }] }] } }
+  ]
+});

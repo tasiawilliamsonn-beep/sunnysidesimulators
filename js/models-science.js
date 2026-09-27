@@ -1328,3 +1328,480 @@ SUNNY_MODELS.stateChart = function (M) {
   draw();
   return { auto: function (st) { var c = st.goal.check || {}; if (c.T != null) T = c.T.eq != null ? c.T.eq : c.T.gte != null ? c.T.gte : c.T.lte != null ? c.T.lte : c.T; if (typeof st.goal.check === 'function') { for (var t = -250; t <= 3000; t++) { T = t; draw(); if (st.goal.check(M.state)) break; } } sT.set(T, true); draw(); } };
 };
+
+/* ------------------------------------------------------------------ */
+/* Skate Park: potential and kinetic energy on a ramp                  */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.skatePark = function (M) {
+  var K = M.kit, S = M.state;
+  var g = 9.8, mass = 50, fric = false, shape = 'U', x = -0.8, v = 0, E0 = 0, thermal = 0, running = false, maxSp = 0, dir = 1, trail = [];
+  var HMAX = 8, W = 640, Hpx = 340;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.6fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 340', class: 'sn-svg', role: 'img', 'aria-label': 'Skate park ramp with a skater' });
+  var bars = K.svgEl('svg', { viewBox: '0 0 260 340', class: 'sn-svg', role: 'img', 'aria-label': 'Energy bar graph' });
+  row.appendChild(svg); row.appendChild(bars); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rH = K.readout('Height', 'm'), rV = K.readout('Speed', 'm/s', true), rM = K.readout('Top speed', 'm/s');
+  [rH, rV, rM].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag the skater up the ramp to choose the starting height, then let go.</span></div>');
+  var mS = K.seg([['50', 'Skater 50 kg'], ['100', 'Skater 100 kg']], '50', function (v2) { mass = +v2; M.set('mass', mass); resetRun(); });
+  var fT = K.toggle('Friction', false, function (b) { fric = b; M.set('friction', b); });
+  var shS = K.seg([['U', 'U-ramp'], ['W', 'Double dip']], shape, function (v2) { shape = v2; M.set('shape', v2); resetRun(); });
+  var stop = K.btn('❚❚ Stop', function () { running = false; }, 'ghost sm');
+  var drops = K.el('<div class="sn-row"><b class="sn-note">Drop from:</b></div>');
+  [2, 4, 6, 8].forEach(function (hh) { drops.appendChild(K.btn(hh + ' m', function () { x = -Math.sqrt(hh / HMAX); if (shape !== 'U') { shape = 'U'; shS.set('U'); M.set('shape', 'U'); } release(); M.set('startH', hh); }, 'sm')); });
+  [mS.el, fT.el, shS.el, stop].forEach(function (b) { ctr.appendChild(b); }); ctr.appendChild(drops); M.el.appendChild(ctr);
+  function h(xx) { return shape === 'U' ? HMAX * xx * xx : HMAX * (2.2 * xx * xx * xx * xx - 1.4 * xx * xx + 0.2) / 1.0; }
+  function dh(xx) { return shape === 'U' ? 2 * HMAX * xx : HMAX * (8.8 * xx * xx * xx - 2.8 * xx); }
+  function px(xx) { return 320 + xx * 290; } function py(hh) { return 320 - hh * 36; }
+  function resetRun() { running = false; v = 0; thermal = 0; maxSp = 0; trail = []; draw(); }
+  function release() { E0 = mass * g * h(x); thermal = 0; v = 0; maxSp = 0; running = true; dir = x < 0 ? 1 : -1; trail = []; M.set({ released: true, startH: K.round(h(x), 1), runs: (S.runs || 0) + 1, maxSpeed: 0, bottomSpeed: null }); }
+  function step(dt) {
+    var PE = mass * g * h(x), KE = Math.max(0, E0 - PE - thermal); var sp = Math.sqrt(2 * KE / mass);
+    if (KE <= 0.0001) { dir = -Math.sign(dh(x)) || -dir; }
+    var slope = dh(x), ds = sp * dt * dir / Math.sqrt(1 + slope * slope * 0.02);
+    x += ds / 9; x = K.clamp(x, -0.999, 0.999);
+    var PE2 = mass * g * h(x); if (E0 - PE2 - thermal < 0) { x -= ds / 9; dir = -dir; }
+    if (fric) thermal += 0.06 * mass * g * Math.abs(ds) * 0.35;
+    maxSp = Math.max(maxSp, sp);
+    if (Math.abs(x) < 0.02 && shape === 'U') M.set('bottomSpeed', K.round(sp, 1));
+    if (E0 - mass * g * h(x) - thermal < mass * 0.02 && fric && Math.abs(x) < 0.05) { running = false; M.set('stopped', true); }
+  }
+  function draw() {
+    var hh = '<defs><linearGradient id="spSky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#a5d8ff"/><stop offset="1" stop-color="#e7f5ff"/></linearGradient></defs><rect width="640" height="340" fill="url(#spSky)"/>';
+    for (var m = 0; m <= 8; m += 2) hh += '<line x1="20" x2="620" y1="' + py(m) + '" y2="' + py(m) + '" stroke="#74c0fc" stroke-dasharray="3 5"/><text x="24" y="' + (py(m) - 3) + '" font-size="10" fill="#1864ab">' + m + ' m</text>';
+    var pts = []; for (var xx = -1; xx <= 1.0001; xx += 0.02) pts.push(px(xx) + ',' + py(h(xx)));
+    hh += '<polyline points="' + pts.join(' ') + ' 610,340 30,340" fill="#ced4da"/><polyline points="' + pts.join(' ') + '" fill="none" stroke="#495057" stroke-width="6"/>';
+    var sx = px(x), sy = py(h(x)), ang = Math.atan(-dh(x) * 36 / 290) * 180 / Math.PI;
+    hh += '<g class="sp-sk" role="button" aria-label="Skater. Drag to set the starting height." transform="translate(' + sx + ' ' + sy + ') rotate(' + ang + ')"><rect x="-14" y="-6" width="28" height="5" rx="2" fill="#343a40"/><circle cx="-9" cy="0" r="3" fill="#212529"/><circle cx="9" cy="0" r="3" fill="#212529"/><rect x="-5" y="-30" width="10" height="24" rx="4" fill="' + (mass > 60 ? '#7048e8' : '#e8590c') + '"/><circle cx="0" cy="-37" r="7" fill="#f4c7a1"/><circle cx="0" cy="-20" r="26" fill="transparent"/></g>';
+    svg.innerHTML = hh;
+    var PE = mass * g * h(x), KE = running ? Math.max(0, E0 - PE - thermal) : 0, th = running ? thermal : 0, tot = running ? E0 : PE, scale = 220 / (100 * g * HMAX);
+    var bb = '<rect width="260" height="340" fill="#fff"/><text x="130" y="20" text-anchor="middle" font-size="13" font-weight="800">Energy (joules)</text>';
+    [['Potential', PE, '#1971c2'], ['Kinetic', KE, '#2f9e44'], ['Thermal', th, '#e8590c'], ['Total', tot, '#495057']].forEach(function (b, i) { var bh = b[1] * scale; bb += '<rect x="' + (18 + i * 60) + '" y="' + (300 - bh) + '" width="44" height="' + bh + '" fill="' + b[2] + '"/><text x="' + (40 + i * 60) + '" y="318" font-size="10" text-anchor="middle">' + b[0] + '</text><text x="' + (40 + i * 60) + '" y="' + (294 - bh) + '" font-size="10" text-anchor="middle" font-weight="700">' + Math.round(b[1]) + '</text>'; });
+    bb += '<line x1="10" x2="250" y1="300" y2="300" stroke="#495057"/>';
+    bars.innerHTML = bb;
+    var sp = running ? Math.sqrt(2 * KE / mass) : 0;
+    rH.set(K.fmt(h(x), 1)); rV.set(K.fmt(sp, 1)); rM.set(K.fmt(maxSp, 1));
+    var st = { height: K.round(h(x), 1), speed: K.round(sp, 1), PE: Math.round(PE), KE: Math.round(KE), thermal: Math.round(th), maxSpeed: K.round(maxSp, 1), atTop: running && KE < mass * 0.5, atBottom: running && Math.abs(x) < 0.05 };
+    if (running && S.startH != null) { st['top_' + S.startH + '_' + mass] = K.round(maxSp, 1); }
+    M.set(st);
+    K.drag(svg.querySelector('.sp-sk'), { svg: svg, pos: function () { return [sx, sy]; }, start: function () { running = false; }, move: function (a) { x = K.clamp((a - 320) / 290, -0.98, 0.98); draw(); }, end: function () { if (h(x) > 0.3) release(); }, key: function () { release(); } });
+  }
+  M.loop(function (dt) { if (running) { for (var i = 0; i < 4; i++) step(dt / 4); draw(); } });
+  M.set({ mass: mass, friction: false, shape: shape }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.mass) { mass = c.mass.eq || c.mass; mS.set(String(mass)); } if (c.friction != null) { fric = !!c.friction; fT.set(fric); M.set('friction', fric); } if (c.shape) { shape = c.shape; shS.set(shape); }
+    var H0 = c.startH ? (c.startH.eq || c.startH.gte || c.startH) : 4; for (var k in c) { var mm = k.match(/^top_([\d.]+)_(\d+)$/); if (mm) { H0 = +mm[1]; mass = +mm[2]; } } x = -Math.sqrt(H0 / HMAX); release(); var vmax = Math.sqrt(2 * g * H0); M.set({ startH: H0, maxSpeed: K.round(vmax, 1), bottomSpeed: K.round(vmax, 1), atTop: true, atBottom: true, stopped: fric }); var o = {}; o['top_' + H0 + '_' + mass] = K.round(vmax, 1); M.set(o); running = false; } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Ramp and Cup: kinetic energy depends on mass and speed               */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.rampKE = function (M) {
+  var K = M.kit, S = M.state;
+  var H = 1, m = 1, phase = 'ready', t = 0, cupX = 0, dist = 0, bx = 0;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 280', class: 'sn-svg', role: 'img', 'aria-label': 'Ball rolling down a ramp into a cup' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rV = K.readout('Speed at bottom', 'm/s'), rK = K.readout('Kinetic energy', 'J'), rD = K.readout('Cup moved', 'cm', true);
+  [rV, rK, rD].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var hS = K.seg([['0.5', 'Ramp 0.5 m'], ['1', '1 m'], ['2', '2 m']], '1', function (v) { if (phase === 'rolling') return; H = +v; reset(); });
+  var mS = K.seg([['1', 'Ball 1 kg'], ['2', '2 kg'], ['4', '4 kg']], '1', function (v) { if (phase === 'rolling') return; m = +v; reset(); });
+  var go = K.btn('▶ Release the ball', function () { if (phase !== 'ready') reset(); phase = 'rolling'; t = 0; }, 'primary');
+  [hS.el, mS.el, go].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function vBottom() { return Math.sqrt(2 * 9.8 * H * 5 / 7); } // rolling ball
+  function KE() { return 0.5 * m * vBottom() * vBottom(); }
+  function reset() { phase = 'ready'; t = 0; cupX = 0; dist = 0; bx = 0; draw(); }
+  function draw() {
+    var top = 230 - H * 80, h = '<rect width="700" height="280" fill="#f8f9fa"/><rect y="230" width="700" height="50" fill="#adb5bd"/>';
+    h += '<polygon points="40,230 40,' + top + ' 260,230" fill="#d0bfff" stroke="#7048e8" stroke-width="2"/><text x="44" y="' + (top - 6) + '" font-size="11" fill="#5f3dc4">' + H + ' m</text>';
+    var r = 8 + m * 3, bxp, byp;
+    if (phase === 'ready') { bxp = 50; byp = top - r + 4; }
+    else if (phase === 'rolling') { var f = Math.min(1, t / 1.2); bxp = 50 + f * 210; byp = top + (230 - top) * f - r; }
+    else { bxp = 262 + bx; byp = 230 - r; }
+    h += '<circle cx="' + bxp + '" cy="' + byp + '" r="' + r + '" fill="#e8590c" stroke="#a61e4d" stroke-width="2"/>';
+    var cx = 330 + Math.min(cupX, 330);
+    h += '<path d="M' + cx + ' 190 h40 l-6 40 h-28 z" fill="#ffe066" stroke="#e67700" stroke-width="2" transform="rotate(90 ' + (cx + 20) + ' 210)"/>';
+    for (var d = 0; d <= 300; d += 50) h += '<line x1="' + (340 + d) + '" x2="' + (340 + d) + '" y1="232" y2="244" stroke="#495057"/><text x="' + (340 + d) + '" y="258" font-size="10" text-anchor="middle">' + d + ' cm</text>';
+    svg.innerHTML = h;
+    rV.set(phase === 'ready' ? '—' : K.fmt(vBottom(), 1)); rK.set(phase === 'ready' ? '—' : K.fmt(KE(), 1)); rD.set(Math.round(dist));
+  }
+  M.loop(function (dt) {
+    if (phase === 'rolling') { t += dt; if (t >= 1.2) { phase = 'hit'; t = 0; } draw(); }
+    else if (phase === 'hit') { var target = KE() * 10; dist = Math.min(target, dist + dt * Math.max(40, target * 1.5)); cupX = dist; bx = Math.min(40, bx + dt * 60); if (dist >= target) { phase = 'done'; var st = { released: true, H: H, m: m, dist: Math.round(dist), KE: K.round(KE(), 1), v: K.round(vBottom(), 1) }; st['d_' + H + '_' + m] = Math.round(dist); M.set(st); } draw(); }
+  });
+  M.set({ H: H, m: m }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var todo = []; for (var k in c) { var mm = k.match(/^d_([\d.]+)_(\d+)$/); if (mm) todo.push([+mm[1], +mm[2]]); } if (c.H) todo.push([c.H, c.m || 1]); if (!todo.length) todo.push([H, m]); todo.forEach(function (p) { H = p[0]; m = p[1]; var o = { released: true, H: H, m: m, dist: Math.round(KE() * 10), KE: K.round(KE(), 1), v: K.round(vBottom(), 1) }; o['d_' + H + '_' + m] = o.dist; M.set(o); }); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Coaster Designer: will the car make it over the hills?              */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.coaster = function (M) {
+  var K = M.kit, S = M.state;
+  var hs = [30, 25, 20], fric = 0, pos = 0, running = false, v = 0, E = 0, result = '';
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 300', class: 'sn-svg', role: 'img', 'aria-label': 'Roller coaster with three hills' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rR = K.readout('Result', ''), rS = K.readout('Speed', 'm/s');
+  reads.appendChild(rR.el); reads.appendChild(rS.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sl = hs.map(function (hv, i) { return K.slider({ label: ['🚩 Start hill', 'Hill 2', 'Hill 3'][i], min: 10, max: 40, step: 5, value: hv, unit: 'm', onInput: function (v2) { hs[i] = v2; running = false; result = ''; M.set('hills', hs.join('/')); draw(); } }); });
+  sl.forEach(function (s) { ctr.appendChild(s.el); });
+  var fS = K.seg([['0', 'No friction'], ['4', 'Some friction']], '0', function (v2) { fric = +v2; M.set('fric', fric); });
+  var go = K.btn('▶ Launch the car', function () { pos = 0.02; dir = 1; back = 0; running = true; result = ''; E = 9.8 * hs[0] + 0.5; M.set({ launched: true, madeIt: null, stuckAt: null, hills: hs.join('/'), fric: fric }); }, 'primary');
+  var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(fS.el); r2.appendChild(go); ctr.appendChild(r2); M.el.appendChild(ctr);
+  // track: start hill peak at s=0, valley, hill2 peak at s=1, valley, hill3 peak at s=2, valley end at 3
+  function hAt(s) { var peaks = [hs[0], hs[1], hs[2], 0]; var i = Math.floor(s), f = s - i; if (i >= 3) return 0; var a = peaks[i], b = peaks[i + 1]; var valley = 2; if (f < 0.5) { var q = f / 0.5; return valley + (a - valley) * (1 + Math.cos(Math.PI * q)) / 2; } var q2 = (f - 0.5) / 0.5; return valley + (b - valley) * (1 - Math.cos(Math.PI * q2)) / 2; }
+  function X(s) { return 30 + s * 215; } function Y(hh) { return 280 - hh * 6; }
+  function draw() {
+    var h = '<rect width="700" height="300" fill="#fff4e6"/>', pts = [];
+    for (var s = 0; s <= 3; s += 0.02) pts.push(X(s) + ',' + Y(hAt(s)));
+    h += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="#c92a2a" stroke-width="5"/>';
+    for (var k = 0; k < 30; k++) { var s2 = k * 0.1; h += '<line x1="' + X(s2) + '" x2="' + X(s2) + '" y1="' + Y(hAt(s2)) + '" y2="290" stroke="#e8590c" stroke-width="1.5" opacity=".4"/>'; }
+    [0, 1, 2].forEach(function (i) { h += '<text x="' + X(i) + '" y="' + (Y(hs[i]) - 10) + '" text-anchor="middle" font-size="12" font-weight="800">' + hs[i] + ' m</text>'; });
+    var cx = X(pos), cy = Y(hAt(pos));
+    h += '<rect x="' + (cx - 14) + '" y="' + (cy - 18) + '" width="28" height="14" rx="4" fill="#1971c2"/><circle cx="' + (cx - 8) + '" cy="' + (cy - 3) + '" r="4" fill="#343a40"/><circle cx="' + (cx + 8) + '" cy="' + (cy - 3) + '" r="4" fill="#343a40"/>';
+    svg.innerHTML = h;
+    rR.set(result || (running ? 'rolling…' : 'ready')); rS.set(K.fmt(Math.sqrt(Math.max(0, 2 * (E - 9.8 * hAt(pos)))), 1));
+  }
+  var dir = 1, back = 0;
+  M.loop(function (dt) {
+    if (!running) return;
+    for (var i = 0; i < 6; i++) {
+      var ke = E - 9.8 * hAt(pos);
+      if (ke <= 0) {
+        if (dir > 0 && !result) { var blocked = pos < 1 ? 1 : 2; result = '⚠ Not enough energy: rolled back from hill ' + (blocked + 1); M.set({ madeIt: false, stuckAt: blocked, cleared: blocked - 1, result: 'stuck' }); }
+        dir = -dir; pos += dir * 0.004; ke = 0.01;
+      }
+      var sp = Math.sqrt(2 * Math.max(ke, 0.01)); pos += dir * sp * dt / 6 / 30; E -= fric * 0.02 * sp * dt / 6;
+      if (pos >= 2.98) { running = false; result = '🎉 Made it over every hill!'; M.set({ madeIt: true, cleared: 2, result: 'made it' }); break; }
+      if (pos <= 0.01) { pos = 0.01; dir = 1; }
+    }
+    if (result && !S.madeIt) { back += dt; if (back > 6) { running = false; back = 0; } } else back = 0;
+    draw();
+  });
+  M.set({ hills: hs.join('/'), fric: 0 }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.fric != null) { fric = c.fric; fS.set(String(fric)); } if (typeof st.goal.check === 'function') { hs = [35, 30, 20]; } sl.forEach(function (s, i) { s.set(hs[i], true); }); var made = hs[0] > hs[1] + fric && hs[0] > hs[2] + fric * 2; M.set({ launched: true, madeIt: c.madeIt != null ? c.madeIt : made, hills: hs.join('/'), fric: fric, result: made ? 'made it' : 'stuck' }); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Spoon Conduction: which spoon handle gets hot?                      */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.conduction = function (M) {
+  var K = M.kit, S = M.state;
+  var SP = [['metal', 'Metal spoon', '#adb5bd', 0.22, 72], ['wood', 'Wooden spoon', '#c08457', 0.02, 30], ['plastic', 'Plastic spoon', '#ff8787', 0.015, 27]];
+  var temps = { metal: 20, wood: 20, plastic: 20 }, t = 0, running = false, acc = 0;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 360 300', class: 'sn-svg', role: 'img', 'aria-label': 'Three spoons in a pot of hot cocoa with butter on the handles' });
+  var g = K.graph({ title: 'Handle temperature', xLabel: 'Minutes', yLabel: '°C', xMax: 10, yMax: 80, series: SP.map(function (s) { return { name: s[1].split(' ')[0], color: s[2] === '#adb5bd' ? '#495057' : s[2] }; }) });
+  row.appendChild(svg); row.appendChild(g.el); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rt = K.readout('Time', 'min'), rs = SP.map(function (s) { var r = K.readout(s[1] + ' handle', '°C'); reads.appendChild(r.el); return r; });
+  reads.insertBefore(rt.el, reads.firstChild); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var go = K.btn('▶ Put the spoons in the hot cocoa (80 °C)', function () { running = !running; go.textContent = running ? '❚❚ Pause' : '▶ Keep going'; M.set('started', true); }, 'primary');
+  var rst = K.btn('↺ Reset', function () { temps = { metal: 20, wood: 20, plastic: 20 }; t = 0; running = false; g.clear(); go.textContent = '▶ Put the spoons in the hot cocoa (80 °C)'; M.set({ time: 0, meltedMetal: false }); draw(); }, 'ghost');
+  ctr.appendChild(go); ctr.appendChild(rst); M.el.appendChild(ctr);
+  function tick() { t += 0.1; SP.forEach(function (s) { temps[s[0]] += (s[4] - temps[s[0]]) * s[3] * 0.1 * 3; }); SP.forEach(function (s, i) { g.add(i, t, temps[s[0]]); }); var st = { time: K.round(t, 1) }; SP.forEach(function (s) { st[s[0]] = Math.round(temps[s[0]]); if (temps[s[0]] > 35) st['butter_' + s[0]] = true; }); if (Math.abs(t - 5) < 0.05) SP.forEach(function (s) { st['t5_' + s[0]] = Math.round(temps[s[0]]); }); M.set(st); if (t >= 10) running = false; }
+  function draw() {
+    var h = '<rect width="360" height="300" fill="#fff4e6"/><path d="M60 170 h240 v90 q0 20 -20 20 h-200 q-20 0 -20 -20 z" fill="#6f4e37"/><rect x="50" y="160" width="260" height="14" rx="6" fill="#495057"/><text x="180" y="240" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Hot cocoa 80 °C</text>';
+    SP.forEach(function (s, i) { var x = 100 + i * 80, T = temps[s[0]], hot = K.clamp((T - 20) / 60, 0, 1); h += '<rect x="' + (x - 6) + '" y="40" width="12" height="160" rx="6" fill="' + s[2] + '" stroke="#495057"/><rect x="' + (x - 6) + '" y="40" width="12" height="160" rx="6" fill="#ff6b6b" opacity="' + (hot * 0.6) + '"/>';
+      var melt = K.clamp((T - 30) / 12, 0, 1); h += '<ellipse cx="' + x + '" cy="' + (40 + melt * 20) + '" rx="' + (12 + melt * 6) + '" ry="' + (7 - melt * 4) + '" fill="#ffe066" stroke="#e0b400"/>' + '<text x="' + x + '" y="28" text-anchor="middle" font-size="11" font-weight="800">' + s[1].split(' ')[0] + '</text>'; });
+    h += '<text x="180" y="296" text-anchor="middle" font-size="11" fill="#495057">Butter pats sit on each handle.</text>';
+    svg.innerHTML = h; rt.set(K.fmt(t, 1)); SP.forEach(function (s, i) { rs[i].set(Math.round(temps[s[0]])); });
+  }
+  M.loop(function (dt) { if (!running) return; acc += dt; while (acc > 0.05) { acc -= 0.05; tick(); } draw(); });
+  M.set({ time: 0 }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; var need = (c.time && c.time.gte) || 10; while (t < need - 0.001) tick(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Cocoa Cup Test: which cup keeps cocoa hot longest?                  */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.cooling = function (M) {
+  var K = M.kit, S = M.state;
+  var CUPS = [['foam', 'Foam cup', '#f8f9fa', 0.012], ['ceramic', 'Ceramic mug', '#74c0fc', 0.028], ['glass', 'Glass cup', '#c5f6fa', 0.034], ['metal', 'Metal cup', '#adb5bd', 0.05]];
+  var T = {}, lid = false, t = 0, running = false, acc = 0, room = 20;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 360 260', class: 'sn-svg', role: 'img', 'aria-label': 'Four cups of hot cocoa' });
+  var g = K.graph({ title: 'Cocoa temperature', xLabel: 'Minutes', yLabel: '°C', xMax: 30, yMax: 90, yMin: 0, series: CUPS.map(function (c, i) { return { name: c[0], color: ['#e8590c', '#1971c2', '#0c8599', '#495057'][i] }; }) });
+  row.appendChild(svg); row.appendChild(g.el); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rt = K.readout('Time', 'min'), rs = CUPS.map(function (c) { var r = K.readout(c[1], '°C'); return r; });
+  reads.appendChild(rt.el); rs.forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var lT = K.toggle('Put lids on all cups', false, function (b) { if (t > 0) { lT.set(lid); M.toast('Reset to change lids.'); return; } lid = b; M.set('lid', b); draw(); });
+  var go = K.btn('▶ Pour 80 °C cocoa and start the timer', function () { running = !running; go.textContent = running ? '❚❚ Pause' : '▶ Keep going'; }, 'primary');
+  var rst = K.btn('↺ Reset', function () { reset(); }, 'ghost');
+  [lT.el, go, rst].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function reset() { CUPS.forEach(function (c) { T[c[0]] = 80; }); t = 0; running = false; go.textContent = '▶ Pour 80 °C cocoa and start the timer'; g.clear(); M.set({ time: 0 }); draw(); }
+  function tick() { t += 0.25; CUPS.forEach(function (c, i) { var k = c[3] * (lid ? 0.55 : 1); T[c[0]] = room + (T[c[0]] - room) * Math.exp(-k * 0.25); g.add(i, t, T[c[0]]); }); var st = { time: K.round(t, 2), lid: lid }; CUPS.forEach(function (c) { st[c[0]] = Math.round(T[c[0]]); }); if (Math.abs(t - 20) < 0.01) CUPS.forEach(function (c) { st['t20_' + c[0] + (lid ? '_lid' : '')] = Math.round(T[c[0]]); }); M.set(st); if (t >= 30) { running = false; go.textContent = '✓ Done'; } }
+  function draw() {
+    var h = '<rect width="360" height="260" fill="#f1f3f5"/><rect y="200" width="360" height="60" fill="#c08457"/>';
+    CUPS.forEach(function (c, i) { var x = 50 + i * 86, hot = K.clamp((T[c[0]] - 20) / 60, 0, 1); h += '<path d="M' + (x - 26) + ' 110 h52 l-6 90 h-40 z" fill="' + c[2] + '" stroke="#495057" stroke-width="2"/><rect x="' + (x - 23) + '" y="118" width="46" height="8" fill="#6f4e37"/>' + (lid ? '<rect x="' + (x - 29) + '" y="102" width="58" height="10" rx="4" fill="#343a40"/>' : (hot > 0.3 ? '<path d="M' + (x - 8) + ' 100 q6 -14 0 -26 M' + (x + 8) + ' 100 q6 -14 0 -26" stroke="#ced4da" stroke-width="' + (1 + hot * 3) + '" fill="none"/>' : '')) + '<text x="' + x + '" y="222" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">' + c[1] + '</text><text x="' + x + '" y="240" text-anchor="middle" font-size="12" fill="#fff">' + Math.round(T[c[0]]) + ' °C</text>'; });
+    svg.innerHTML = h; rt.set(K.fmt(t, 1)); CUPS.forEach(function (c, i) { rs[i].set(Math.round(T[c[0]])); });
+  }
+  M.loop(function (dt) { if (!running) return; acc += dt; while (acc > 0.05) { acc -= 0.05; tick(); } draw(); });
+  reset();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.lid != null) { lid = c.lid; lT.set(lid); } reset(); var need = (c.time && c.time.gte) || 30; while (t < need - 0.001) tick(); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Heat Transfer Stations: conduction, convection, radiation           */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.heatWays = function (M) {
+  var K = M.kit, S = M.state;
+  var st = 'conduction', burner = false, lamp = false, t = 0, cans = { black: 20, white: 20 }, pan = 20, handle = 20, dots = [];
+  for (var i = 0; i < 40; i++) dots.push({ a: Math.random() * 6.28, r: Math.random() });
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 320', class: 'sn-svg', role: 'img', 'aria-label': 'Heat transfer station' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var sS = K.seg([['conduction', '🍳 Station 1: Frying pan'], ['convection', '🍲 Station 2: Pot of water'], ['radiation', '💡 Station 3: Heat lamp']], st, function (v) { st = v; var vis = (S.stations || []).slice(); if (vis.indexOf(v) < 0) vis.push(v); M.set({ station: v, stations: vis, stationCount: vis.length }); t = 0; draw(); });
+  var bT = K.toggle('🔥 Burner / lamp ON', false, function (b) { burner = b; lamp = b; M.set('on_' + st, b ? true : S['on_' + st]); });
+  var rs = K.btn('↺ Cool down', function () { cans = { black: 20, white: 20 }; pan = 20; handle = 20; t = 0; draw(); }, 'ghost sm');
+  [sS.el, bT.el, rs].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function draw() {
+    var h = '<rect width="640" height="320" fill="#f8f9fa"/>', rd = [];
+    if (st === 'conduction') {
+      h += '<rect x="170" y="240" width="200" height="60" fill="#343a40"/>' + (burner ? '<path d="M200 240 q10 -20 20 0 q10 -26 20 0 q10 -20 20 0 q10 -26 20 0 q10 -20 20 0 q10 -26 20 0" fill="#ff922b"/>' : '');
+      var hot = K.clamp((pan - 20) / 180, 0, 1), hh = K.clamp((handle - 20) / 60, 0, 1);
+      h += '<ellipse cx="270" cy="225" rx="110" ry="16" fill="rgb(' + Math.round(90 + 165 * hot) + ',' + Math.round(90 - 40 * hot) + ',90)"/><rect x="375" y="218" width="190" height="12" rx="6" fill="rgb(' + Math.round(130 + 125 * hh) + ',' + Math.round(130 - 60 * hh) + ',130)"/>';
+      for (var k = 0; k < 8; k++) { var x = 180 + k * 48, q = K.clamp((x < 380 ? pan : handle) / 200, 0, 1); h += '<circle cx="' + (x + Math.sin(t * (6 + q * 20) + k) * (1 + q * 5)) + '" cy="' + (180 + Math.cos(t * (5 + q * 20) + k) * (1 + q * 5)) + '" r="8" fill="#868e96"/>'; }
+      h += '<text x="320" y="150" text-anchor="middle" font-size="12" fill="#495057">Zoomed-in metal particles: fast-vibrating particles bump their neighbors</text>';
+      rd = [['Pan', Math.round(pan)], ['Metal handle tip', Math.round(handle)]];
+    } else if (st === 'convection') {
+      h += '<rect x="200" y="80" width="240" height="190" rx="8" fill="#a5d8ff" opacity=".6" stroke="#495057" stroke-width="3"/><rect x="200" y="272" width="240" height="30" fill="#343a40"/>' + (burner ? '<path d="M230 272 q10 -18 20 0 q10 -24 20 0 q10 -18 20 0 q10 -24 20 0 q10 -18 20 0 q10 -24 20 0 q10 -18 20 0 q10 -24 20 0" fill="#ff922b"/>' : '');
+      dots.forEach(function (d) { var a = d.a + (burner ? t * 1.2 : 0), rx = 80 * (0.3 + d.r * 0.7), ry = 70 * (0.3 + d.r * 0.7); var x = 320 + Math.cos(a) * rx, y = 175 + Math.sin(a) * ry; if (!burner) { x = 210 + ((d.a * 40) % 220); y = 90 + ((d.r * 170)); } var warm = burner ? (Math.sin(a) > 0 ? 1 : 0) : 0; h += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="' + (warm ? '#e8590c' : '#1971c2') + '"/>'; });
+      if (burner) h += '<path d="M330 250 v-150" stroke="#e8590c" stroke-width="3" marker-end="url(#hwA)"/><path d="M420 110 v130" stroke="#1971c2" stroke-width="3" marker-end="url(#hwB)"/><defs><marker id="hwA" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e8590c"/></marker><marker id="hwB" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1971c2"/></marker></defs><text x="470" y="150" font-size="12" fill="#495057">warm water rises,</text><text x="470" y="166" font-size="12" fill="#495057">cool water sinks</text>';
+      rd = [['Water movement', burner ? 'circulating' : 'still']];
+    } else {
+      h += '<rect x="300" y="20" width="40" height="30" rx="6" fill="#495057"/>' + (lamp ? '<circle cx="320" cy="60" r="18" fill="#ffd43b"/><path d="M320 80 L200 230 M320 80 L440 230 M320 80 L320 230" stroke="#ff922b" stroke-width="2" stroke-dasharray="6 6"/><text x="360" y="70" font-size="12" fill="#e8590c">infrared waves travel through the air</text>' : '<circle cx="320" cy="60" r="18" fill="#dee2e6"/>');
+      h += '<rect x="170" y="230" width="60" height="70" rx="6" fill="#212529"/><text x="200" y="316" text-anchor="middle" font-size="11">Black can ' + Math.round(cans.black) + '°</text><rect x="410" y="230" width="60" height="70" rx="6" fill="#fff" stroke="#adb5bd"/><text x="440" y="316" text-anchor="middle" font-size="11">White can ' + Math.round(cans.white) + '°</text>';
+      rd = [['Black can', Math.round(cans.black)], ['White can', Math.round(cans.white)]];
+    }
+    svg.innerHTML = h;
+    reads.innerHTML = rd.map(function (r) { return '<div class="sn-read"><span class="sn-read-l">' + r[0] + '</span><b class="sn-read-v">' + r[1] + '</b>' + (typeof r[1] === 'number' ? '<span class="sn-read-u">°C</span>' : '') + '</div>'; }).join('');
+  }
+  M.loop(function (dt) {
+    t += dt;
+    if (st === 'conduction') { if (burner) { pan += (200 - pan) * dt * 0.3; } else pan += (20 - pan) * dt * 0.2; handle += (pan * 0.45 + 11 - handle) * dt * 0.25; M.set({ pan: Math.round(pan), handle: Math.round(handle) }); if (handle > 60) M.set('hotHandle', true); }
+    if (st === 'radiation') { var p = lamp ? 1 : 0; cans.black += ((20 + 30 * p) - cans.black) * dt * 0.25; cans.white += ((20 + 9 * p) - cans.white) * dt * 0.25; M.set({ black: Math.round(cans.black), white: Math.round(cans.white) }); if (cans.black > 40) M.set('blackHot', true); }
+    if (st === 'convection' && burner) M.set('sawCurrents', true);
+    draw();
+  });
+  M.set({ station: st, stations: [st], stationCount: 1 }); draw();
+  return { auto: function (st2) { var c = st2.goal.check || {}; if (c.station) { st = c.station; sS.set(st); } if (c.stationCount) M.set({ stations: ['conduction', 'convection', 'radiation'], stationCount: 3 }); var o = {}; ['hotHandle', 'blackHot', 'sawCurrents'].forEach(function (k) { if (c[k]) o[k] = true; }); if (c.blackHot) { o.black = 50; o.white = 29; cans = { black: 50, white: 29 }; } if (c.hotHandle) { pan = 200; handle = 101; o.handle = 101; o.pan = 200; } o.station = st; M.set(o); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Eclipse Lab: tilted Moon orbit, solar and lunar eclipses            */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.eclipseLab = function (M) {
+  var K = M.kit, S = M.state;
+  var moonA = 90, nodeA = 0, tilt = true; // moonA: 0 = full (away from Sun), 180 = new (toward Sun) in elongation terms
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:10px"></div>');
+  var top = K.svgEl('svg', { viewBox: '0 0 400 340', class: 'sn-svg', role: 'img', 'aria-label': 'Top view of the Sun, Earth, and Moon' });
+  var right = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  var side = K.svgEl('svg', { viewBox: '0 0 300 120', class: 'sn-svg', role: 'img', 'aria-label': 'Side view showing the Moon above or below Earth\'s orbit' });
+  var view = K.svgEl('svg', { viewBox: '0 0 300 150', class: 'sn-svg', role: 'img', 'aria-label': 'What we see from Earth' });
+  right.appendChild(side); right.appendChild(view);
+  row.appendChild(top); row.appendChild(right); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rP = K.readout('Moon phase', ''), rL = K.readout('Moon above/below Sun–Earth line', '°'), rE = K.readout('Eclipse?', '', true);
+  [rP, rL, rE].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag the Moon around Earth.</span></div>');
+  var nS = K.slider({ label: '📅 Time of year (rotates the Moon\'s tilted orbit)', min: 0, max: 330, step: 30, value: 0, fmt: function (v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][v / 30]; }, onInput: function (v) { nodeA = v; draw(); } });
+  var tT = K.toggle('Moon\'s orbit is tilted 5° (real)', true, function (b) { tilt = b; M.set('tilt', b); draw(); });
+  ctr.appendChild(nS.el); ctr.appendChild(tT.el); M.el.appendChild(ctr);
+  function lat() { return tilt ? 5 * Math.sin((moonA - nodeA) * Math.PI / 180) : 0; }
+  function phase() { var e = ((180 - moonA) % 360 + 360) % 360; return e < 12 || e > 348 ? 'New moon' : Math.abs(e - 180) < 12 ? 'Full moon' : e < 180 ? 'Waxing' : 'Waning'; }
+  function eclipse() { var p = phase(), L = Math.abs(lat()); if (p === 'New moon' && L < 1.5) return 'Solar eclipse'; if (p === 'Full moon' && L < 1.5) return 'Lunar eclipse'; return 'None'; }
+  function draw() {
+    var cx = 230, cy = 170, R = 110, a = moonA * Math.PI / 180, mx = cx + Math.cos(a) * R, my = cy - Math.sin(a) * R;
+    var h = '<rect width="400" height="340" fill="#0b1026"/><circle cx="-30" cy="170" r="70" fill="#ffd43b"/><text x="8" y="330" fill="#ffd43b" font-size="11">Sun (far left)</text>';
+    h += '<line x1="40" y1="170" x2="390" y2="170" stroke="#495057" stroke-dasharray="4 4"/><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#495057" stroke-dasharray="3 5"/>';
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="22" fill="#1c7ed6"/><path d="M' + cx + ' ' + (cy - 22) + ' A22 22 0 0 1 ' + cx + ' ' + (cy + 22) + ' Z" fill="#000" opacity=".5"/>';
+    var la = lat(); h += '<g class="ec-m" role="button" aria-label="Moon"><circle cx="' + mx + '" cy="' + my + '" r="11" fill="' + (eclipse() === 'Lunar eclipse' ? '#c92a2a' : '#dee2e6') + '"/><circle cx="' + mx + '" cy="' + my + '" r="22" fill="transparent"/></g><text x="' + mx + '" y="' + (my - 16) + '" fill="#fff" font-size="10" text-anchor="middle">' + (la > 0.3 ? 'above' : la < -0.3 ? 'below' : 'in line') + '</text>';
+    if (eclipse() !== 'None') h += '<text x="200" y="24" fill="#ff8787" font-size="16" font-weight="800" text-anchor="middle">' + eclipse().toUpperCase() + '!</text>';
+    top.innerHTML = h;
+    var sv = '<rect width="300" height="120" fill="#10193a"/><text x="8" y="14" fill="#adb5bd" font-size="10">SIDE VIEW (tilt exaggerated)</text><line x1="10" y1="60" x2="290" y2="60" stroke="#495057"/><circle cx="20" cy="60" r="14" fill="#ffd43b"/><circle cx="170" cy="60" r="10" fill="#1c7ed6"/>';
+    var sx = 170 + Math.cos(a) * 90, sy = 60 - la * 8; sv += '<circle cx="' + sx + '" cy="' + sy + '" r="5" fill="#dee2e6"/><line x1="' + (170 - 90) + '" y1="' + (60 - (tilt ? 5 * Math.sin((180 - nodeA) * Math.PI / 180) : 0) * 8) + '" x2="' + (170 + 90) + '" y2="' + (60 - (tilt ? 5 * Math.sin((0 - nodeA) * Math.PI / 180) : 0) * 8) + '" stroke="#91a7ff" stroke-dasharray="3 3"/>';
+    side.innerHTML = sv;
+    var vv = '<rect width="300" height="150" fill="#10193a"/><text x="150" y="16" fill="#fff" font-size="12" text-anchor="middle" font-weight="800">View from Earth</text>';
+    var ecl = eclipse();
+    if (phase() === 'New moon') { vv += '<circle cx="150" cy="80" r="40" fill="#ffd43b"/><circle cx="' + (150 + la * 14) + '" cy="' + (80 - la * 14) + '" r="39" fill="#212529"/>' + (ecl === 'Solar eclipse' ? '<circle cx="150" cy="80" r="46" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/>' : ''); }
+    else vv += '<circle cx="150" cy="80" r="36" fill="' + (ecl === 'Lunar eclipse' ? '#c92a2a' : '#dee2e6') + '"/>';
+    vv += '<text x="150" y="142" fill="#bac8ff" font-size="12" text-anchor="middle">' + (ecl === 'None' ? phase() : ecl) + '</text>';
+    view.innerHTML = vv;
+    rP.set(phase()); rL.set(K.fmt(la, 1)); rE.set(ecl === 'None' ? 'No' : ecl);
+    var st = { phase: phase(), lat: K.round(la, 1), eclipse: ecl, month: nodeA / 30, tilt: tilt }; if (ecl === 'Solar eclipse') st.sawSolar = true; if (ecl === 'Lunar eclipse') st.sawLunar = true; if ((phase() === 'New moon' || phase() === 'Full moon') && ecl === 'None') st.sawMiss = true; M.set(st);
+    K.drag(top.querySelector('.ec-m'), { svg: top, pos: function () { return [mx, my]; }, move: function (x, y) { var an = Math.atan2(cy - y, x - cx) * 180 / Math.PI; an = (an + 360) % 360; [0, 180].forEach(function (s) { if (Math.abs(an - s) < 6 || Math.abs(an - s - 360) < 6) an = s; }); moonA = an; draw(); } });
+  }
+  M.set({ tilt: true }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.tilt != null) { tilt = c.tilt; tT.set(tilt); } if (c.sawMiss) { nodeA = 90; moonA = 180; draw(); } if (c.sawSolar) { nodeA = 0; moonA = 180; draw(); } if (c.sawLunar) { nodeA = 0; moonA = 0; draw(); } nS.set(nodeA, true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Seasons: axial tilt, sunlight angle, and day length                 */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.seasonsTilt = function (M) {
+  var K = M.kit, S = M.state;
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], TEMP = [-3, 0, 5, 11, 17, 22, 24, 23, 19, 13, 6, 0];
+  var mon = 5, tilt = 23.5;
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:10px"></div>');
+  var orb = K.svgEl('svg', { viewBox: '0 0 360 300', class: 'sn-svg', role: 'img', 'aria-label': 'Earth orbiting the Sun with a tilted axis' });
+  var beam = K.svgEl('svg', { viewBox: '0 0 280 300', class: 'sn-svg', role: 'img', 'aria-label': 'Sunlight hitting the ground in Indiana' });
+  row.appendChild(orb); row.appendChild(beam); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rA = K.readout('Indiana noon Sun height', '°'), rD = K.readout('Indiana daylight', 'hours'), rT = K.readout('Indiana avg. temp', '°C'), rS = K.readout('Sydney noon Sun height', '°');
+  [rA, rD, rT, rS].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var mS = K.slider({ label: '📅 Month', min: 0, max: 11, step: 1, value: mon, fmt: function (v) { return MON[v]; }, onInput: function (v) { mon = v; draw(); } });
+  var tS = K.seg([['23.5', 'Real tilt 23.5°'], ['0', 'No tilt']], '23.5', function (v) { tilt = +v; M.set('tilt', tilt); draw(); });
+  ctr.appendChild(mS.el); ctr.appendChild(tS.el); M.el.appendChild(ctr);
+  function decl() { return tilt * Math.cos(2 * Math.PI * (mon - 5.7) / 12); }
+  function alt(lat) { return 90 - Math.abs(lat - decl()); }
+  function dayLen() { var d = decl() * Math.PI / 180, l = 40 * Math.PI / 180; return 24 / Math.PI * Math.acos(-Math.tan(l) * Math.tan(d)); }
+  function draw() {
+    var cx = 180, cy = 150, a = (mon - 5.7) / 12 * 2 * Math.PI, ex = cx + Math.cos(a) * 120, ey = cy + Math.sin(a) * 60;
+    var h = '<rect width="360" height="300" fill="#0b1026"/><ellipse cx="' + cx + '" cy="' + cy + '" rx="120" ry="60" fill="none" stroke="#495057" stroke-dasharray="4 5"/><circle cx="' + cx + '" cy="' + cy + '" r="24" fill="#ffd43b"/>';
+    MON.forEach(function (m, i) { var b = (i - 5.7) / 12 * 2 * Math.PI; h += '<text x="' + (cx + Math.cos(b) * 145) + '" y="' + (cy + Math.sin(b) * 78 + 4) + '" fill="#868e96" font-size="10" text-anchor="middle">' + m + '</text>'; });
+    h += '<circle cx="' + ex + '" cy="' + ey + '" r="16" fill="#1c7ed6"/><line x1="' + (ex - Math.sin(-tilt * Math.PI / 180) * 26) + '" y1="' + (ey - Math.cos(tilt * Math.PI / 180) * 26) + '" x2="' + (ex + Math.sin(-tilt * Math.PI / 180) * 26) + '" y2="' + (ey + Math.cos(tilt * Math.PI / 180) * 26) + '" stroke="#fff" stroke-width="2"/><text x="' + ex + '" y="' + (ey - 30) + '" fill="#fff" font-size="10" text-anchor="middle">N pole tilts →</text>';
+    h += '<text x="10" y="290" fill="#adb5bd" font-size="10">The axis always points the same direction in space.</text>';
+    orb.innerHTML = h;
+    var A = alt(40), spread = 1 / Math.sin(A * Math.PI / 180), w = Math.min(240, 60 * spread);
+    var b = '<rect width="280" height="300" fill="#e7f5ff"/><rect y="220" width="280" height="80" fill="#8ce99a"/><text x="140" y="18" text-anchor="middle" font-size="12" font-weight="800">Noon sunlight in Indiana</text>';
+    var rad = A * Math.PI / 180, sx = 140 - Math.cos(rad) * 180, sy = 220 - Math.sin(rad) * 180;
+    b += '<polygon points="' + (sx - 30 * Math.sin(rad)) + ',' + (sy + 30 * Math.cos(rad) - 30) + ' ' + (sx + 30 * Math.sin(rad)) + ',' + (sy - 30 * Math.cos(rad) + 30) + ' ' + (140 + w / 2) + ',220 ' + (140 - w / 2) + ',220" fill="#ffe066" opacity=".6"/><rect x="' + (140 - w / 2) + '" y="218" width="' + w + '" height="6" fill="#f08c00"/><text x="140" y="250" text-anchor="middle" font-size="12">Same beam spreads over ' + K.fmt(spread, 2) + '× the area</text><text x="140" y="268" text-anchor="middle" font-size="12">Sun ' + Math.round(A) + '° above the horizon</text>';
+    beam.innerHTML = b;
+    var tmp = tilt ? TEMP[mon] : 11;
+    rA.set(Math.round(A)); rD.set(K.fmt(dayLen(), 1)); rT.set(tmp); rS.set(Math.round(alt(-34)));
+    var st = { month: mon, monthName: MON[mon], tilt: tilt, alt: Math.round(A), day: K.round(dayLen(), 1), temp: tmp, sydney: Math.round(alt(-34)), spread: K.round(spread, 2) }; st['alt_' + MON[mon] + (tilt ? '' : '_0')] = Math.round(A); M.set(st);
+  }
+  M.set({ tilt: tilt }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.tilt != null) { tilt = c.tilt; tS.set(String(tilt)); } if (c.month != null) { mon = c.month; } if (c.monthName) mon = MON.indexOf(c.monthName); for (var k in c) { var mm = k.match(/^alt_(\w{3})(_0)?$/); if (mm) { mon = MON.indexOf(mm[1]); tilt = mm[2] ? 0 : 23.5; draw(); } } mS.set(mon, true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Newton's Cannon: gravity and orbits                                 */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.orbitCannon = function (M) {
+  var K = M.kit, S = M.state;
+  var GM = 398600, R = 6371, H = 400, v0 = 5, gravity = true, ball = null, paths = [], running = false;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 560 400', class: 'sn-svg', role: 'img', 'aria-label': 'A cannon on a very tall mountain on Earth' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rV = K.readout('Launch speed', 'km/s', true), rO = K.readout('Result', '');
+  reads.appendChild(rV.el); reads.appendChild(rO.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var vS = K.slider({ label: '💥 Launch speed', min: 1, max: 12, step: 0.5, value: v0, unit: 'km/s', onInput: function (v) { v0 = v; rV.set(v); } });
+  var fire = K.btn('🔥 Fire!', function () { ball = { x: 0, y: R + H, vx: v0, vy: 0, ang: 0, t: 0 }; paths.push({ v: v0, pts: [] }); if (paths.length > 5) paths.shift(); running = true; M.set({ fired: true, outcome: 'flying' }); }, 'primary');
+  var gT = K.toggle('Gravity ON', true, function (b) { gravity = b; M.set('gravity', b); });
+  var clr = K.btn('Clear paths', function () { paths = []; draw(); }, 'ghost sm');
+  ctr.appendChild(vS.el); var r2 = K.el('<div class="sn-row"></div>'); [fire, gT.el, clr].forEach(function (b) { r2.appendChild(b); }); ctr.appendChild(r2); M.el.appendChild(ctr);
+  var sc = 160 / 13000;
+  function P(x, y) { return [280 + x * sc, 200 - y * sc]; }
+  function finish(out, extra) { running = false; var st = { outcome: out, lastSpeed: v0, gravity: gravity }; st['out_' + String(v0).replace('.', '_')] = out; for (var k in extra || {}) st[k] = extra[k]; M.set(st); rO.set(out); }
+  M.loop(function (dt) {
+    if (!running || !ball) { draw(); return; }
+    for (var i = 0; i < 200; i++) {
+      var r = Math.sqrt(ball.x * ball.x + ball.y * ball.y), a = gravity ? GM / (r * r) : 0;
+      ball.vx -= a * ball.x / r * 5; ball.vy -= a * ball.y / r * 5; ball.x += ball.vx * 5; ball.y += ball.vy * 5; ball.t += 5;
+      var ang = Math.atan2(ball.x, ball.y); if (ang < 0) ang += 2 * Math.PI; if (ang < ball.ang - 3) ball.lap = true; ball.ang = ang;
+      if (i % 20 === 0) paths[paths.length - 1].pts.push([ball.x, ball.y]);
+      if (r < R) { finish('crashed', { crashKm: Math.round(ang * R) }); break; }
+      if (ball.lap && ang > 0.1) { finish('orbit', { orbitMin: Math.round(ball.t / 60) }); break; }
+      if (r > 5 * R && (!gravity || (ball.vx * ball.vx + ball.vy * ball.vy) / 2 - GM / r >= 0)) { finish(gravity ? 'escaped' : 'flew off in a straight line'); break; }
+      if (ball.t > 400000) { finish('orbit', { orbitMin: Math.round(ball.t / 60) }); break; }
+    }
+    draw();
+  });
+  function draw() {
+    var h = '<rect width="560" height="400" fill="#0b1026"/>'; var c = P(0, 0);
+    h += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + R * sc + '" fill="#1c7ed6"/><path d="M' + (c[0] - 30) + ' ' + (c[1] - R * sc + 6) + ' q30 -26 60 0 q-30 20 -60 0" fill="#40c057"/>';
+    var m1 = P(-300, R), m2 = P(0, R + H), m3 = P(300, R); h += '<polygon points="' + m1.join(',') + ' ' + m2.join(',') + ' ' + m3.join(',') + '" fill="#868e96"/>';
+    paths.forEach(function (p, i) { if (p.pts.length > 1) h += '<polyline points="' + p.pts.map(function (q) { return P(q[0], q[1]).join(','); }).join(' ') + '" fill="none" stroke="' + ['#ffd43b', '#ff8787', '#63e6be', '#91a7ff', '#ffa94d'][i % 5] + '" stroke-width="2"/>'; });
+    if (ball) { var b = P(ball.x, ball.y); h += '<circle cx="' + b[0] + '" cy="' + b[1] + '" r="4" fill="#fff"/>'; }
+    var cn = P(0, R + H); h += '<rect x="' + (cn[0] - 4) + '" y="' + (cn[1] - 10) + '" width="18" height="7" rx="3" fill="#343a40"/>';
+    h += '<text x="10" y="390" fill="#adb5bd" font-size="11">Mountain height is exaggerated. Earth drawn to scale with the paths.</text>';
+    svg.innerHTML = h;
+  }
+  rV.set(v0); M.set({ gravity: true }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.gravity != null) { gravity = c.gravity; gT.set(gravity); } var sp = c.lastSpeed != null ? (c.lastSpeed.gte || c.lastSpeed.eq || c.lastSpeed) : c.outcome === 'orbit' ? 8 : c.outcome === 'escaped' ? 11.5 : 4; v0 = sp; vS.set(v0, true); fire.click(); var g2 = 0; while (running && g2++ < 400) { var dt = 0; for (var i = 0; i < 200 && running; i++) { var r = Math.sqrt(ball.x * ball.x + ball.y * ball.y), a = gravity ? GM / (r * r) : 0; ball.vx -= a * ball.x / r * 5; ball.vy -= a * ball.y / r * 5; ball.x += ball.vx * 5; ball.y += ball.vy * 5; ball.t += 5; var ang = Math.atan2(ball.x, ball.y); if (ang < 0) ang += 2 * Math.PI; if (ang < ball.ang - 3) ball.lap = true; ball.ang = ang; if (r < R) finish('crashed', { crashKm: Math.round(ang * R) }); else if (ball.lap && ang > 0.1) finish('orbit', { orbitMin: Math.round(ball.t / 60) }); else if (r > 5 * R && (!gravity || (ball.vx * ball.vx + ball.vy * ball.vy) / 2 - GM / r >= 0)) finish(gravity ? 'escaped' : 'flew off in a straight line'); else if (ball.t > 400000) finish('orbit', {}); } } draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Gravity Lab: force between two masses                                */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.gravityLab = function (M) {
+  var K = M.kit, S = M.state;
+  var m1 = 1, m2 = 1, d = 2, mode = 'force', planet = 'Earth';
+  var PL = [['Moon', 1.6], ['Mars', 3.7], ['Earth', 9.8], ['Jupiter', 24.8]];
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 260', class: 'sn-svg', role: 'img', 'aria-label': 'Two masses pulling on each other with gravity' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rF = K.readout('Gravitational pull', 'units', true), rW = K.readout('50 kg student weighs', 'N');
+  reads.appendChild(rF.el); reads.appendChild(rW.el); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var s1 = K.slider({ label: 'Mass A', min: 1, max: 4, step: 1, value: m1, unit: '×', onInput: function (v) { m1 = v; draw(); } });
+  var s2 = K.slider({ label: 'Mass B', min: 1, max: 4, step: 1, value: m2, unit: '×', onInput: function (v) { m2 = v; draw(); } });
+  var sd = K.slider({ label: 'Distance', min: 1, max: 4, step: 1, value: d, unit: 'units', onInput: function (v) { d = v; draw(); } });
+  var pS = K.seg(PL.map(function (p) { return [p[0], p[0]]; }), planet, function (v) { planet = v; draw(); });
+  ctr.appendChild(s1.el); ctr.appendChild(s2.el); ctr.appendChild(sd.el); var r2 = K.el('<div class="sn-row"><b class="sn-note">Weigh a student on:</b></div>'); r2.appendChild(pS.el); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function F() { return K.round(100 * m1 * m2 / (d * d) / 4, 2); }
+  function draw() {
+    var f = F(), x1 = 320 - d * 60, x2 = 320 + d * 60, r1 = 14 + m1 * 8, r2b = 14 + m2 * 8, L = Math.min(110, 8 + f * 1.2);
+    var h = '<rect width="640" height="260" fill="#10193a"/><defs><marker id="glA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffd43b"/></marker></defs>';
+    h += '<circle cx="' + x1 + '" cy="120" r="' + r1 + '" fill="#4dabf7"/><text x="' + x1 + '" y="125" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">A ' + m1 + '×</text><circle cx="' + x2 + '" cy="120" r="' + r2b + '" fill="#f783ac"/><text x="' + x2 + '" y="125" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">B ' + m2 + '×</text>';
+    h += '<line x1="' + (x1 + r1 + 4) + '" y1="120" x2="' + (x1 + r1 + 4 + L) + '" y2="120" stroke="#ffd43b" stroke-width="5" marker-end="url(#glA)"/><line x1="' + (x2 - r2b - 4) + '" y1="120" x2="' + (x2 - r2b - 4 - L) + '" y2="120" stroke="#ffd43b" stroke-width="5" marker-end="url(#glA)"/>';
+    h += '<line x1="' + x1 + '" y1="200" x2="' + x2 + '" y2="200" stroke="#adb5bd"/><text x="320" y="220" text-anchor="middle" fill="#adb5bd" font-size="12">distance = ' + d + ' units</text><text x="320" y="30" text-anchor="middle" fill="#fff" font-size="12">Both objects pull on each other equally (yellow arrows)</text>';
+    svg.innerHTML = h;
+    var g = PL.filter(function (p) { return p[0] === planet; })[0][1];
+    rF.set(K.fmt(f, 2)); rW.set(Math.round(50 * g));
+    var st = { m1: m1, m2: m2, d: d, F: f, planet: planet, weight: Math.round(50 * g) }; st['f_' + m1 + '_' + m2 + '_' + d] = f; st['w_' + planet] = Math.round(50 * g); M.set(st);
+  }
+  draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.m1) { m1 = c.m1; s1.set(m1, true); } if (c.m2) { m2 = c.m2; s2.set(m2, true); } if (c.d) { d = c.d; sd.set(d, true); } if (c.planet) { planet = c.planet; pS.set(planet); } for (var k in c) { var mm = k.match(/^f_(\d)_(\d)_(\d)$/); if (mm) { m1 = +mm[1]; m2 = +mm[2]; d = +mm[3]; draw(); } var w = k.match(/^w_(\w+)$/); if (w) { planet = w[1]; draw(); } } draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Tides: the Moon's gravity makes two ocean bulges                    */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.tidesLab = function (M) {
+  var K = M.kit, S = M.state;
+  var moonA = 0, hour = 0, sunOn = false, playing = false, g, hist = [];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 360 320', class: 'sn-svg', role: 'img', 'aria-label': 'Earth with ocean bulges and the Moon' });
+  g = K.graph({ title: 'Tide at the beach town', xLabel: 'Hour', yLabel: 'Water level (m)', xMax: 24, yMax: 2.5, yMin: -2.5, series: [{ name: 'Tide', color: '#1971c2' }] });
+  row.appendChild(svg); row.appendChild(g.el); M.el.appendChild(row);
+  var reads = K.el('<div class="sn-reads"></div>'), rH = K.readout('Hour', ''), rT = K.readout('Beach water level', 'm', true), rK = K.readout('Tide type', '');
+  [rH, rT, rK].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag the Moon to move it.</span></div>');
+  var pl = K.btn('▶ Spin Earth one day', function () { playing = !playing; if (playing && hour >= 24) { hour = 0; hist = []; g.clear(); } pl.textContent = playing ? '❚❚ Pause' : '▶ Spin Earth one day'; }, 'primary');
+  var sT = K.toggle('Include the Sun\'s pull', false, function (b) { sunOn = b; M.set('sun', b); draw(); });
+  [pl, sT.el].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function countHighs() { var n = 0, N = 240; for (var i = 0; i < N; i++) { var a = level((i - 1 + N) % N / 10), b = level(i / 10), c = level((i + 1) % N / 10); if (b > a && b >= c && b > 0.3) n++; } return n; }
+  function amp() { if (!sunOn) return 1.5; var al = Math.cos(2 * moonA * Math.PI / 180); return 1.5 + 0.6 * al; } // sun at angle 180 (left); aligned when moon at 0 or 180
+  function level(hr) { var town = hr / 24 * 360; return amp() * Math.cos(2 * (town - moonA) * Math.PI / 180); }
+  function draw() {
+    var cx = 170, cy = 160, A = amp();
+    var h = '<rect width="360" height="320" fill="#0b1026"/>' + (sunOn ? '<circle cx="-20" cy="160" r="40" fill="#ffd43b"/><text x="4" y="220" fill="#ffd43b" font-size="10">Sun</text>' : '');
+    var pts = []; for (var a = 0; a <= 360; a += 6) { var r = 70 + 12 * A * Math.pow(Math.cos((a - moonA) * Math.PI / 180), 2); pts.push((cx + Math.cos(a * Math.PI / 180) * r) + ',' + (cy - Math.sin(a * Math.PI / 180) * r)); }
+    h += '<polygon points="' + pts.join(' ') + '" fill="#4dabf7" opacity=".7"/><circle cx="' + cx + '" cy="' + cy + '" r="60" fill="#2f9e44"/>';
+    var ta = hour / 24 * 360 * Math.PI / 180; h += '<circle cx="' + (cx + Math.cos(ta) * 64) + '" cy="' + (cy - Math.sin(ta) * 64) + '" r="7" fill="#ffd43b" stroke="#000"/><text x="' + (cx + Math.cos(ta) * 30) + '" y="' + (cy - Math.sin(ta) * 30 + 4) + '" fill="#fff" font-size="10" text-anchor="middle">town</text>';
+    var ma = moonA * Math.PI / 180, mx = cx + Math.cos(ma) * 140, my = cy - Math.sin(ma) * 140;
+    h += '<g class="td-m" role="button" aria-label="Moon"><circle cx="' + mx + '" cy="' + my + '" r="12" fill="#dee2e6"/><circle cx="' + mx + '" cy="' + my + '" r="24" fill="transparent"/></g>';
+    svg.innerHTML = h;
+    var lv = level(hour), type = !sunOn ? 'regular' : Math.abs(Math.cos(2 * moonA * Math.PI / 180)) > 0.8 ? (Math.cos(2 * moonA * Math.PI / 180) > 0 ? 'spring tide (extra big)' : 'neap tide (small)') : 'in between';
+    rH.set(Math.floor(hour) + ':00'); rT.set(K.fmt(lv, 1)); rK.set(type);
+    M.set({ hour: Math.floor(hour), level: K.round(lv, 1), moonA: Math.round(moonA), tideType: type, range: K.round(2 * A, 1) });
+    K.drag(svg.querySelector('.td-m'), { svg: svg, pos: function () { return [mx, my]; }, move: function (x, y) { var an = Math.atan2(cy - y, x - cx) * 180 / Math.PI; moonA = (an + 360) % 360; [0, 90, 180, 270].forEach(function (s) { if (Math.abs(moonA - s) < 8) moonA = s; }); M.set('movedMoon', true); draw(); } });
+  }
+  M.loop(function (dt) { if (!playing) return; hour += dt * 3; if (hour >= 24) { hour = 24; playing = false; pl.textContent = '▶ Spin Earth one day'; var highs = countHighs(); var lv = hist.map(function (p) { return p[1]; }); M.set({ dayDone: true, highs: highs, maxLevel: K.round(Math.max.apply(0, lv), 1), sunDay: sunOn, moonDay: Math.round(moonA) }); } hist.push([hour, level(hour)]); g.set(0, hist); draw(); });
+  M.set({ sun: false }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.sun != null) { sunOn = c.sun; sT.set(sunOn); } if (c.moonA != null) moonA = c.moonA.eq != null ? c.moonA.eq : c.moonA; if (c.movedMoon) M.set('movedMoon', true); if (typeof st.goal.check === 'function' && /90|270/.test(String(st.goal.check))) { sunOn = true; sT.set(true); moonA = 90; } if (typeof st.goal.check === 'function' && /spring/.test(String(st.goal.check))) { sunOn = true; sT.set(true); moonA = 0; } hour = 0; hist = []; while (hour < 24) { hour += 0.1; hist.push([hour, level(hour)]); } g.set(0, hist); var highs = countHighs(); var lv = hist.map(function (p) { return p[1]; }); M.set({ dayDone: true, highs: highs, maxLevel: K.round(Math.max.apply(0, lv), 1), sunDay: sunOn, moonDay: Math.round(moonA) }); draw(); } };
+};
