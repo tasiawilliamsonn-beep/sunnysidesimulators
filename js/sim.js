@@ -132,7 +132,34 @@ function SunnySim() {
     return { el: e, add: function (k, x, y) { data[k].push([x, y]); if (x > xMax && o.grow) xMax = Math.ceil(x * 1.25); draw(); }, set: function (k, pts) { data[k] = pts.slice(); draw(); }, clear: function () { data = data.map(function () { return []; }); draw(); }, range: function (a, b, c) { xMax = a; yMax = b; if (c != null) yMin = c; draw(); }, data: function () { return data; } };
   }
 
-  var KIT = { esc: esc, el: el, svgEl: svgEl, clamp: clamp, round: round, fmt: fmt, money: money, hash: hash, rng: rng, norm: norm, words: words, parseNum: parseNum, slider: slider, btn: btn, readout: readout, toggle: toggle, seg: seg, drag: drag, graph: graph };
+  // Fractions: [numerator, denominator]
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a || 1; }
+  function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+  function simp(f) { var g = gcd(f[0], f[1]); return [f[0] / g, f[1] / g]; }
+  function fstr(f, mixed) { f = simp(f); if (f[1] === 1) return String(f[0]); if (mixed && Math.abs(f[0]) > f[1]) { var w = Math.trunc(f[0] / f[1]), r = Math.abs(f[0] % f[1]); return w + ' ' + r + '/' + f[1]; } return f[0] + '/' + f[1]; }
+  function fadd(a, b) { return simp([a[0] * b[1] + b[0] * a[1], a[1] * b[1]]); }
+  function fsub(a, b) { return simp([a[0] * b[1] - b[0] * a[1], a[1] * b[1]]); }
+  function fmul(a, b) { return simp([a[0] * b[0], a[1] * b[1]]); }
+  function fval(f) { return f[0] / f[1]; }
+  // Isometric unit cubes for volume models. iso(ox, oy, s) returns cube(x, y, z, color) → SVG string.
+  // x runs right-down, y runs left-down (depth), z runs up. Draw back-to-front: larger x+y first is nearer.
+  function shade(hex, f) { var n = parseInt(hex.slice(1), 16), r = n >> 16, g = n >> 8 & 255, b = n & 255; function c(v) { return Math.max(0, Math.min(255, Math.round(v * f))); } return 'rgb(' + c(r) + ',' + c(g) + ',' + c(b) + ')'; }
+  function iso(ox, oy, s) {
+    var cx = s * 0.866, cy = s * 0.5;
+    function P(x, y, z) { return [ox + (x - y) * cx, oy + (x + y) * cy - z * s]; }
+    function poly(pts, fill) { return '<polygon points="' + pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') + '" fill="' + fill + '" stroke="#1d2433" stroke-width="1" stroke-linejoin="round"/>'; }
+    var f = function (x, y, z, col) {
+      col = col || '#74c0fc';
+      return poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], shade(col, 1.1)) +
+        poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], shade(col, 0.8)) +
+        poly([P(x, y + 1, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], shade(col, 0.95));
+    };
+    f.P = P; f.poly = poly;
+    // wireframe box outline for an l × w × h prism at (x0,y0,z0)
+    f.outline = function (x0, y0, z0, l, w, h, col) { var st = ' fill="none" stroke="' + (col || '#495057') + '" stroke-width="2" stroke-dasharray="5 4"'; function L(a, b) { return '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"' + st + '/>'; } var c = [P(x0, y0, z0), P(x0 + l, y0, z0), P(x0 + l, y0 + w, z0), P(x0, y0 + w, z0)], t = [P(x0, y0, z0 + h), P(x0 + l, y0, z0 + h), P(x0 + l, y0 + w, z0 + h), P(x0, y0 + w, z0 + h)], o = ''; for (var i = 0; i < 4; i++) { o += L(c[i], c[(i + 1) % 4]) + L(t[i], t[(i + 1) % 4]) + L(c[i], t[i]); } return o; };
+    return f;
+  }
+  var KIT = { iso: iso, shade: shade, gcd: gcd, lcm: lcm, simp: simp, fstr: fstr, fadd: fadd, fsub: fsub, fmul: fmul, fval: fval, esc: esc, el: el, svgEl: svgEl, clamp: clamp, round: round, fmt: fmt, money: money, hash: hash, rng: rng, norm: norm, words: words, parseNum: parseNum, slider: slider, btn: btn, readout: readout, toggle: toggle, seg: seg, drag: drag, graph: graph };
 
   /* ======================================================================
    * Levels and ranks
@@ -297,7 +324,7 @@ function SunnySim() {
       paintLog(); paintTop();
       var host = root.querySelector('.sn-card-wrap');
       var lv = LEVELS[S.level];
-      var h = '<article class="sn-card sn-step" data-tag="' + esc(st.tag || '') + '">' +
+      var h = '<article class="sn-card sn-step" data-key="' + esc(st.key) + '" data-tag="' + esc(st.tag || '') + '">' +
         '<div class="sn-sh"><span class="sn-tag t-' + esc(st.tag || 'step') + '">' + esc(TAGS[st.tag] || 'Step') + '</span>' + (st.sheet ? '<span class="sn-sheetb" title="Write this on your lab sheet">Sheet ' + circ(st.sheet) + '</span>' : '') + '</div>' +
         '<h2>' + esc(st.title || '') + '</h2>' +
         (st.text ? '<div class="sn-text">' + fill(st.text) + '</div>' : '') +
@@ -327,6 +354,7 @@ function SunnySim() {
       var g = host.querySelector('[data-goal]'), met = goalMet(st);
       if (g) { g.classList.toggle('met', met); g.querySelector('.sn-gi').textContent = met ? '✓' : '▶'; }
       var qh = host.querySelector('[data-q]');
+      if (!qh || host.querySelector('.sn-step') && host.querySelector('.sn-step').getAttribute('data-key') !== st.key) return;
       if (st.q) {
         if (met && !qh.getAttribute('data-built')) { qh.setAttribute('data-built', '1'); buildQ(st, qh); }
         else if (!met && !qh.getAttribute('data-built')) qh.innerHTML = '<div class="sn-locked">🔒 The question opens after you do the step above in the simulation.</div>';
