@@ -266,3 +266,159 @@ SUNNY_SIMS.push({
       { label: 'Reasoning', starter: 'This is because the particles', min: 10, need: [{ words: ['particle'], label: 'Explains with particles' }] }] } }
   ]
 });
+
+/* ======================= 5.ESS: Earth, Sun, Moon & space ======================= */
+SUNNY_SIMS.push({
+  id: 'g5-sci-shadow-clock', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1–5.ESS.2',
+  title: 'Shadow Clock', model: 'shadowLab', minutes: 25, icon: '🕰️',
+  place: 'Sunnyside School Playground · Sundial Garden',
+  mission: 'The school garden is building a sundial. Move the Sun across the sky, mark the stick\'s shadow at different times and seasons, and discover the pattern that makes a shadow clock work.',
+  question: 'Why do shadows change length and direction during the day and across the seasons?',
+  takeaway: 'Earth\'s rotation makes the Sun appear to move from east to west, so shadows point west in the morning, north at noon, and east in the afternoon. Shadows are shortest when the Sun is highest. The Sun is higher in summer, so summer shadows are shorter.',
+  vocab: [['Rotation', 'Earth spinning on its axis, once every 24 hours.'], ['Shadow', 'A dark area where an object blocks light.'], ['Sun height (altitude)', 'How high the Sun is above the horizon, in degrees.'], ['Pattern', 'Something that repeats in a predictable way.'], ['Solar noon', 'When the Sun is highest in the sky.']],
+  warmup: { style: 'Quick sketch', prompt: 'Sketch and label, then answer.', items: [['Draw a flagpole and its shadow at 8 AM if the Sun is in the east.', 'Shadow points west (away from the Sun) and is long.'], ['When is your own shadow shortest: morning, noon, or evening?', 'Around noon, when the Sun is highest.'], ['Does the Sun really move across the sky? Explain.', 'No. Earth rotates; the Sun only appears to move.']] },
+  steps: [
+    { tag: 'explore', title: 'Move the Sun', text: 'Drag the **Time of day** slider and watch the shadow in the top view and the Sun in the sky view.', goal: { text: 'Move the time slider.', check: { movedTime: true } } },
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'In the morning the Sun is in the east. Which way will the shadow point?', choices: ['West, away from the Sun', 'East, toward the Sun', 'Straight down, no shadow'] } },
+    { tag: 'test', title: 'Morning shadow', sheet: 1, goal: { text: 'Set the time to **9:00 AM** in **March**.', check: { time: 9, season: 'equinox' } },
+      q: { type: 'mc', q: 'Which way does the 9:00 AM shadow point?', choices: ['Northwest', 'Southeast', 'South', 'East'], answer: 0, why: 'The Sun is in the southeast, so the shadow points the opposite way: northwest.' } },
+    { tag: 'record', title: 'Record shadow data', sheet: 2, text: 'Stay in **March**. Set each time, then type the shadow length and direction you see.',
+      q: { type: 'table', q: 'Shadow data for a 1-meter stick', rowHead: 'Time', cols: [{ label: 'Shadow length', unit: 'm', value: function (s) { return s.len; }, tol: 0.06 }, { label: 'Points', value: function (s) { return s.dir; }, accept: [] }],
+        rows: [{ label: '7:00 AM', when: { time: 7, season: 'equinox' } }, { label: '12:00 PM (noon)', when: { time: 12, season: 'equinox' } }, { label: '3:00 PM', when: { time: 15, season: 'equinox' } }], hint: 'Directions are letters like N, NE, E. Read the "Shadow points" display.' } },
+    { tag: 'reason', title: 'Find the pattern', sheet: 3, q: { type: 'mc', q: 'Use your table. When is the shadow shortest, and why?', choices: ['At noon, because the Sun is highest in the sky', 'At 7 AM, because the Sun is closest', 'At 3 PM, because it is warmest', 'It never changes'], answer: 0 } },
+    { tag: 'reason', title: 'Why does the Sun move?', q: { type: 'mc', q: 'What really causes the Sun to seem to move from east to west each day?', choices: ['Earth rotates (spins) toward the east', 'The Sun orbits around Earth every day', 'Earth orbits the Sun every day', 'Clouds push the Sun'], answer: 0, fb: [null, 'It looks that way, but the Sun does not circle Earth. Earth spins.', 'One orbit takes a whole year, not a day.', 'Clouds do not move the Sun.'] } },
+    { tag: 'test', title: 'Try a different season', sheet: 4, text: 'Mark the **noon** shadow in **June** and in **December**.', goal: { text: 'Mark the noon shadow in June and in December.', check: function (s) { return s.mark_summer_12 != null && s.mark_winter_12 != null; } },
+      q: { type: 'num', q: 'How much LONGER is the December noon shadow than the June noon shadow?', unit: 'm', answer: function (s) { return Math.round((s.mark_winter_12 - s.mark_summer_12) * 10) / 10; }, tol: 0.11, work: true, hint: 'Subtract the June length from the December length.' } },
+    { tag: 'explain', title: 'Explain seasons and shadows', sheet: 4, q: { type: 'mc', q: 'Why are winter shadows longer at noon?', choices: ['The Sun is lower in the winter sky', 'The Sun is farther from Earth in winter', 'The stick shrinks in the cold', 'There is less daylight'], answer: 0, why: 'In winter the Sun does not climb as high, so its light comes in at a lower angle and makes longer shadows.' } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: tell time by shadow', sheet: 5, q: { type: 'mc', q: 'In March, a shadow points northeast and is about 1.4 m long. About what time is it?', choices: ['3:00 PM', '9:00 AM', '12:00 PM', '6:00 PM'], answer: 0, why: 'NE shadows happen when the Sun is in the southwest: afternoon. 1.4 m matches 3:00 PM in your table.' } },
+    { tag: 'write', title: 'Final claim (CER)', sheet: 6, q: { type: 'write', q: 'Why do shadows change length and direction during the day?', parts: [
+      { label: 'Claim', starter: 'Shadows change because', min: 6, need: [{ words: ['rotat', 'spin', 'sun moves', 'position'], label: 'Names the cause (Earth rotating / Sun position)' }] },
+      { label: 'Evidence', starter: 'At 7 AM the shadow was', min: 12, number: true, need: [{ words: ['noon', '12'], label: 'Uses the noon data' }, { words: ['long', 'short'], label: 'Describes length' }] },
+      { label: 'Reasoning', starter: 'This happens because', min: 12, need: [{ words: ['east', 'west'], label: 'Explains the east-to-west motion' }, { words: ['high', 'low', 'height', 'angle'], label: 'Connects Sun height to shadow length' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-day-night', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  title: 'Day & Night Spinner', model: 'spinEarth', minutes: 20, icon: '🌍',
+  place: 'Sunnyside Space Center · Mission Control',
+  mission: 'Mission Control needs to call astronauts\' families in Indiana, London, and Tokyo, but it is always a different time somewhere! Spin Earth to figure out how rotation creates day, night, and time zones.',
+  question: 'How does Earth\'s rotation cause day and night?',
+  takeaway: 'Earth spins on its axis once every 24 hours. The half facing the Sun has day; the half facing away has night. Because Earth rotates, places take turns facing the Sun, which is why it is daytime in Indiana while it is nighttime in Tokyo.',
+  vocab: [['Axis', 'An imaginary line through the North and South Poles that Earth spins around.'], ['Rotation', 'One full spin of Earth on its axis (24 hours).'], ['Sunrise / sunset', 'When a place turns into or out of the Sun\'s light.'], ['Time zone', 'A region where everyone uses the same clock time.']],
+  warmup: { style: 'True or false?', prompt: 'Write T or F. Fix each false one.', items: [['The Sun goes around Earth once a day.', 'False: Earth spins once a day.'], ['When it is day in Indiana, it is day everywhere.', 'False: the far side of Earth has night.'], ['Earth spins once every 24 hours.', 'True.']] },
+  steps: [
+    { tag: 'explore', title: 'Spin the planet', text: 'You are looking down on the North Pole. Sunlight comes from the left.', goal: { text: 'Spin Earth a full day (24 hours). Use Play, the buttons, or drag Earth.', check: { fullDay: true } },
+      q: { type: 'mc', q: 'While Earth spun, which side was always lit?', choices: ['The side facing the Sun', 'The side with Indiana', 'The top half', 'It changed randomly'], answer: 0 } },
+    { tag: 'test', title: 'Find noon in Indiana', sheet: 1, goal: { text: 'Spin until it is **12:00 PM (noon)** in Indiana.', check: { noon: true }, hint: 'Noon is when Indiana points straight at the Sun.' },
+      q: { type: 'mc', q: 'Where is Indiana pointing at noon?', choices: ['Straight at the Sun', 'Straight away from the Sun', 'At the North Pole'], answer: 0 } },
+    { tag: 'test', title: 'Find midnight', sheet: 1, goal: { text: 'Spin until it is **12:00 AM (midnight)** in Indiana.', check: { midnight: true } },
+      q: { type: 'num', q: 'How many hours did it take to go from noon to midnight?', unit: 'hours', answer: 12 } },
+    { tag: 'record', title: 'Time around the world', sheet: 2, text: 'Set the times below and read the clocks.',
+      q: { type: 'table', q: 'Read Indiana and Tokyo\'s times.', rowHead: 'Moment', cols: [{ label: 'Indiana has', value: function (s) { return s.day ? 'day' : 'night'; }, accept: [] }, { label: 'Tokyo has', value: function (s) { var t = s.tokyo; return t >= 6 && t < 18 ? 'day' : 'night'; } }],
+        rows: [{ label: 'Indiana noon', when: { noon: true } }, { label: 'Indiana midnight', when: { midnight: true } }], tip: 'Type day or night.' } },
+    { tag: 'reason', title: 'Why different times?', sheet: 3, q: { type: 'mc', q: 'When it is noon in Indiana, it is nighttime in Tokyo. Why?', choices: ['Tokyo is on the side of Earth facing away from the Sun', 'Tokyo is closer to the Moon', 'The Sun turns off over Asia', 'Tokyo spins slower'], answer: 0 } },
+    { tag: 'test', title: 'Sunrise direction', sheet: 4, goal: { text: 'Spin until it is **sunrise** (6:00 AM) in Indiana.', check: { sunrise: true } },
+      q: { type: 'mc', q: 'At sunrise, Indiana is turning from night into day. Which way is Earth spinning (seen from above the North Pole)?', choices: ['Counterclockwise', 'Clockwise', 'It does not spin'], answer: 0, why: 'Earth spins counterclockwise seen from above the North Pole. That is why the Sun rises in the east.' } },
+    { tag: 'apply', title: 'Plan the call', sheet: 5, q: { type: 'num', q: 'Tokyo is 14 hours ahead of Indiana. If it is 7:00 PM in Indiana, what hour is it in Tokyo the next morning? (Type the hour, like 9.)', unit: 'AM', answer: 9, work: true, hint: '7 PM + 14 hours. Count 5 hours to midnight, then 9 more.' } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: faster spin', sheet: 5, q: { type: 'mc', q: 'If Earth spun twice as fast, how long would one day-and-night cycle last?', choices: ['12 hours', '48 hours', '24 hours', '6 hours'], answer: 0 } },
+    { tag: 'explain', title: 'Explain it', sheet: 6, q: { type: 'text', q: 'Explain how Earth\'s rotation causes day and night. Use the words rotate and Sun.', rows: 3, starter: 'Earth rotates on its axis, so', need: [{ words: ['rotat', 'spin'], label: 'Uses rotate/spin' }, { words: ['sun', 'light'], label: 'Mentions the Sun\'s light' }, { words: ['facing', 'faces', 'toward', 'away'], label: 'Explains facing toward / away' }], model: 'Earth rotates on its axis once every 24 hours. The side facing the Sun has day, and the side facing away has night. As Earth spins, places take turns in the light.' } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-night-sky', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  title: 'Seasonal Night Sky', model: 'orbitSky', minutes: 20, icon: '✨',
+  place: 'Sunnyside Planetarium',
+  mission: 'The planetarium needs a star guide for the whole school year. Move Earth around its orbit and find out which constellations can be seen at midnight each season, and why they change.',
+  question: 'Why do we see different constellations in different seasons?',
+  takeaway: 'Earth orbits the Sun once a year. At night we look out from the side of Earth facing away from the Sun, so as Earth moves around its orbit, our night sky points toward different stars. That is why Orion is a winter constellation and Scorpius is a summer one.',
+  vocab: [['Orbit', 'The path Earth travels around the Sun (one trip = 1 year).'], ['Constellation', 'A group of stars that forms a pattern in the sky.'], ['Revolution', 'One complete trip around the Sun.'], ['Night side', 'The half of Earth facing away from the Sun.']],
+  warmup: { style: 'Notice & wonder', prompt: 'Think about the night sky where you live.', items: [['Have you ever noticed the same stars in the sky all year? What do you wonder?', 'Some stars stay all year (like the Big Dipper), but many change with the seasons.'], ['Why can\'t we see stars during the day?', 'The Sun\'s light is so bright it hides them.'], ['How long does Earth take to orbit the Sun?', 'About 365 days (1 year).']] },
+  steps: [
+    { tag: 'explore', title: 'Start in January', text: 'The dashed line shows where Indiana looks at midnight.', goal: { text: 'Look at the sky in **January**.', check: { month: 0 } }, q: { type: 'mc', q: 'Which constellation do we see at midnight in January?', choices: ['Orion', 'Scorpius', 'Leo', 'Pegasus'], answer: 0 } },
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'If Earth moves halfway around its orbit (to July), will we still see Orion at midnight?', choices: ['Yes, the stars never change', 'No, we will see a different constellation', 'We will see no stars'] } },
+    { tag: 'test', title: 'Move to July', sheet: 1, goal: { text: 'Drag Earth (or use the slider) to **July**.', check: { month: 6 } }, q: { type: 'mc', q: 'You predicted: {{pred:s1}}. What do we see in July?', choices: ['Scorpius', 'Orion', 'No stars'], answer: 0 } },
+    { tag: 'record', title: 'Star guide', sheet: 2, q: { type: 'table', q: 'Fill in the star guide for each season.', rowHead: 'Month', cols: [{ label: 'Constellation at midnight', value: function (s) { return s.visName; } }],
+      rows: [{ label: 'January (winter)', when: { month: 0 } }, { label: 'April (spring)', when: { month: 3 } }, { label: 'July (summer)', when: { month: 6 } }, { label: 'October (fall)', when: { month: 9 } }] } },
+    { tag: 'reason', title: 'Where is Orion in July?', sheet: 3, q: { type: 'mc', q: 'In July, Orion is still out there. Why can\'t we see it?', choices: ['Orion is on the same side as the Sun, so it is in the daytime sky', 'Orion burns out in summer', 'Clouds cover it every July', 'Orion moves to the other side of the galaxy'], answer: 0, why: 'In July, the Sun is between Earth and Orion. Orion is up during the day, hidden by sunlight.' } },
+    { tag: 'reason', title: 'Rotation or revolution?', sheet: 3, q: { type: 'sort', q: 'Sort each effect by its cause.', bins: ['Earth\'s rotation (spin, 24 h)', 'Earth\'s revolution (orbit, 1 year)'], items: [['Day and night', 0], ['Sun rises in the east', 0], ['Different constellations each season', 1], ['Stars seem to move across the sky in one night', 0], ['Orion returns every January', 1]] } },
+    { tag: 'test', title: 'Complete the year', sheet: 4, goal: { text: 'Visit all four constellations by moving Earth around the whole orbit.', check: { seenCount: 4 } }, q: { type: 'num', q: 'How many months until the January stars come back to the midnight sky?', unit: 'months', answer: 12 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: 6 months later', sheet: 5, q: { type: 'mc', q: 'Leo is overhead at midnight in April. When will Leo be hidden near the Sun?', choices: ['October', 'May', 'January', 'Never'], answer: 0, why: 'Half an orbit (6 months) later, Earth is on the opposite side, so Leo is behind the Sun.' } },
+    { tag: 'write', title: 'Explain it (CER)', sheet: 6, q: { type: 'write', q: 'Why do we see different constellations in different seasons?', parts: [
+      { label: 'Claim', starter: 'We see different constellations because', min: 6, need: [{ words: ['orbit', 'revolv', 'around the sun', 'moves'], label: 'Names Earth\'s orbit' }] },
+      { label: 'Evidence', starter: 'In January we saw', min: 10, need: [{ words: ['orion', 'scorpius', 'leo', 'pegasus'], label: 'Names constellations from your star guide' }] },
+      { label: 'Reasoning', starter: 'At night we face', min: 10, need: [{ words: ['away', 'night side', 'opposite'], label: 'Explains we see stars on the night side, away from the Sun' }] }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-moon-phases', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  title: 'Moon Phase Viewer', model: 'moonPhase', minutes: 25, icon: '🌓',
+  place: 'Sunnyside Observatory',
+  mission: 'The observatory\'s moon calendar got scrambled. Move the Moon around Earth, compare the top view with the view from Earth, and rebuild the calendar in the right order.',
+  question: 'Why does the Moon seem to change shape?',
+  takeaway: 'The Sun always lights half of the Moon. As the Moon orbits Earth (about 29.5 days), we see different amounts of that lit half. That changing view is the Moon\'s phases. The Moon doesn\'t change shape, and Earth\'s shadow does not cause phases.',
+  vocab: [['Phase', 'The shape of the lit part of the Moon we see from Earth.'], ['Waxing', 'The lit part we see is growing.'], ['Waning', 'The lit part we see is shrinking.'], ['Crescent / Gibbous', 'Less than half lit / more than half lit.']],
+  warmup: { style: 'Fix the mistake', prompt: 'Each statement has a mistake. Rewrite it correctly.', items: [['The Moon makes its own light.', 'The Moon reflects sunlight.'], ['Earth\'s shadow causes the Moon\'s phases.', 'Phases come from how much of the lit half we see.'], ['A full moon happens every week.', 'About once every 29.5 days.']] },
+  steps: [
+    { tag: 'explore', title: 'Two views', text: 'Left: the top view from space. Right: what someone on Earth sees.', goal: { text: 'Drag the Moon to a new spot on its orbit.', check: function (s) { return s.day > 0.5; } } },
+    { tag: 'observe', title: 'The lit half', q: { type: 'mc', q: 'In the top view, which half of the Moon is always lit?', choices: ['The half facing the Sun', 'The half facing Earth', 'The top half'], answer: 0 } },
+    { tag: 'test', title: 'Full moon', sheet: 1, goal: { text: 'Move the Moon to make a **Full moon**.', check: { phaseIdx: 4 } }, q: { type: 'mc', q: 'Where is the Moon during a full moon?', choices: ['On the far side of Earth from the Sun', 'Between Earth and the Sun', 'Beside Earth, at a right angle'], answer: 0 } },
+    { tag: 'test', title: 'New moon', sheet: 1, goal: { text: 'Move the Moon to make a **New moon**.', check: { phaseIdx: 0 } }, q: { type: 'mc', q: 'Why can\'t we see the new moon?', choices: ['Its lit half faces away from Earth', 'Earth\'s shadow covers it', 'It is too far away'], answer: 0, fb: [null, 'This is a common idea, but in the top view Earth\'s shadow points the other way.', 'It is the same distance as always.'] } },
+    { tag: 'record', title: 'Rebuild the calendar', sheet: 2, text: 'Use **+7 days** from the new moon.', q: { type: 'table', q: 'Record the phase name.', rowHead: 'Day', cols: [{ label: 'Phase', value: function (s) { return s.phase; } }, { label: 'Lit part we see', unit: '%', value: function (s) { return s.lit; }, tol: 3 }],
+      rows: [{ label: 'About day 7', when: { phaseIdx: 2 } }, { label: 'About day 15', when: { phaseIdx: 4 } }, { label: 'About day 22', when: { phaseIdx: 6 } }] } },
+    { tag: 'reason', title: 'Put the phases in order', sheet: 3, q: { type: 'order', q: 'Order the phases starting at the new moon.', items: ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Third quarter', 'Waning crescent'] } },
+    { tag: 'test', title: 'See every phase', sheet: 4, goal: { text: 'Move the Moon through all 8 phases.', check: { phasesSeen: 8 } }, q: { type: 'num', q: 'About how many days does it take to go from one full moon to the next?', unit: 'days', answer: [29.5, 29, 30], tol: 0.51 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: which side?', sheet: 5, q: { type: 'mc', q: 'Tonight the RIGHT side of the Moon is lit and it is getting bigger each night. What phase comes next?', choices: ['First quarter, then waxing gibbous', 'Waning crescent', 'New moon', 'Third quarter'], answer: 0 } },
+    { tag: 'explain', title: 'Bust the myth', sheet: 6, q: { type: 'text', q: 'Your friend says, "Phases happen because Earth\'s shadow covers part of the Moon." Explain what really causes phases.', rows: 3, starter: 'Phases are not caused by Earth\'s shadow. They happen because', need: [{ words: ['half', 'lit'], label: 'The Sun always lights half the Moon' }, { words: ['orbit', 'moves around', 'position'], label: 'The Moon orbits Earth' }, { words: ['see', 'view', 'from earth'], label: 'We see different amounts of the lit half' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-solar-scale', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.2',
+  title: 'Solar System to Scale', model: 'solarScale', minutes: 25, icon: '🪐',
+  place: 'Sunnyside Space Center · Flight Planning',
+  mission: 'Flight Planning is designing a mission to the outer planets. Explore the solar system to scale: how far apart the planets are, how big they are, and how long a spacecraft would travel.',
+  question: 'How big and how spread out is our solar system?',
+  takeaway: 'The solar system is mostly empty space. The four rocky inner planets are close to the Sun and small. The gas and ice giants are huge and very far apart; Neptune is 30 times farther from the Sun than Earth. Spacecraft take years to reach the outer planets.',
+  vocab: [['AU (astronomical unit)', 'Earth\'s distance from the Sun, about 150 million km.'], ['Inner planets', 'Mercury, Venus, Earth, Mars: small and rocky.'], ['Outer planets', 'Jupiter, Saturn, Uranus, Neptune: giant planets.'], ['Scale model', 'A model where sizes or distances are shrunk by the same amount.']],
+  warmup: { style: 'Rank it', prompt: 'Rank from smallest to largest. Explain your first choice.', items: [['Earth, the Sun, the Moon, Jupiter', 'Moon, Earth, Jupiter, Sun.'], ['A trip to: the Moon, Mars, Neptune', 'Moon (days), Mars (months), Neptune (years).'], ['Which is closer to the Sun: Mars or Jupiter?', 'Mars.']] },
+  steps: [
+    { tag: 'explore', title: 'The distance map', goal: { text: 'Tap 3 different planets to open their fact cards.', check: { infoCount: { gte: 3 } } } },
+    { tag: 'observe', title: 'Crowded or spread out?', sheet: 1, q: { type: 'mc', q: 'On the distance map, where are the four rocky planets?', choices: ['Bunched up close to the Sun', 'Spread out evenly', 'Past Jupiter'], answer: 0 } },
+    { tag: 'test', title: 'Zoom in', goal: { text: 'Turn on **Zoom in on the inner planets**.', check: { zoomed: true } }, q: { type: 'num', q: 'How far is Mars from the Sun?', unit: 'AU', answer: 1.52, tol: 0.011 } },
+    { tag: 'reason', title: 'How many times farther?', sheet: 2, q: { type: 'num', q: 'Neptune is 30.1 AU from the Sun and Earth is 1 AU. About how many times farther from the Sun is Neptune than Earth?', unit: 'times', answer: 30, tol: 0.2 } },
+    { tag: 'test', title: 'Size lineup', sheet: 3, goal: { text: 'Switch to **Size lineup** and tap Jupiter.', check: { mode: 'size', pick: 'Jupiter' } }, q: { type: 'num', q: 'How many Earths wide is Jupiter?', unit: 'Earths', answer: 11.2, tol: 0.05 } },
+    { tag: 'reason', title: 'Sort the planets', sheet: 3, q: { type: 'sort', q: 'Sort the planets.', bins: ['Inner, rocky, small', 'Outer, giant'], items: [['Mercury', 0], ['Venus', 0], ['Earth', 0], ['Mars', 0], ['Jupiter', 1], ['Saturn', 1], ['Uranus', 1], ['Neptune', 1]] } },
+    { tag: 'test', title: 'Plan a trip', sheet: 4, goal: { text: 'Open the **Trip planner** and choose **Saturn** at **17 km/s**.', check: { mode: 'trip', dest: 'Saturn', speed: 17 } }, q: { type: 'num', q: 'About how many years would the trip to Saturn take?', unit: 'years', answer: function (s) { return s.tripYears; }, tol: 0.11 } },
+    { tag: 'apply', title: 'Speed it up', sheet: 4, goal: { text: 'Change the speed to **34 km/s** (twice as fast) for the Saturn trip.', check: { dest: 'Saturn', speed: 34 } }, q: { type: 'mc', q: 'What happened to the travel time when the speed doubled?', choices: ['It was cut in half', 'It doubled', 'It stayed the same'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: scale model', sheet: 5, q: { type: 'num', q: 'In a playground model, Earth is 1 m from the Sun. How far away should Neptune be?', unit: 'm', answer: 30.1, tol: 0.2 } },
+    { tag: 'explain', title: 'Report to Flight Planning', sheet: 6, q: { type: 'text', q: 'Explain why a trip to Neptune takes much longer than a trip to Mars. Use numbers.', number: true, rows: 3, need: [{ words: ['au', 'far', 'distance'], label: 'Compares distances' }, { words: ['year', 'time', 'longer'], label: 'Connects distance to travel time' }] } }
+  ]
+});
+
+SUNNY_SIMS.push({
+  id: 'g5-sci-star-brightness', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.2',
+  title: 'Star Brightness Lab', model: 'starBright', minutes: 20, icon: '⭐',
+  place: 'Sunnyside Observatory · Light Lab',
+  mission: 'Why does the Sun look so much brighter than every other star? Test lamps and light meters in the dark lab, then use real star data to answer the question.',
+  question: 'Why does the Sun look brighter than other stars?',
+  takeaway: 'Light spreads out as it travels, so a light looks dimmer the farther away it is: twice as far looks 4 times dimmer. The Sun is an ordinary star, but it is extremely close to us, so it looks far brighter than stars that are actually much more powerful.',
+  vocab: [['Apparent brightness', 'How bright a light looks from where you are.'], ['Actual brightness', 'How much light a star really gives off.'], ['Light-year', 'The distance light travels in a year (about 9.5 trillion km).'], ['Light meter', 'A tool that measures how bright light is.']],
+  warmup: { style: 'Would you rather?', prompt: 'Choose, then give a reason.', items: [['Read by a flashlight 1 meter away or a stadium light 1 kilometer away?', 'The flashlight: close lights can look brighter.'], ['Why does a car\'s headlight look dim far away but blinding up close?', 'Light spreads out with distance.'], ['Is the Sun the biggest, brightest star in the universe?', 'No. It is an average star that is very close.']] },
+  steps: [
+    { tag: 'explore', title: 'Two identical lamps', goal: { text: 'Move lamp B to **2 m** away.', check: { dB: 2, pB: 1 } }, q: { type: 'num', q: 'Lamp A reads 100 at 1 m. What does lamp B read at 2 m?', unit: 'units', answer: 25 } },
+    { tag: 'predict', title: 'Predict', sheet: 1, q: { type: 'predict', q: 'If lamp B moves to 4 m (twice as far as 2 m), the meter will read...', choices: ['Half of 25', 'One-fourth of 25', 'The same'] } },
+    { tag: 'record', title: 'Distance data', sheet: 1, q: { type: 'table', q: 'Record meter B for a normal lamp.', rowHead: 'Distance', cols: [{ label: 'Meter B', unit: 'units', value: function (s) { return s.meterB; }, tol: 0.2 }], rows: [{ label: '1 m', when: { dB: 1, pB: 1 } }, { label: '2 m', when: { dB: 2, pB: 1 } }, { label: '3 m', when: { dB: 3, pB: 1 } }, { label: '4 m', when: { dB: 4, pB: 1 } }] } },
+    { tag: 'reason', title: 'The pattern', sheet: 2, q: { type: 'mc', q: 'You predicted: {{pred:s1}}. What happens when the distance doubles?', choices: ['The light looks 4 times dimmer', 'The light looks 2 times dimmer', 'Nothing changes'], answer: 0, why: '100 → 25 when distance went 1 m → 2 m. Light spreads out over a bigger area, so less reaches the meter.' } },
+    { tag: 'test', title: 'A stronger lamp far away', sheet: 3, goal: { text: 'Make lamp B **4× stronger** and find a distance where both meters read the SAME.', check: { equalFar: true } }, q: { type: 'mc', q: 'A 4× stronger lamp looks the same as lamp A when it is 2 m away. What does this show?', choices: ['A powerful light can look dim if it is far away', 'Stronger lamps always look brighter', 'Distance doesn\'t matter'], answer: 0 } },
+    { tag: 'test', title: 'Real stars', sheet: 4, goal: { text: 'Switch to **Real stars** and tap Rigel.', check: { mode: 'sky', star_Rigel: true } }, q: { type: 'mc', q: 'Rigel really gives off 120,000 times more light than the Sun. Why does it look like a tiny dot?', choices: ['It is 860 light-years away', 'It is smaller than the Sun', 'It is turned off at night'], answer: 0 } },
+    { tag: 'reason', title: 'Close vs far', sheet: 4, q: { type: 'mc', q: 'Proxima Centauri is the closest star after the Sun, but we can\'t see it without a telescope. Use the data table: why?', choices: ['It gives off very little light (0.0017 × the Sun)', 'It is the farthest star', 'It is behind the Moon'], answer: 0 } },
+    { tag: 'challenge', levels: ['legend'], title: 'Legend: 3 times as far', sheet: 5, q: { type: 'num', q: 'A lamp reads 90 at 1 m. What would it read at 3 m?', unit: 'units', answer: 10, work: true, why: '3 times as far = 3 × 3 = 9 times dimmer. 90 ÷ 9 = 10.' } },
+    { tag: 'write', title: 'Final claim (CER)', sheet: 6, q: { type: 'write', q: 'Why does the Sun look brighter than other stars?', parts: [
+      { label: 'Claim', starter: 'The Sun looks brighter because', min: 6, need: [{ words: ['close', 'closer', 'near', 'distance'], label: 'Names distance as the reason' }] },
+      { label: 'Evidence', starter: 'In the lamp lab,', min: 12, number: true, need: [{ words: ['meter', 'lamp', 'dimmer', '25'], label: 'Uses lamp lab data' }] },
+      { label: 'Reasoning', starter: 'This shows that', min: 10, need: [{ words: ['far', 'distance', 'away'], label: 'Connects distance to how bright it looks' }, { words: ['rigel', 'sirius', 'other stars', 'stars'], label: 'Compares to other stars' }] }] } }
+  ]
+});

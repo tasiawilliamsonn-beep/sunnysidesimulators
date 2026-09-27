@@ -473,3 +473,320 @@ SUNNY_MODELS.dissolveLab = function (M) {
     M.set({ temp: temp, stir: stir, dropped: true, before: 310 });
   } };
 };
+
+/* ------------------------------------------------------------------ */
+/* Shadow Clock: move the Sun through the day and seasons               */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.shadowLab = function (M) {
+  var K = M.kit, S = M.state;
+  var SEA = { summer: { rise: 4.8, set: 19.2, max: 73, name: 'June (summer)' }, equinox: { rise: 6, set: 18, max: 50, name: 'March (spring)' }, winter: { rise: 7.3, set: 16.7, max: 27, name: 'December (winter)' } };
+  var t = 9, sea = 'equinox', marks = [];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.1fr 1fr;gap:10px"></div>');
+  var top = K.svgEl('svg', { viewBox: '0 0 360 360', class: 'sn-svg', role: 'img', 'aria-label': 'Top view of a stick and its shadow with compass directions' });
+  var side = K.svgEl('svg', { viewBox: '0 0 360 220', class: 'sn-svg', role: 'img', 'aria-label': 'Sky view of the Sun\'s path from east to west' });
+  var right = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>');
+  right.appendChild(side);
+  var reads = K.el('<div class="sn-reads"></div>'), rT = K.readout('Time', ''), rA = K.readout('Sun height', '°'), rL = K.readout('Shadow length', 'm'), rD = K.readout('Shadow points', '');
+  [rT, rA, rL, rD].forEach(function (r) { reads.appendChild(r.el); }); right.appendChild(reads);
+  row.appendChild(top); row.appendChild(right); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var tS = K.slider({ label: '🕘 Time of day', min: 4.5, max: 19.5, step: 0.5, value: t, fmt: clock, onInput: function (v) { t = v; M.set('movedTime', true); update(); } });
+  var sS = K.seg([['summer', '☀️ June'], ['equinox', '🌷 March'], ['winter', '❄️ December']], sea, function (v) { sea = v; M.set('season', v); M.set('seasonsTried', uniq((S.seasonsTried || []).concat([v]))); update(); });
+  var mk = K.btn('📍 Mark the shadow', function () { var s = sun(); if (s.alt <= 0) { M.toast('No shadow: the Sun is down.'); return; } marks.push({ t: t, sea: sea, len: s.len, az: s.az }); var st = { marks: marks.length }; st['mark_' + sea + '_' + t] = K.round(s.len, 1); st['marks_' + sea] = marks.filter(function (m) { return m.sea === sea; }).length; M.set(st); update(); }, 'primary');
+  var cl = K.btn('Erase marks', function () { marks = []; M.set('marks', 0); update(); }, 'ghost sm');
+  ctr.appendChild(tS.el); var r2 = K.el('<div class="sn-row"></div>'); r2.appendChild(sS.el); r2.appendChild(mk); r2.appendChild(cl); ctr.appendChild(r2); M.el.appendChild(ctr);
+  function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
+  function clock(v) { var h = Math.floor(v), m = Math.round((v - h) * 60); var ap = h >= 12 ? 'PM' : 'AM', hh = h % 12 || 12; return hh + ':' + (m < 10 ? '0' : '') + m + ' ' + ap; }
+  function sun(tt, ss) {
+    var e = SEA[ss || sea], x = ((tt == null ? t : tt) - e.rise) / (e.set - e.rise);
+    if (x <= 0 || x >= 1) return { alt: -5, az: x <= 0 ? 90 : 270, len: 0 };
+    var alt = e.max * Math.sin(Math.PI * x), az = 90 + 180 * x; // east (90) → south (180) → west (270)
+    return { alt: alt, az: az, len: 1 / Math.tan(alt * Math.PI / 180) };
+  }
+  function dirName(az) { var d = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']; return d[Math.round(((az % 360) + 360) % 360 / 45) % 8]; }
+  function update() {
+    var s = sun(), cx = 180, cy = 180, R = 150;
+    var h = '<rect width="360" height="360" fill="#8fbf6a"/><circle cx="180" cy="180" r="160" fill="#a5d27a"/>';
+    h += '<circle cx="180" cy="180" r="' + R + '" fill="none" stroke="#6d9f4d" stroke-width="2" stroke-dasharray="4 5"/>';
+    [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function (d) { var a = (d[1] - 90) * Math.PI / 180; h += '<text x="' + (cx + Math.cos(a) * 134) + '" y="' + (cy + Math.sin(a) * 134 + 6) + '" text-anchor="middle" font-size="18" font-weight="800" fill="#1d3a12">' + d[0] + '</text>'; });
+    marks.forEach(function (m) { if (m.sea !== sea) return; var a = (m.az + 180 - 90) * Math.PI / 180, L = Math.min(m.len, 4.6) * 26; h += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + Math.cos(a) * L) + '" y2="' + (cy + Math.sin(a) * L) + '" stroke="#fff" stroke-width="2" stroke-dasharray="3 3"/><circle cx="' + (cx + Math.cos(a) * L) + '" cy="' + (cy + Math.sin(a) * L) + '" r="4" fill="#fff"/><text x="' + (cx + Math.cos(a) * (L + 12)) + '" y="' + (cy + Math.sin(a) * (L + 12) + 4) + '" font-size="10" text-anchor="middle" fill="#1d3a12">' + clock(m.t).replace(':00', '') + '</text>'; });
+    if (s.alt > 0) { var a2 = (s.az + 180 - 90) * Math.PI / 180, L2 = Math.min(s.len, 4.6) * 26; h += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + Math.cos(a2) * L2) + '" y2="' + (cy + Math.sin(a2) * L2) + '" stroke="#2f3e28" stroke-width="10" stroke-linecap="round" opacity=".75"/>' + (s.len > 4.6 ? '<text x="' + (cx + Math.cos(a2) * 140) + '" y="' + (cy + Math.sin(a2) * 140) + '" font-size="11" fill="#1d3a12" text-anchor="middle">(longer)</text>' : '');
+      var a3 = (s.az - 90) * Math.PI / 180; h += '<circle cx="' + (cx + Math.cos(a3) * 160) + '" cy="' + (cy + Math.sin(a3) * 160) + '" r="14" fill="#ffd43b" stroke="#f08c00" stroke-width="3"/>'; }
+    h += '<circle cx="180" cy="180" r="7" fill="#8b5a2b" stroke="#5c3a1a" stroke-width="2"/><text x="180" y="352" text-anchor="middle" font-size="12" fill="#1d3a12" font-weight="700">TOP VIEW · 1-meter stick</text>';
+    top.innerHTML = h;
+    // side sky view
+    var e = SEA[sea], hs = '<defs><linearGradient id="skyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + (s.alt > 0 ? '#74c0fc' : '#1b2a4a') + '"/><stop offset="1" stop-color="' + (s.alt > 0 ? '#d0ebff' : '#364fc7') + '"/></linearGradient></defs><rect width="360" height="220" fill="url(#skyG)"/>';
+    var pts = []; for (var tt = e.rise; tt <= e.set; tt += 0.25) { var q = sun(tt); var x = 20 + (q.az - 90) / 180 * 320; pts.push(x + ',' + (190 - q.alt * 2.2)); }
+    hs += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4" opacity=".8"/>';
+    if (s.alt > 0) { var sx = 20 + (s.az - 90) / 180 * 320; hs += '<circle cx="' + sx + '" cy="' + (190 - s.alt * 2.2) + '" r="13" fill="#ffd43b" stroke="#f08c00" stroke-width="3"/>'; }
+    else hs += '<text x="180" y="100" text-anchor="middle" font-size="16" fill="#fff" font-weight="700">Night: the Sun is below the horizon</text>';
+    hs += '<rect y="190" width="360" height="30" fill="#6d9f4d"/><text x="20" y="210" font-size="13" font-weight="800" fill="#fff">E</text><text x="180" y="210" font-size="13" font-weight="800" fill="#fff" text-anchor="middle">S</text><text x="340" y="210" font-size="13" font-weight="800" fill="#fff" text-anchor="end">W</text><text x="10" y="18" font-size="11" fill="#fff" font-weight="700">SKY VIEW (looking south) · ' + e.name + '</text>';
+    side.innerHTML = hs;
+    rT.set(clock(t)); rA.set(s.alt > 0 ? Math.round(s.alt) : 'down'); rL.set(s.alt > 0 ? K.fmt(s.len, 1) : '—'); rD.set(s.alt > 0 ? dirName(s.az + 180) : '—');
+    M.set({ time: t, alt: Math.round(Math.max(0, s.alt)), len: s.alt > 0 ? K.round(s.len, 1) : 0, dir: s.alt > 0 ? dirName(s.az + 180) : 'none', up: s.alt > 0, season: sea });
+  }
+  M.set({ season: sea, marks: 0, seasonsTried: [sea] }); update();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.season) { sea = c.season; sS.set(sea); } if (c.time != null) { t = c.time; tS.set(t, true); } M.set('movedTime', true); update();
+    for (var k in c) { var mm = k.match(/^mark_(\w+)_([\d.]+)$/); if (mm) { sea = mm[1]; t = +mm[2]; sS.set(sea); tS.set(t, true); update(); mk.click(); } var m2 = k.match(/^marks_(\w+)$/); if (m2) { sea = m2[1]; sS.set(sea); [8, 10, 12, 14, 16].forEach(function (x) { t = x; update(); mk.click(); }); } }
+    if (c.marks) { [9, 12, 15].forEach(function (x) { t = x; update(); mk.click(); }); }
+    if (c.seasonsTried) { M.set('seasonsTried', ['summer', 'equinox', 'winter']); } } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Earth Spinner: rotation makes day and night                          */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.spinEarth = function (M) {
+  var K = M.kit, S = M.state;
+  var hours = 6, playing = false, dirOK = true, spun = 0;
+  var CITIES = M.cfg.cities || [{ id: 'indiana', name: 'Indiana', ahead: 0, col: '#e8590c' }, { id: 'tokyo', name: 'Tokyo', ahead: 14, col: '#7048e8' }, { id: 'london', name: 'London', ahead: 5, col: '#1971c2' }];
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 640 360', class: 'sn-svg', role: 'img', 'aria-label': 'Earth seen from above the North Pole with sunlight from the left' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rT = K.readout('Time in Indiana', '', true), rDN = K.readout('Indiana has', ''), rH = K.readout('Hours spun', 'h'), rTk = K.readout('Time in Tokyo', '');
+  [rT, rDN, rH, rTk].forEach(function (r) { reads.appendChild(r.el); }); M.el.appendChild(reads);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag Earth to spin it, or use the buttons.</span></div>');
+  var b1 = K.btn('⟲ Spin 1 hour', function () { step(1); }), b6 = K.btn('⟲ Spin 6 hours', function () { step(6); }), pl = K.btn('▶ Play a day', function () { playing = !playing; pl.textContent = playing ? '❚❚ Pause' : '▶ Play a day'; }, 'primary');
+  var lbl = K.toggle('Show day/night labels', true, function () { draw(); });
+  [b1, b6, pl, lbl.el].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function clock(hh) { hh = ((hh % 24) + 24) % 24; var h = Math.floor(hh), m = Math.round((hh - h) * 60); if (m === 60) { h = (h + 1) % 24; m = 0; } return (h % 12 || 12) + ':' + (m < 10 ? '0' : '') + m + (h >= 12 ? ' PM' : ' AM'); }
+  function step(dh) { hours += dh; spun += Math.abs(dh); report(); draw(); }
+  // Indiana's local time = hours; noon when Indiana faces the Sun (left).
+  // Seen from above the North Pole, Earth spins counterclockwise. Noon points at the Sun (left, 180°).
+  function angleOf(ahead) { return 180 - (hours + (ahead || 0) - 12) * 15; }
+  function report() {
+    var ind = ((hours % 24) + 24) % 24, day = ind >= 6 && ind < 18;
+    var st = { hours: K.round(hours, 2), time: K.round(ind, 2), day: day, spun: K.round(spun, 1), tokyo: K.round((ind + 14) % 24, 2) };
+    st.noon = Math.abs(ind - 12) < 0.26; st.midnight = ind < 0.26 || ind > 23.74; st.sunrise = Math.abs(ind - 6) < 0.26; st.sunset = Math.abs(ind - 18) < 0.26;
+    if (st.noon) st.sawNoon = true; if (st.midnight) st.sawMidnight = true; if (st.sunrise) st.sawSunrise = true; if (st.sunset) st.sawSunset = true;
+    if (spun >= 24) st.fullDay = true;
+    M.set(st);
+    rT.set(clock(ind)); rDN.set(day ? '☀ DAY' : '🌙 NIGHT'); rH.set(K.fmt(spun, 1)); rTk.set(clock(ind + 14));
+  }
+  function draw() {
+    var cx = 400, cy = 180, R = 120;
+    var h = '<rect width="640" height="360" fill="#0b1026"/>';
+    for (var i = 0; i < 60; i++) { var r = K.rng('st' + i); h += '<circle cx="' + (r() * 640) + '" cy="' + (r() * 360) + '" r="' + (r() * 1.4 + .3) + '" fill="#fff" opacity=".7"/>'; }
+    h += '<circle cx="-40" cy="180" r="120" fill="#ffd43b"/><circle cx="-40" cy="180" r="150" fill="#ffd43b" opacity=".15"/><text x="20" y="40" fill="#ffd43b" font-size="14" font-weight="800">SUNLIGHT →</text>';
+    for (var y = 70; y <= 290; y += 44) h += '<line x1="90" y1="' + y + '" x2="' + (cx - R - 10) + '" y2="' + y + '" stroke="#ffe066" stroke-width="2" opacity=".5" marker-end=""/>';
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="#1c7ed6"/>';
+    var rot = angleOf(0);
+    h += '<g transform="rotate(' + (rot - 180) + ' ' + cx + ' ' + cy + ')"><path d="M' + (cx - 60) + ' ' + (cy - 70) + ' q40 -30 70 0 q20 30 -10 50 q-40 10 -60 -50 z" fill="#40c057"/><path d="M' + (cx + 30) + ' ' + (cy + 40) + ' q30 -10 50 10 q10 30 -20 40 q-30 -10 -30 -50 z" fill="#40c057"/><path d="M' + (cx - 20) + ' ' + (cy + 60) + ' q20 10 10 40 q-30 0 -10 -40 z" fill="#40c057"/></g>';
+    h += '<path d="M' + cx + ' ' + (cy - R) + ' A' + R + ' ' + R + ' 0 0 1 ' + cx + ' ' + (cy + R) + ' Z" fill="#000" opacity=".55"/>';
+    if (lbl.get()) h += '<text x="' + (cx - 60) + '" y="' + (cy - R - 10) + '" fill="#ffe066" font-size="14" font-weight="800" text-anchor="middle">DAY SIDE</text><text x="' + (cx + 60) + '" y="' + (cy - R - 10) + '" fill="#91a7ff" font-size="14" font-weight="800" text-anchor="middle">NIGHT SIDE</text>';
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="5" fill="#fff"/><text x="' + cx + '" y="' + (cy + 20) + '" fill="#fff" font-size="10" text-anchor="middle">North Pole</text>';
+    h += '<path d="M' + (cx + R + 24) + ' ' + (cy + 40) + ' A' + (R + 24) + ' ' + (R + 24) + ' 0 0 0 ' + (cx + R + 24) + ' ' + (cy - 40) + '" fill="none" stroke="#adb5bd" stroke-width="3" marker-end="url(#arr)"/><defs><marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#adb5bd"/></marker></defs><text x="' + (cx + R + 30) + '" y="' + (cy + 70) + '" fill="#adb5bd" font-size="11">spins this way</text>';
+    CITIES.forEach(function (c) {
+      var a = (angleOf(c.ahead)) * Math.PI / 180, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R, x2 = cx + Math.cos(a) * (R + 26), y2 = cy + Math.sin(a) * (R + 26);
+      h += '<line x1="' + x + '" y1="' + y + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + c.col + '" stroke-width="3"/><circle cx="' + x2 + '" cy="' + y2 + '" r="7" fill="' + c.col + '" stroke="#fff" stroke-width="2"/><text x="' + (cx + Math.cos(a) * (R + 46)) + '" y="' + (cy + Math.sin(a) * (R + 46) + 4) + '" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">' + c.name + '</text>';
+    });
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R + 6) + '" fill="transparent" class="se-grab"/>';
+    svg.innerHTML = h;
+  }
+  // Drag to spin: angle of pointer around the center.
+  svg.addEventListener('pointerdown', function (ev) {
+    var pt = svg.createSVGPoint(); function ang(e) { pt.x = e.clientX; pt.y = e.clientY; var m = svg.getScreenCTM(); if (!m) return 0; var q = pt.matrixTransform(m.inverse()); return Math.atan2(q.y - 180, q.x - 400) * 180 / Math.PI; }
+    var a0 = ang(ev), on = true; svg.setPointerCapture && svg.setPointerCapture(ev.pointerId);
+    function mv(e) { if (!on) return; var a = ang(e), d = a - a0; if (d > 180) d -= 360; if (d < -180) d += 360; a0 = a; if (d > 0) { if (!S.wrongWay) M.set('wrongWay', true); } hours -= d / 15; spun += Math.abs(d / 15); report(); draw(); }
+    function up() { on = false; svg.removeEventListener('pointermove', mv); svg.removeEventListener('pointerup', up); }
+    svg.addEventListener('pointermove', mv); svg.addEventListener('pointerup', up);
+  });
+  M.loop(function (dt) { if (playing) { hours += dt * 3; spun += dt * 3; report(); draw(); } });
+  report(); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.fullDay) { spun = 24; } if (c.sawNoon || c.noon) hours = 12; if (c.sawMidnight || c.midnight) hours = 24; if (c.sawSunrise || c.sunrise) hours = 30; if (c.sawSunset || c.sunset) hours = 42; if (c.sawNoon && c.sawMidnight) { hours = 12; report(); hours = 24; } report(); draw(); if (c.sawNoon) M.set('sawNoon', true); if (c.sawMidnight) M.set('sawMidnight', true); if (c.sawSunset) M.set('sawSunset', true); if (c.sawSunrise) M.set('sawSunrise', true); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Orbit & Night Sky: Earth's orbit changes the stars we see            */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.orbitSky = function (M) {
+  var K = M.kit, S = M.state;
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var CON = [{ id: 'orion', name: 'Orion', ang: 180, stars: [[0, -18], [10, -10], [-8, -8], [-4, 0], [0, 0], [4, 0], [-8, 12], [10, 14]], season: 'winter' }, { id: 'leo', name: 'Leo', ang: 270, stars: [[-14, 0], [-6, -8], [2, -10], [8, -4], [4, 4], [14, 8], [-4, 8]], season: 'spring' }, { id: 'scorpius', name: 'Scorpius', ang: 0, stars: [[-14, -12], [-8, -6], [-2, 0], [2, 6], [6, 12], [12, 12], [16, 6]], season: 'summer' }, { id: 'pegasus', name: 'Pegasus', ang: 90, stars: [[-10, -10], [10, -10], [10, 10], [-10, 10], [-18, -16], [18, 14]], season: 'fall' }];
+  var month = 0; // 0 = January
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 420 420', class: 'sn-svg', role: 'img', 'aria-label': 'Earth orbiting the Sun with four constellations far away' });
+  var sky = K.svgEl('svg', { viewBox: '0 0 260 260', class: 'sn-svg', role: 'img', 'aria-label': 'Midnight sky from Indiana' });
+  var rc = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>'); rc.appendChild(sky);
+  var reads = K.el('<div class="sn-reads"></div>'), rM = K.readout('Month', ''), rV = K.readout('Seen at midnight', '');
+  reads.appendChild(rM.el); reads.appendChild(rV.el); rc.appendChild(reads);
+  row.appendChild(svg); row.appendChild(rc); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var mS = K.slider({ label: '📅 Month', min: 0, max: 11, step: 1, value: month, fmt: function (v) { return MONTHS[v]; }, onInput: function (v) { month = v; draw(); } });
+  var lines = K.toggle('Show line of sight at midnight', true, function () { draw(); });
+  ctr.appendChild(mS.el); ctr.appendChild(lines.el); M.el.appendChild(ctr);
+  function earthAng() { return 180 + month * 30; } // Earth angle around the Sun (deg). Jan: Earth on left.
+  function visible() { var ea = earthAng() % 360; var best = null, bd = 999; CON.forEach(function (c) { var d = Math.abs(((c.ang - ea + 540) % 360) - 180); if (d < bd) { bd = d; best = c; } }); return best; }
+  function draw() {
+    var h = '<rect width="420" height="420" fill="#0b1026"/>', cx = 210, cy = 210;
+    CON.forEach(function (c) { var a = c.ang * Math.PI / 180, x = cx + Math.cos(a) * 180, y = cy + Math.sin(a) * 180; c.stars.forEach(function (s) { h += '<circle cx="' + (x + s[0] * 0.9) + '" cy="' + (y + s[1] * 0.9) + '" r="2.2" fill="#fff"/>'; }); h += '<text x="' + x + '" y="' + (y + (c.ang === 90 ? -24 : 30)) + '" fill="#bac8ff" font-size="12" text-anchor="middle" font-weight="700">' + c.name + '</text>'; });
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="115" fill="none" stroke="#495057" stroke-dasharray="4 5"/>';
+    for (var m = 0; m < 12; m++) { var am = (180 + m * 30) * Math.PI / 180; h += '<text x="' + (cx + Math.cos(am) * 132) + '" y="' + (cy + Math.sin(am) * 132 + 4) + '" fill="#868e96" font-size="10" text-anchor="middle">' + MONTHS[m] + '</text>'; }
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="28" fill="#ffd43b"/><circle cx="' + cx + '" cy="' + cy + '" r="38" fill="#ffd43b" opacity=".2"/>';
+    var a = earthAng() * Math.PI / 180, ex = cx + Math.cos(a) * 115, ey = cy + Math.sin(a) * 115;
+    if (lines.get()) h += '<line x1="' + ex + '" y1="' + ey + '" x2="' + (cx + Math.cos(a) * 190) + '" y2="' + (cy + Math.sin(a) * 190) + '" stroke="#91a7ff" stroke-width="2" stroke-dasharray="5 4"/>';
+    h += '<g class="os-earth" role="button" aria-label="Earth. Drag it around its orbit."><circle cx="' + ex + '" cy="' + ey + '" r="16" fill="#1c7ed6" stroke="#fff" stroke-width="2"/><path d="M' + ex + ' ' + (ey - 16) + ' A16 16 0 0 ' + (1) + ' ' + ex + ' ' + (ey + 16) + '" transform="rotate(' + (earthAng() - 180) + ' ' + ex + ' ' + ey + ')" fill="#000" opacity=".55"/><circle cx="' + ex + '" cy="' + ey + '" r="24" fill="transparent"/></g>';
+    h += '<text x="10" y="410" fill="#adb5bd" font-size="11">Earth\'s night side faces away from the Sun.</text>';
+    svg.innerHTML = h;
+    var v = visible();
+    var hs = '<rect width="260" height="260" fill="#10193a"/><text x="130" y="22" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">Indiana · midnight · ' + MONTHS[month] + '</text>';
+    v.stars.forEach(function (s) { hs += '<circle cx="' + (130 + s[0] * 4) + '" cy="' + (130 + s[1] * 4) + '" r="4" fill="#fff"/>'; });
+    for (var i = 0; i < v.stars.length - 1; i++) hs += '<line x1="' + (130 + v.stars[i][0] * 4) + '" y1="' + (130 + v.stars[i][1] * 4) + '" x2="' + (130 + v.stars[i + 1][0] * 4) + '" y2="' + (130 + v.stars[i + 1][1] * 4) + '" stroke="#748ffc" stroke-width="1.5" opacity=".6"/>';
+    hs += '<text x="130" y="232" text-anchor="middle" fill="#bac8ff" font-size="16" font-weight="800">' + v.name + '</text><rect y="240" width="260" height="20" fill="#1b2a1b"/>';
+    sky.innerHTML = hs;
+    rM.set(MONTHS[month]); rV.set(v.name);
+    var st = { month: month, monthName: MONTHS[month], visible: v.id, visName: v.name }; st['saw_' + v.id] = true;
+    var seen = (S.seenList || []).slice(); if (seen.indexOf(v.id) < 0) seen.push(v.id); st.seenList = seen; st.seenCount = seen.length;
+    M.set(st);
+    var g = svg.querySelector('.os-earth');
+    K.drag(g, { svg: svg, pos: function () { return [ex, ey]; }, move: function (x, y) { var ang = Math.atan2(y - cy, x - cx) * 180 / Math.PI; var m2 = Math.round((((ang - 180) % 360) + 360) % 360 / 30) % 12; if (m2 !== month) { month = m2; mS.set(month, true); draw(); } } });
+  }
+  draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.month != null) { month = c.month; } for (var k in c) { var mm = k.match(/^saw_(\w+)$/); if (mm) { var cc = CON.filter(function (x) { return x.id === mm[1]; })[0]; month = ((cc.ang - 180) / 30 + 12) % 12; draw(); } } if (c.seenCount) [0, 3, 6, 9].forEach(function (m) { month = m; draw(); }); mS.set(month, true); draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Moon Phases: move the Moon around Earth; see it from Earth           */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.moonPhase = function (M) {
+  var K = M.kit, S = M.state, cfg = M.cfg || {};
+  var day = cfg.startDay || 0, CYC = 29.5;
+  var NAMES = ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Third quarter', 'Waning crescent'];
+  M.el.innerHTML = '';
+  var row = K.el('<div style="display:grid;grid-template-columns:1.5fr 1fr;gap:10px"></div>');
+  var svg = K.svgEl('svg', { viewBox: '0 0 440 400', class: 'sn-svg', role: 'img', 'aria-label': 'Top view of the Moon orbiting Earth with sunlight from the left' });
+  var view = K.svgEl('svg', { viewBox: '0 0 240 240', class: 'sn-svg', role: 'img', 'aria-label': 'The Moon as seen from Earth' });
+  var rc = K.el('<div style="display:flex;flex-direction:column;gap:8px"></div>'); rc.appendChild(view);
+  var reads = K.el('<div class="sn-reads"></div>'), rP = K.readout('Phase', ''), rD = K.readout('Days since new moon', ''), rL = K.readout('Lit side we see', '%');
+  [rP, rD, rL].forEach(function (r) { reads.appendChild(r.el); }); rc.appendChild(reads);
+  row.appendChild(svg); row.appendChild(rc); M.el.appendChild(row);
+  var ctr = K.el('<div class="sn-ctrls"><span class="sn-note">Drag the Moon along its orbit, or step one day at a time.</span></div>');
+  var b1 = K.btn('+1 day', function () { day = (day + 1) % CYC; draw(); }), b7 = K.btn('+7 days', function () { day = (day + 7.4) % CYC; draw(); }, 'primary');
+  var half = K.toggle('Show the half the Sun lights', true, function () { draw(); });
+  [b1, b7, half.el].forEach(function (b) { ctr.appendChild(b); }); M.el.appendChild(ctr);
+  function elong() { return day / CYC * 360; } // 0 = new, 180 = full
+  function phaseIdx() { return Math.round(elong() / 45) % 8; }
+  function discPath(cx, cy, R, e) {
+    e = ((e % 360) + 360) % 360; var rx = Math.abs(Math.cos(e * Math.PI / 180)) * R;
+    if (e < 180) { var s = e < 90 ? 0 : 1; return 'M' + cx + ' ' + (cy - R) + ' A' + R + ' ' + R + ' 0 0 1 ' + cx + ' ' + (cy + R) + ' A' + rx + ' ' + R + ' 0 0 ' + s + ' ' + cx + ' ' + (cy - R) + ' Z'; }
+    var s2 = e > 270 ? 1 : 0; return 'M' + cx + ' ' + (cy - R) + ' A' + R + ' ' + R + ' 0 0 0 ' + cx + ' ' + (cy + R) + ' A' + rx + ' ' + R + ' 0 0 ' + s2 + ' ' + cx + ' ' + (cy - R) + ' Z';
+  }
+  function draw() {
+    var cx = 250, cy = 200, R = 140, e = elong(), th = (180 - e) * Math.PI / 180, mx = cx + Math.cos(th) * R, my = cy + Math.sin(th) * R;
+    var h = '<rect width="440" height="400" fill="#0b1026"/><text x="10" y="22" fill="#ffd43b" font-size="13" font-weight="800">SUNLIGHT →</text>';
+    for (var y = 50; y <= 360; y += 40) h += '<line x1="10" y1="' + y + '" x2="70" y2="' + y + '" stroke="#ffe066" stroke-width="2" opacity=".6"/>';
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#495057" stroke-dasharray="4 5"/>';
+    for (var k = 0; k < 8; k++) { var ta = (180 - k * 45) * Math.PI / 180; h += '<circle cx="' + (cx + Math.cos(ta) * R) + '" cy="' + (cy + Math.sin(ta) * R) + '" r="3" fill="#495057"/>'; }
+    h += '<circle cx="' + cx + '" cy="' + cy + '" r="34" fill="#1c7ed6"/><path d="M' + cx + ' ' + (cy - 34) + ' A34 34 0 0 1 ' + cx + ' ' + (cy + 34) + ' Z" fill="#000" opacity=".5"/><text x="' + cx + '" y="' + (cy + 52) + '" fill="#fff" font-size="11" text-anchor="middle">Earth</text>';
+    h += '<g class="mp-moon" role="button" aria-label="Moon. Drag it around Earth."><circle cx="' + mx + '" cy="' + my + '" r="18" fill="#343a40"/>' + (half.get() ? '<path d="M' + mx + ' ' + (my - 18) + ' A18 18 0 0 0 ' + mx + ' ' + (my + 18) + ' Z" fill="#f1f3f5"/>' : '') + '<circle cx="' + mx + '" cy="' + my + '" r="28" fill="transparent"/></g>';
+    h += '<line x1="' + cx + '" y1="' + cy + '" x2="' + mx + '" y2="' + my + '" stroke="#91a7ff" stroke-width="1.5" stroke-dasharray="3 4"/>';
+    svg.innerHTML = h;
+    var v = '<rect width="240" height="240" fill="#10193a"/><text x="120" y="22" text-anchor="middle" fill="#fff" font-size="13" font-weight="800">View from Earth</text><circle cx="120" cy="125" r="70" fill="#2b2f3a"/>';
+    if (e > 3 && e < 357) v += '<path d="' + discPath(120, 125, 70, e) + '" fill="#f1f3f5"/>';
+    var lit = Math.round((1 - Math.cos(e * Math.PI / 180)) / 2 * 100);
+    v += '<text x="120" y="222" text-anchor="middle" fill="#bac8ff" font-size="15" font-weight="800">' + NAMES[phaseIdx()] + '</text>';
+    view.innerHTML = v;
+    rP.set(NAMES[phaseIdx()]); rD.set(K.fmt(day, 1)); rL.set(lit);
+    var st = { day: K.round(day, 1), phase: NAMES[phaseIdx()], phaseIdx: phaseIdx(), lit: lit }; st['saw_' + phaseIdx()] = true;
+    var seen = (S.seenPhases || []).slice(); if (seen.indexOf(phaseIdx()) < 0) seen.push(phaseIdx()); st.seenPhases = seen; st.phasesSeen = seen.length;
+    M.set(st);
+    K.drag(svg.querySelector('.mp-moon'), { svg: svg, pos: function () { return [mx, my]; }, move: function (x, y) { var a = Math.atan2(y - cy, x - cx) * 180 / Math.PI; var ee = ((180 - a) % 360 + 360) % 360; var nd = ee / 360 * CYC; var n = Math.round(nd / (CYC / 8)); if (Math.abs(nd - n * CYC / 8) < 0.6) nd = n * CYC / 8; day = nd % CYC; draw(); } });
+  }
+  draw();
+  return { auto: function (st) { var c = st.goal.check || {}; for (var k in c) { var mm = k.match(/^saw_(\d)$/); if (mm) { day = +mm[1] * CYC / 8; draw(); } } if (c.phaseIdx != null) { day = (c.phaseIdx.eq != null ? c.phaseIdx.eq : c.phaseIdx) * CYC / 8; draw(); } if (c.phasesSeen) for (var i = 0; i < 8; i++) { day = i * CYC / 8; draw(); } draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Solar System to Scale: distances, sizes, and trips                   */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.solarScale = function (M) {
+  var K = M.kit, S = M.state;
+  var P = [['Mercury', 0.39, 0.38, '#adb5bd', 'rocky', 88, '176 Earth days'], ['Venus', 0.72, 0.95, '#f4d58d', 'rocky', 225, '243 Earth days'], ['Earth', 1, 1, '#1c7ed6', 'rocky', 365, '24 hours'], ['Mars', 1.52, 0.53, '#e8590c', 'rocky', 687, '24.6 hours'], ['Jupiter', 5.2, 11.2, '#d9a066', 'gas giant', 4333, '10 hours'], ['Saturn', 9.5, 9.45, '#e9c46a', 'gas giant', 10759, '10.7 hours'], ['Uranus', 19.2, 4.0, '#66d9e8', 'ice giant', 30687, '17 hours'], ['Neptune', 30.1, 3.88, '#4263eb', 'ice giant', 60190, '16 hours']];
+  var mode = 'distance', pick = 'Earth', zoom = false, dest = 'Mars', speed = 17;
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 720 300', class: 'sn-svg', role: 'img', 'aria-label': 'Solar system scale model' });
+  M.el.appendChild(svg);
+  var card = K.el('<div class="sn-panel" aria-live="polite"></div>'); M.el.appendChild(card);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var mS = K.seg([['distance', '📏 Distance map'], ['size', '⚪ Size lineup'], ['trip', '🚀 Trip planner']], mode, function (v) { mode = v; M.set('mode', v); M.set('modes', uniq((S.modes || []).concat([v]))); draw(); });
+  var zT = K.toggle('Zoom in on the inner planets', false, function (b) { zoom = b; M.set('zoomed', b ? true : S.zoomed); draw(); });
+  var sp = K.slider({ label: '🚀 Spacecraft speed', min: 10, max: 60, step: 1, value: speed, unit: 'km/s', onInput: function (v) { speed = v; M.set('speed', v); draw(); } });
+  ctr.appendChild(mS.el); ctr.appendChild(zT.el); ctr.appendChild(sp.el); M.el.appendChild(ctr);
+  function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
+  function info(n) { return P.filter(function (p) { return p[0] === n; })[0]; }
+  function years(au) { return au * 149.6e6 / (speed * 3.156e7); }
+  function draw() {
+    var h = '<rect width="720" height="300" fill="#0b1026"/>';
+    if (mode === 'distance') {
+      var max = zoom ? 2 : 31, x0 = 40, x1 = 700, sc = (x1 - x0) / max;
+      h += '<circle cx="' + x0 + '" cy="150" r="22" fill="#ffd43b"/><text x="' + x0 + '" y="190" fill="#ffd43b" font-size="11" text-anchor="middle">Sun</text><line x1="' + x0 + '" y1="150" x2="' + x1 + '" y2="150" stroke="#495057"/>';
+      for (var a = 0; a <= max; a += zoom ? 0.5 : 5) h += '<line x1="' + (x0 + a * sc) + '" x2="' + (x0 + a * sc) + '" y1="235" y2="245" stroke="#868e96"/><text x="' + (x0 + a * sc) + '" y="260" fill="#868e96" font-size="11" text-anchor="middle">' + a + '</text>';
+      h += '<text x="370" y="285" fill="#adb5bd" font-size="12" text-anchor="middle">Distance from the Sun (AU). 1 AU = Earth\'s distance = 150 million km</text>';
+      if (!zoom) h += '<text x="' + (x0 + 1 * sc) + '" y="98" fill="#ffe066" font-size="12" text-anchor="middle" font-weight="700">Inner planets</text><text x="' + (x0 + 1 * sc) + '" y="112" fill="#adb5bd" font-size="10" text-anchor="middle">(zoom in to see them)</text>';
+      P.forEach(function (p, i) { if (p[1] > max) return; var x = x0 + p[1] * sc, y = 150 + (i % 2 ? 34 : -34), lab = zoom || p[1] > 2; h += '<g class="ss-p" data-p="' + p[0] + '" role="button" tabindex="0"><line x1="' + x + '" y1="150" x2="' + x + '" y2="' + y + '" stroke="' + (lab ? '#495057' : 'none') + '"/><circle cx="' + x + '" cy="150" r="' + (p[0] === pick ? 7 : 5) + '" fill="' + p[3] + '" stroke="' + (p[0] === pick ? '#fff' : 'none') + '" stroke-width="2"/><text x="' + x + '" y="' + (y + (i % 2 ? 14 : -4)) + '" fill="#fff" font-size="12" text-anchor="middle" font-weight="700">' + p[0] + '</text><circle cx="' + x + '" cy="150" r="16" fill="transparent"/></g>'; });
+    } else if (mode === 'size') {
+      h += '<circle cx="-2150" cy="150" r="2200" fill="#ffd43b"/><text x="20" y="30" fill="#0b1026" font-size="12" font-weight="800">edge of the Sun (109× Earth)</text>';
+      var x = 90; P.forEach(function (p) { var r = p[2] * 5; x += r + 8; h += '<g class="ss-p" data-p="' + p[0] + '" role="button" tabindex="0"><circle cx="' + x + '" cy="150" r="' + r + '" fill="' + p[3] + '" stroke="' + (p[0] === pick ? '#fff' : 'none') + '" stroke-width="2"/><text x="' + x + '" y="' + (150 + Math.max(r, 8) + 16) + '" fill="#fff" font-size="11" text-anchor="middle">' + p[0] + '</text><circle cx="' + x + '" cy="150" r="' + Math.max(r, 12) + '" fill="transparent"/></g>'; x += r + 6; });
+      h += '<text x="360" y="285" fill="#adb5bd" font-size="12" text-anchor="middle">Sizes to scale (distances not to scale). Earth is ' + 10 + ' px wide.</text>';
+    } else {
+      var d = info(dest), yrs = years(d[1] - 1 < 0 ? 1 - d[1] : d[1] - 1);
+      h += '<text x="20" y="30" fill="#fff" font-size="14" font-weight="800">Trip from Earth to ' + dest + ' (straight line, planets lined up)</text>';
+      var sc2 = 640 / 30; h += '<line x1="40" y1="160" x2="680" y2="160" stroke="#495057"/>';
+      P.forEach(function (p) { var xx = 40 + p[1] * sc2; h += '<g class="ss-p" data-p="' + p[0] + '" role="button" tabindex="0"><circle cx="' + xx + '" cy="160" r="' + (p[0] === dest ? 8 : 5) + '" fill="' + p[3] + '"/><text x="' + xx + '" y="' + (p[1] < 2 ? 190 + P.indexOf(p) * 12 : 185) + '" fill="#fff" font-size="10" text-anchor="middle">' + p[0] + '</text><circle cx="' + xx + '" cy="160" r="14" fill="transparent"/></g>'; });
+      h += '<text x="360" y="90" fill="#ffd43b" font-size="26" font-weight="800" text-anchor="middle">' + (yrs < 1 ? Math.round(yrs * 365) + ' days' : K.fmt(yrs, 1) + ' years') + '</text><text x="360" y="115" fill="#adb5bd" font-size="12" text-anchor="middle">at ' + speed + ' km/s (Voyager 1 flies about 17 km/s)</text>';
+      M.set({ dest: dest, tripYears: K.round(yrs, 1), tripDays: Math.round(yrs * 365) });
+    }
+    svg.innerHTML = h;
+    svg.querySelectorAll('.ss-p').forEach(function (g) { function go() { var n = g.getAttribute('data-p'); if (mode === 'trip') { dest = n; } pick = n; var st = { pick: n }; st['info_' + n] = true; var seen = (S.infoSeen || []).slice(); if (seen.indexOf(n) < 0) seen.push(n); st.infoSeen = seen; st.infoCount = seen.length; M.set(st); draw(); } g.addEventListener('click', go); g.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); }); });
+    var p = info(pick);
+    card.innerHTML = '<h3>' + p[0] + '</h3><div class="sn-reads"><div class="sn-read"><span class="sn-read-l">Distance from Sun</span><b class="sn-read-v">' + p[1] + '</b><span class="sn-read-u">AU</span></div><div class="sn-read"><span class="sn-read-l">Width (Earth = 1)</span><b class="sn-read-v">' + p[2] + '</b><span class="sn-read-u">×</span></div><div class="sn-read"><span class="sn-read-l">Type</span><b class="sn-read-v" style="font-size:1em">' + p[4] + '</b></div><div class="sn-read"><span class="sn-read-l">1 year</span><b class="sn-read-v">' + p[5].toLocaleString() + '</b><span class="sn-read-u">days</span></div><div class="sn-read"><span class="sn-read-l">1 day (spin)</span><b class="sn-read-v" style="font-size:1em">' + p[6] + '</b></div></div>';
+  }
+  M.set({ mode: mode, modes: [mode], speed: speed }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.mode) { mode = c.mode; mS.set(mode); M.set('mode', mode); } if (c.modes) M.set('modes', ['distance', 'size', 'trip']); if (c.zoomed) { zoom = true; zT.set(true); M.set('zoomed', true); } if (c.dest) { mode = 'trip'; dest = c.dest; } if (c.speed) { speed = c.speed.eq || c.speed; sp.set(speed, true); M.set('speed', speed); } for (var k in c) { var mm = k.match(/^info_(\w+)$/); if (mm) { pick = mm[1]; var s2 = {}; s2[k] = true; M.set(s2); } } if (c.infoCount) M.set('infoCount', 8); if (c.pick) { pick = c.pick; M.set('pick', pick); } draw(); } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Star Brightness: distance makes lights look dimmer                  */
+/* ------------------------------------------------------------------ */
+SUNNY_MODELS.starBright = function (M) {
+  var K = M.kit, S = M.state;
+  var dB = 1, pB = 1, mode = 'lab';
+  var STARS = [['Sun', 1, 0.0000158, '#ffd43b'], ['Sirius', 25, 8.6, '#d0ebff'], ['Proxima Centauri', 0.0017, 4.2, '#ff8787'], ['Rigel', 120000, 860, '#a5d8ff'], ['Vega', 40, 25, '#e7f5ff']];
+  M.el.innerHTML = '';
+  var svg = K.svgEl('svg', { viewBox: '0 0 700 300', class: 'sn-svg', role: 'img', 'aria-label': 'Two lamps and two light meters on a dark lab bench' });
+  M.el.appendChild(svg);
+  var reads = K.el('<div class="sn-reads"></div>'), rA = K.readout('Meter A (lamp A at 1 m)', 'units', true), rB = K.readout('Meter B', 'units', true);
+  reads.appendChild(rA.el); reads.appendChild(rB.el); M.el.appendChild(reads);
+  var tbl = K.el('<div class="sn-panel" hidden></div>'); M.el.appendChild(tbl);
+  var ctr = K.el('<div class="sn-ctrls"></div>');
+  var mS = K.seg([['lab', '💡 Lamp lab'], ['sky', '✨ Real stars']], mode, function (v) { mode = v; M.set('mode', v); draw(); });
+  var dS = K.slider({ label: '↔ Lamp B distance', min: 1, max: 4, step: 0.5, value: dB, unit: 'm', onInput: function (v) { dB = v; draw(); } });
+  var pS = K.seg([['1', 'Lamp B: normal'], ['4', 'Lamp B: 4× stronger'], ['9', 'Lamp B: 9× stronger']], '1', function (v) { pB = +v; draw(); });
+  ctr.appendChild(mS.el); ctr.appendChild(dS.el); ctr.appendChild(pS.el); M.el.appendChild(ctr);
+  function meter(power, d) { return Math.round(100 * power / (d * d) * 10) / 10; }
+  function draw() {
+    var lab = mode === 'lab'; dS.el.hidden = !lab; pS.el.hidden = !lab; tbl.hidden = lab; reads.hidden = !lab;
+    var h = '<rect width="700" height="300" fill="#141a2a"/>';
+    if (lab) {
+      h += '<rect y="250" width="700" height="50" fill="#3b2f2f"/>';
+      function lamp(x, y, p, label) { var g = 10 + 10 * Math.sqrt(p); return '<circle cx="' + x + '" cy="' + y + '" r="' + (g * 2.6) + '" fill="#ffe066" opacity=".12"/><circle cx="' + x + '" cy="' + y + '" r="' + g + '" fill="#fff3bf"/><rect x="' + (x - 8) + '" y="' + (y + g - 2) + '" width="16" height="' + (250 - y - g) + '" fill="#868e96"/><text x="' + x + '" y="' + (y - g * 2.6 - 4) + '" fill="#fff" font-size="12" text-anchor="middle" font-weight="800">' + label + '</text>'; }
+      var mx = 60, sc = 150;
+      h += '<rect x="' + (mx - 20) + '" y="60" width="40" height="190" rx="6" fill="#343a40"/><text x="' + mx + '" y="54" fill="#fff" font-size="12" text-anchor="middle">meters</text>';
+      h += '<rect x="' + (mx - 14) + '" y="80" width="28" height="18" rx="3" fill="#111a22"/><text x="' + mx + '" y="93" fill="#7cf5c4" font-size="10" text-anchor="middle">A</text><rect x="' + (mx - 14) + '" y="190" width="28" height="18" rx="3" fill="#111a22"/><text x="' + mx + '" y="203" fill="#7cf5c4" font-size="10" text-anchor="middle">B</text>';
+      h += lamp(mx + sc * 1, 90, 1, 'Lamp A · 1 m') + lamp(mx + sc * dB, 200, pB, 'Lamp B · ' + dB + ' m');
+      for (var m = 0; m <= 4; m++) h += '<text x="' + (mx + sc * m) + '" y="280" fill="#adb5bd" font-size="11" text-anchor="middle">' + m + ' m</text>';
+      var a = meter(1, 1), b = meter(pB, dB); rA.set(a); rB.set(b);
+      var st = { dB: dB, pB: pB, meterA: a, meterB: b, equal: Math.abs(a - b) < 0.05 }; st['m_' + pB + '_' + dB] = b; if (st.equal && pB > 1) st.equalFar = true; M.set(st);
+    } else {
+      var sel = S.starPick || 'Sirius';
+      h += STARS.map(function (s, i) { var x = 80 + i * 135, app = Math.log10(s[1] / (s[2] * s[2]) * 1e-6 + 1e-12); return '<g class="sb-s" data-s="' + s[0] + '" role="button" tabindex="0"><circle cx="' + x + '" cy="130" r="' + (s[0] === 'Sun' ? 36 : Math.max(3, 6 + app * 1.5)) + '" fill="' + s[3] + '"/><text x="' + x + '" y="200" fill="#fff" font-size="12" text-anchor="middle" font-weight="' + (s[0] === sel ? 800 : 400) + '">' + s[0] + '</text><circle cx="' + x + '" cy="130" r="40" fill="transparent"/></g>'; }).join('');
+      h += '<text x="350" y="260" fill="#adb5bd" font-size="12" text-anchor="middle">How bright each star LOOKS from Earth (tap a star)</text>';
+      tbl.innerHTML = '<h3>Star data</h3><div class="sn-tblw"><table class="sn-tbl"><thead><tr><th>Star</th><th>Real brightness (Sun = 1)</th><th>Distance (light-years)</th></tr></thead><tbody>' + STARS.map(function (s) { return '<tr><th>' + s[0] + '</th><td>' + s[1].toLocaleString() + '</td><td>' + (s[0] === 'Sun' ? '0.0000158 (8 light-minutes)' : s[2]) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+    }
+    svg.innerHTML = h;
+    svg.querySelectorAll('.sb-s').forEach(function (g) { g.addEventListener('click', function () { M.set('starPick', g.getAttribute('data-s')); var o = {}; o['star_' + g.getAttribute('data-s').split(' ')[0]] = true; M.set(o); draw(); }); });
+  }
+  M.set({ mode: mode }); draw();
+  return { auto: function (st) { var c = st.goal.check || {}; if (c.mode) { mode = c.mode; mS.set(mode); } if (c.dB) { dB = c.dB.eq || c.dB; dS.set(dB, true); } if (c.pB) { pB = c.pB.eq || c.pB; pS.set(String(pB)); } if (c.equalFar) { pB = 4; dB = 2; pS.set('4'); dS.set(2, true); } for (var k in c) { var mm = k.match(/^m_(\d+)_([\d.]+)$/); if (mm) { pB = +mm[1]; dB = +mm[2]; draw(); } } draw(); for (var k2 in c) if (/^star_/.test(k2)) { var o = {}; o[k2] = true; M.set(o); } } };
+};
