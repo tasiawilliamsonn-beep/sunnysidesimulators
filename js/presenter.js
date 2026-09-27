@@ -37,11 +37,11 @@ function LessonPresenter(mount, P, opts) {
     var id = 'c' + (cfuN++), body = '';
     if (ck.type === 'mc') body = '<div class="lp-choices">' + ck.choices.map(function (c, k) { return '<button type="button" class="lp-choice" data-cfu="' + id + '" data-k="' + k + '"><b>' + LET[k] + '</b>' + esc(c) + '</button>'; }).join('') + '</div>';
     else if (ck.type === 'input') body = '<div class="lp-inrow"><input type="text" data-in="' + id + '" placeholder="Class answer" aria-label="Class answer">' + (ck.unit ? '<span>' + esc(ck.unit) + '</span>' : '') + '<button type="button" class="lp-btn" data-incheck="' + id + '">Check</button></div>';
-    else if (ck.type === 'order') body = '<ol class="lp-order">' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol><p class="lp-small">Students number these in order on their whiteboards.</p>';
+    else if (ck.type === 'order') body = '<ol class="lp-order">' + ck.items.slice().sort(function (a, b) { return a.length - b.length; }).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol><p class="lp-small">In your notes: number these in the correct order.</p>';
     else if (ck.type === 'highlight') body = '<p class="lp-segs">' + ck.segments.map(function (sg, k) { return '<button type="button" class="lp-seg" data-seg="' + id + '" data-k="' + k + '">' + esc(sg) + '</button>'; }).join(' ') + '</p>';
     var ans = ck.type === 'mc' ? LET[ck.answer] + '. ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return '"' + ck.segments[k] + '"'; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '');
     cfuData[id] = ck;
-    return '<div class="lp-cfu" id="' + id + '"><div class="lp-cfuh"><span class="lp-tag">' + esc(label || 'Check for understanding') + '</span><span class="lp-mode">' + esc(mode || 'Show me on whiteboards: 3, 2, 1!') + '</span></div>' +
+    return '<div class="lp-cfu" id="' + id + '"><div class="lp-cfuh"><span class="lp-tag">' + esc(label || 'Check for understanding') + '</span><span class="lp-mode">' + esc(mode || 'Write your answer in your notes, then show me with fingers.') + '</span></div>' +
       '<p class="lp-q">' + esc(ck.q) + '</p>' + body + '<div class="lp-fb" data-fb="' + id + '"></div>' +
       '<div class="lp-row"><button type="button" class="lp-btn ghost" data-reveal="' + id + '">Reveal answer</button><button type="button" class="lp-btn ghost" data-pick>Pick a student to explain</button></div>' +
       '<div class="lp-ans" data-ans="' + id + '" hidden><b>Answer:</b> ' + esc(ans) + (ck.explain ? '<br><span>' + esc(ck.explain) + '</span>' : '') + '</div></div>';
@@ -58,7 +58,7 @@ function LessonPresenter(mount, P, opts) {
       '<div class="lp-grid2"><div class="lp-box accent"><h3>Learning target</h3><p class="lp-big">' + esc(L.target) + '</p>' +
       '<h3>Success criteria</h3><ul class="lp-checks"><li>I can explain and use the key words: ' + esc(L.vocab.map(function (v) { return v[0]; }).join(', ')) + '.</li>' +
       steps.slice(0, 2).map(function (st) { return '<li>I can explain: ' + esc(st.t.toLowerCase()) + '.</li>'; }).join('') +
-      '<li>I can support my answers with evidence on the exit ticket.</li></ul></div>' +
+      '<li>I can support my answers with evidence on the exit ticket.</li></ul><h3>You need</h3><p>Notebook · guided notes page · pencil</p></div>' +
       '<div class="lp-box"><h3>Agenda</h3><ol class="lp-agenda">' + AG.map(function (a) { return '<li><span>' + a[1] + '</span>' + esc(a[0]) + '<em>' + a[2] + ' min</em></li>'; }).join('') + '</ol>' +
       '<h3>Key vocabulary</h3><div class="lp-chips">' + L.vocab.map(function (v) { return '<span title="' + esc(v[1]) + '">' + esc(v[0]) + '</span>'; }).join('') + '</div></div></div>';
   }, notes: ['Read the learning target aloud; have students repeat it chorally or write it at the top of their notes.', 'Point to the agenda so students know the plan and how they will show learning (exit ticket).', 'Materials: notebooks or printed warm-up and guided notes; devices closed until work time.'] });
@@ -70,8 +70,8 @@ function LessonPresenter(mount, P, opts) {
   }, notes: ['Start the timer as students enter. Circulate and note who is unsure of question 1 or 2 (prior knowledge).', 'At 5 minutes, say "Partner share" and reset to 2:00 if you want.', 'Reveal answers to questions 1–2 only. Question 3 is a prediction: collect ideas without correcting; you will return to it in the debrief.'] });
 
   slide({ part: 1, title: 'Hook', html: function () {
-    return '<div class="lp-head"><span class="lp-tag">Hook · 1 minute</span><h2>Make a prediction</h2></div><div class="lp-box accent lp-hook"><p class="lp-big">' + esc(P.hook) + '</p></div>' +
-      '<div class="lp-box"><h3>Class vote</h3><div class="lp-votes">' + ['Yes / agree', 'Not sure', 'No / disagree'].map(function (v, k) { return '<div class="lp-vote"><span>' + v + '</span><b data-vote="' + k + '">0</b><div><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="1">+1</button><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="-1">−1</button></div></div>'; }).join('') + '</div><p class="lp-small">Write your prediction in your notes first. We will come back to it at the end.</p></div>';
+    return '<div class="lp-head"><span class="lp-tag">Hook · 1 minute</span><h2>Make a prediction</h2></div><div class="lp-box accent lp-hook"><p class="lp-big">' + esc((X.hook || {}).q || '') + '</p></div>' +
+      '<div class="lp-box"><h3>Class vote</h3><div class="lp-votes">' + ((X.hook || {}).options || ['Yes', 'Not sure', 'No']).map(function (v, k) { return '<div class="lp-vote"><span>' + v + '</span><b data-vote="' + k + '">0</b><div><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="1">+1</button><button type="button" class="lp-btn ghost sm" data-vadd="' + k + '" data-d="-1">−1</button></div></div>'; }).join('') + '</div><p class="lp-small">1. Write your prediction in your notes. 2. Vote. 3. We will check it at the end of class.</p></div>';
   }, notes: ['Pose the question and have students commit to a prediction in writing before voting. This creates a reason to listen.', 'Do not reveal the answer. Tell students the lesson will help them decide.'] });
 
   steps.forEach(function (st, i) {
@@ -80,24 +80,25 @@ function LessonPresenter(mount, P, opts) {
         '<div class="lp-grid2"><div><div class="lp-box accent"><h3>Key idea</h3><p class="lp-big">' + esc(st.say) + '</p></div>' +
         '<div class="lp-box"><h3>Guided notes</h3><p class="lp-notes" data-notes>' + blanks(st.note, false) + '</p><button type="button" class="lp-btn ghost sm" data-fill>Show the missing words</button></div>' +
         '<div class="lp-box talk"><h3>Turn and talk <span class="lp-small">(1 minute)</span></h3><p class="lp-big2">' + esc((X.talk || [])[i] || 'Explain this idea to your partner in your own words.') + '</p><div class="lp-row"><button type="button" class="lp-btn ghost sm" data-starttimer="60">Start 1:00</button><button type="button" class="lp-btn ghost sm" data-pick>Pick a pair to share</button></div></div></div>' +
-        '<div><div class="lp-box tool"><h3>Explore it <span class="lp-small">' + esc(st.do) + '</span></h3>' + (st.tool ? vis(st.tool) : '') + (st.cards ? cards(st.cards) : '') + (!st.tool && !st.cards ? '<p class="lp-big2">' + esc(st.do) + '</p><p class="lp-small">Model this on the board while students copy it into their notes.</p>' : '') + '</div>' +
-        cfu(st.check, 'Check for understanding', ['Show me on whiteboards: 3, 2, 1!', 'Hold up fingers for your answer (1 = A, 2 = B...).', 'Think silently for 10 seconds, then show me.', 'Tell your partner, then we vote.'][i % 4]) + '</div></div>';
-    }, notes: ['Teach (about 3 minutes): ' + st.say, 'Use the tool: ' + (st.tool ? (st.tool.sim ? 'run the simulation and ask students to predict before each change.' : 'point to the model and ask "What do you notice?"') : st.cards ? 'flip each card only after students guess.' : 'sketch it on the board.'), 'Check: if fewer than 80% are correct, reteach with a new example before moving on.'].concat(i === 0 ? (L.misconceptions || []).slice(0, 1).map(function (m) { return 'Watch for: ' + m; }) : i === 1 ? (L.misconceptions || []).slice(1, 2).map(function (m) { return 'Watch for: ' + m; }) : i === 2 ? (L.misconceptions || []).slice(2, 3).map(function (m) { return 'Watch for: ' + m; }) : []) });
+        '<div><div class="lp-box tool"><h3>' + (st.tool || st.cards ? 'Explore it' : 'In your notes') + '</h3>' + (st.tool ? vis(st.tool) : '') + (st.cards ? cards(st.cards) : '') + '<p class="lp-task">' + esc((X.dos || [])[i] || st.do) + '</p></div>' +
+        cfu(st.check, 'Check for understanding', ['Write your answer in your notes, then hold up fingers: 1 = A, 2 = B, 3 = C, 4 = D.', 'Think for 10 seconds, then show your answer with fingers.', 'Tell your partner your answer and why. Then we vote.', 'Write it in your notes. Be ready to explain.'][i % 4]) + '</div></div>';
+    }, notes: ['Teach (about 3 minutes): ' + st.say, 'Use the tool: ' + (st.tool ? (st.tool.sim ? 'run the simulation and ask students to predict before each change.' : 'point to the model and ask "What do you notice?"') : st.cards ? 'flip each card only after students guess.' : 'walk through the "In your notes" task on the slide.'), 'Check: if fewer than 80% are correct, reteach with a new example before moving on.'] });
   });
 
-  slide({ part: 1, title: 'I do: watch me think', html: function () {
-    return '<div class="lp-head"><span class="lp-tag">I do · model</span><h2>Watch me think it through</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(L.model) + '</p></div>' +
-      '<div class="lp-box"><h3>As you watch, notice:</h3><ul class="lp-exp"><li>What do I look at first?</li><li>Which key word or rule do I use?</li><li>How do I check that my answer makes sense?</li></ul></div>';
-  }, notes: ['Think aloud slowly. Name each decision ("First I notice... so I...").', 'Ask one student to restate your first step.'] });
+  slide({ part: 1, title: 'Worked example', html: function () {
+    var lines = X.model || [L.model];
+    return '<div class="lp-head"><span class="lp-tag">I do · worked example</span><h2>Worked example</h2></div><div class="lp-grid2 wide"><div class="lp-box accent"><ol class="lp-steps lp-model">' + lines.map(function (t, k) { return '<li data-mstep' + (k ? ' hidden' : '') + '>' + esc(t) + '</li>'; }).join('') + '</ol><button type="button" class="lp-btn" data-nextm>Show next step</button></div>' +
+      '<div class="lp-box"><h3>As you watch, notice</h3><ul class="lp-exp"><li>What is looked at first?</li><li>Which key word or rule is used?</li><li>How is the answer checked?</li></ul><h3>In your notes</h3><p>Copy each step of the example.</p></div></div>';
+  }, notes: ['Reveal one step at a time and think aloud (see the presenter script).'] });
 
   if (X.wedo) slide({ part: 1, title: 'We do: solve it together', html: function () {
-    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p></div>' +
+    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p><p class="lp-small">In your notes: write each step as we solve it.</p></div>' +
       '<div class="lp-box"><ol class="lp-steps">' + X.wedo.steps.map(function (t, k) { return '<li data-wstep hidden>' + esc(t) + '</li>'; }).join('') + '</ol><div class="lp-row"><button type="button" class="lp-btn" data-nextstep>Show next step</button><button type="button" class="lp-btn ghost" data-pick>Pick a student for the next step</button></div>' +
       '<div class="lp-ans" data-wans hidden><b>Answer:</b> ' + esc(X.wedo.a) + '</div></div>';
   }, notes: ['Before revealing each step, ask the class "What should we do next?" and take an answer.', 'Students copy the worked steps into their notes.'] });
 
   if (X.youdo) slide({ part: 1, title: 'You do: try it on your own', timer: 120, html: function () {
-    return '<div class="lp-head"><span class="lp-tag">You do · independent</span><h2>Your turn: on your own</h2></div><div class="lp-grid2 wide"><div>' + cfu(X.youdo, 'Independent check', 'Solve on your whiteboard or in your notes. No talking for 2 minutes.') + '</div>' +
+    return '<div class="lp-head"><span class="lp-tag">You do · independent</span><h2>Your turn: on your own</h2></div><div class="lp-grid2 wide"><div>' + cfu(X.youdo, 'Independent check', 'Solve in your notes. No talking for 2 minutes.') + '</div>' +
       '<div class="lp-box accent"><h3>Then</h3><ul class="lp-exp"><li><b>Got it?</b> Get ready to launch ' + esc(P.room.title) + '.</li><li><b>Not sure?</b> Stay at the teacher table for a 3-minute reteach, then start at the Explorer level.</li></ul><button type="button" class="lp-btn" data-starttimer="120">Start 2:00 timer</button></div></div>';
   }, notes: ['Scan answers. Pull students who miss this item to a quick reteach group before they start the room.', 'Assign mission levels now: Explorer for students who need support, Legend for students ready for more.'] });
 
@@ -159,12 +160,13 @@ function LessonPresenter(mount, P, opts) {
     on('[data-showlast]', function () { root.querySelector('[data-last]').hidden = false; });
     on('[data-fill]', function (el) { var n = root.querySelector('[data-notes]'); n.innerHTML = blanks(S[cur].note || findNote(), true); el.hidden = true; });
     on('[data-vadd]', function (el) { var k = el.getAttribute('data-vadd'), b = root.querySelector('[data-vote="' + k + '"]'); b.textContent = Math.max(0, +b.textContent + +el.getAttribute('data-d')); });
+    on('[data-nextm]', function (el) { var h = root.querySelector('[data-mstep][hidden]'); if (h) h.hidden = false; if (!root.querySelector('[data-mstep][hidden]')) el.disabled = true; });
     on('[data-nextstep]', function (el) { var h = root.querySelector('[data-wstep][hidden]'); if (h) h.hidden = false; if (!root.querySelector('[data-wstep][hidden]')) { root.querySelector('[data-wans]').hidden = false; el.disabled = true; } });
     on('[data-reveal]', function (el) { var id = el.getAttribute('data-reveal'); root.querySelector('[data-ans="' + id + '"]').hidden = false; var ck = cfuData[id]; if (ck.type === 'mc') root.querySelectorAll('[data-cfu="' + id + '"]').forEach(function (b) { if (+b.getAttribute('data-k') === ck.answer) b.classList.add('right'); }); if (ck.type === 'highlight') root.querySelectorAll('[data-seg="' + id + '"]').forEach(function (b) { if (ck.answer.indexOf(+b.getAttribute('data-k')) >= 0) b.classList.add('right'); }); });
     on('[data-cfu]', function (el) {
       var id = el.getAttribute('data-cfu'), ck = cfuData[id], k = +el.getAttribute('data-k'), fb = root.querySelector('[data-fb="' + id + '"]');
       if (k === ck.answer) { el.classList.add('right'); fb.className = 'lp-fb good'; fb.textContent = 'Correct! ' + (ck.explain || ''); }
-      else { el.classList.add('wrong'); fb.className = 'lp-fb bad'; fb.textContent = 'Not quite. Ask: why might someone pick "' + ck.choices[k] + '"? What does the key idea say?'; }
+      else { el.classList.add('wrong'); fb.className = 'lp-fb bad'; fb.textContent = 'Not quite. Why might someone pick "' + ck.choices[k] + '"? Look back at the key idea.'; }
     });
     on('[data-seg]', function (el) { var id = el.getAttribute('data-seg'), ck = cfuData[id], k = +el.getAttribute('data-k'), fb = root.querySelector('[data-fb="' + id + '"]'); if (ck.answer.indexOf(k) >= 0) { el.classList.add('right'); fb.className = 'lp-fb good'; fb.textContent = 'Yes, that part answers the question.'; } else { el.classList.add('wrong'); fb.className = 'lp-fb bad'; fb.textContent = 'Not that part. Reread the question.'; } });
     on('[data-incheck]', function (el) {

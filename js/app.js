@@ -175,7 +175,7 @@
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LETTERS[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : (st.tool.caption || 'Visual model')) : st.cards ? 'Flip cards' : 'Board and notes';
       return '<div class="stepcard"><div class="stephead"><span class="step">' + (i + 1) + '</span><h3>' + esc(st.t) + '</h3><span class="when">3 min</span></div>' +
-        '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc(st.do) + '</dd></div>' +
+        '<dl><div><dt>Teach</dt><dd>' + esc(st.say) + '</dd></div><div><dt>Interactive tool</dt><dd>' + esc(tool) + '</dd></div><div><dt>Students do</dt><dd>' + esc((X.dos || [])[i] || st.do) + '</dd></div>' +
         '<div><dt>Turn and talk</dt><dd>' + esc((X.talk || [])[i] || '') + '</dd></div><div><dt>Guided notes</dt><dd>' + esc(st.note).replace(/\[([^\]]+)\]/g, '<u>$1</u>') + '</dd></div><div><dt>Quick check</dt><dd>' + esc(ck.q) + ' <span class="ans">' + esc(ans) + '</span></dd></div></dl></div>';
     }).join('') + '</div>';
     else html += '<ul>' + L.teach.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
@@ -198,6 +198,26 @@
       '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
       '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review guided notes, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
       '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
+  }
+  function isGallery(r) { return r.format === 'gallery' && r.stages.every(function (s) { return s.art; }); }
+  function posterHTML(r) {
+    var V = EscapeKit().V, sd = STD[r.std];
+    var pages = r.stages.map(function (s, i) {
+      var a = s.art;
+      return '<section class="poster"><div class="ph"><span>Exhibit ' + 'ABCDEFGH'[i] + '</span><span>' + esc(r.title) + ' · ' + esc(sd.code) + '</span></div><h1>' + esc(a.title) + '</h1><p class="med">' + esc(a.medium || '') + '</p>' +
+        '<div class="frame"><div class="art">' + V.scene(a.pic, {}) + a.spots.map(function (sp, k) { return '<b class="spot" style="left:' + (sp.x / 6).toFixed(2) + '%;top:' + (sp.y / 3.8).toFixed(2) + '%">' + (k + 1) + '</b>'; }).join('') + '</div></div>' +
+        '<div class="cols"><div><h2>Look closely</h2><ol>' + a.spots.map(function (sp) { return '<li><b>' + esc(sp.t) + ':</b> ' + esc(sp.d) + '</li>'; }).join('') + '</ol></div><div class="placard"><h2>Placard</h2>' + s.content.replace(/<h3>\s*Placard\s*<\/h3>/i, '') + '</div></div></section>';
+    }).join('');
+    var guide = '<section class="poster setup"><h1>Setting up the gallery walk</h1><ol><li>Print one poster per exhibit (letter or tabloid size, color if possible) and tape them around the room at eye level, spread out.</li><li>Print the Gallery Walk Viewing Guide PDF for each student.</li><li>Make groups of 3–4. Start each group at a different poster.</li><li>Set the lesson presenter timer for 4 minutes per poster. At the signal, groups rotate clockwise.</li><li>At each poster, students find every numbered detail, read the placard, and write I see / I think / I wonder.</li><li>After the walk (about 20 minutes), students open ' + esc(r.title) + ' on devices to solve each exhibit\'s challenge, or discuss the "After the walk" question as a class.</li></ol></section>';
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + esc(r.title) + ' · Gallery posters</title>' +
+      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700&display=swap">' +
+      '<style>body{margin:0;background:#e9e4d8;font-family:"Atkinson Hyperlegible",sans-serif;color:#2a2418}.bar{position:sticky;top:0;background:#2a2418;color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center}.bar button{font:inherit;font-weight:700;padding:8px 16px;border-radius:999px;border:0;background:#f2b84b;cursor:pointer}' +
+      '.poster{background:#fffdf6;max-width:980px;margin:24px auto;padding:32px 40px;box-shadow:0 6px 20px rgba(0,0,0,.2);page-break-after:always;break-after:page}.ph{display:flex;justify-content:space-between;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:#7a6a45}' +
+      'h1{font-family:"Bricolage Grotesque",sans-serif;font-size:48px;margin:6px 0 0}.med{font-style:italic;margin:2px 0 14px;color:#6b5d40}.frame{padding:16px;background:linear-gradient(135deg,#b8862b,#f3d27a 40%,#a8741c 70%,#e6c066)}.art{position:relative;background:#f7f2e6;padding:0;line-height:0}.art svg{width:100%;height:auto}' +
+      '.spot{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#C8272D;color:#fff;display:grid;place-items:center;font-size:17px;border:3px solid #fff;line-height:1}' +
+      '.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:18px;font-size:16px;line-height:1.45}.cols h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#7a6a45;margin:0 0 6px}.cols ol{margin:0;padding-left:1.2em;display:grid;gap:6px}.placard h3{font-size:16px}.placard table{border-collapse:collapse}.placard td,.placard th{border:1px solid #999;padding:3px 6px}' +
+      '.setup ol{font-size:18px;line-height:1.6}@media print{body{background:#fff}.bar{display:none}.poster{box-shadow:none;margin:0;max-width:none;padding:18px 24px}}@media (max-width:700px){.cols{grid-template-columns:1fr}h1{font-size:34px}}</style></head><body>' +
+      '<div class="bar"><b>' + esc(r.title) + ': gallery walk posters</b><span style="flex:1"></span><button onclick="window.print()">Print posters</button></div>' + guide + pages + '</body></html>';
   }
   function answerLines(r) {
     var out = [], code = finalCode(r);
@@ -368,8 +388,10 @@
       '<button class="btn" data-do="html">' + ICONS.down + 'Download for Canvas (.html)</button>' +
       '<button class="btn" data-do="copy">' + ICONS.copy + 'Copy HTML</button>' +
       '<a class="btn" href="#teach-' + r.id + '">' + ICONS.play + 'Lesson presenter</a>' +
+      '<button class="btn" data-do="script">' + ICONS.down + 'Presenter script PDF</button>' +
       '<button class="btn" data-do="guide">' + ICONS.down + '60-min facilitation guide PDF</button>' +
       '<button class="btn" data-do="exit">' + ICONS.down + 'Exit ticket PDF</button>' +
+      (isGallery(r) ? '<button class="btn" data-do="posters">' + ICONS.play + 'Gallery walk posters</button>' : '') +
       '<button class="btn star' + (on ? ' on' : '') + '" data-pick="' + r.id + '" aria-pressed="' + on + '">' + (on ? ICONS.star : ICONS.starOff) + (on ? 'In My Picks' : 'Add to My Picks') + '</button></div>' +
       '<textarea class="code" id="copybox" hidden readonly aria-label="Room HTML"></textarea>' +
       '<div class="layout"><nav class="toc" aria-label="On this page"><a href="#s-glance" data-jump>60-minute plan</a><a href="#s-warm" data-jump>1. Warm-up</a><a href="#s-lesson" data-jump>2. Mini-lesson</a><a href="#s-run" data-jump>3. Activity</a><a href="#s-game" data-jump>Levels &amp; supports</a><a href="#s-debrief" data-jump>4. Debrief</a><a href="#s-key" data-jump>Answer key</a><a href="#s-exit" data-jump>5. Exit ticket</a><a href="#s-res" data-jump>Teacher resources</a><a href="#s-canvas" data-jump>Add to Canvas</a></nav><div>';
@@ -408,10 +430,12 @@
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
       [['1', 'Warm-up worksheet', 'Printable warm-up with notebook expectations. Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
        ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
+       ['1–5', 'Presenter script', 'What to say on every slide: directions, questions, answers, and what to do if students struggle. Slides show only student cues.', '<button class="btn" data-do="script">' + ICONS.down + 'PDF</button>'],
        ['2', 'Guided notes', 'Fill-in notes, vocabulary, and "try it" problems that follow the presenter step by step.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
+].concat(isGallery(r) ? [['3', 'Gallery walk posters', 'One printable poster per exhibit (picture, numbered details, placard) plus setup directions for a classroom gallery walk.', '<button class="btn" data-do="posters">' + ICONS.play + 'Open posters</button>'], ['3', 'Gallery walk viewing guide', 'Student recording sheet: I see / I think / I wonder for every exhibit.', '<button class="btn" data-do="gguide">' + ICONS.down + 'PDF</button>']] : []).concat([
        ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
-       ['All', '60-minute facilitation guide', 'Everything above in one printable teacher guide.', '<button class="btn" data-do="guide">' + ICONS.down + 'PDF</button>']].map(function (x) {
+       ['All', '60-minute facilitation guide', 'Everything above in one printable teacher guide.', '<button class="btn" data-do="guide">' + ICONS.down + 'PDF</button>']]).map(function (x) {
         return '<div class="made-row"><span class="step">' + x[0] + '</span><div><b>' + x[1] + '</b><span>' + x[2] + '</span></div><div class="made-act">' + x[3] + '</div></div>';
       }).join('') + '</div>' +
       '<h3>Extra resources for reteaching or extending</h3><div class="res">' +
@@ -559,6 +583,9 @@
       if (act === 'html') { download(slug(r) + '.html', standaloneHTML(r), 'text/html'); toast('Downloaded. Upload this file to Canvas Files.'); }
       else if (act === 'copy') copyText(standaloneHTML(r), 'HTML copied. Paste it into a new .html file.', $('#copybox'));
       else if (act === 'exit') { download(slug(r) + '-exit-ticket.pdf', CrossroadsPDF.exitTicket(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Exit ticket PDF downloaded.'); }
+      else if (act === 'posters') { var html = posterHTML(r), w = null; try { w = window.open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank'); } catch (e) { } if (!w) download(slug(r) + '-gallery-posters.html', html, 'text/html'); toast(w ? 'Posters opened in a new tab. Use Print posters.' : 'Posters downloaded. Open the file and print.'); }
+      else if (act === 'script') { var wt = writeTask(r); download(slug(r) + '-presenter-script.pdf', CrossroadsPDF.script(r, STD[r.std], lessonOf(r), wt ? (FRAME_INFO[wt.frame] || [wt.frame])[0] : ''), 'application/pdf'); toast('Presenter script downloaded.'); }
+      else if (act === 'gguide') { download(slug(r) + '-gallery-viewing-guide.pdf', CrossroadsPDF.galleryGuide(r, STD[r.std]), 'application/pdf'); toast('Viewing guide downloaded.'); }
       else if (act === 'warm') { download(slug(r) + '-warm-up.pdf', CrossroadsPDF.warmup(r, STD[r.std], lessonOf(r)), 'application/pdf'); toast('Warm-up worksheet downloaded.'); }
       else if (act === 'notes') { download(slug(r) + '-guided-notes.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), false), 'application/pdf'); toast('Guided notes downloaded.'); }
       else if (act === 'noteskey') { download(slug(r) + '-guided-notes-key.pdf', CrossroadsPDF.notes(r, STD[r.std], lessonOf(r), true), 'application/pdf'); toast('Guided notes key downloaded.'); }
@@ -585,6 +612,6 @@
   function measureTop() { var t = document.querySelector('.top'); if (t) document.documentElement.style.setProperty('--toph', t.offsetHeight + 'px'); }
   window.addEventListener('resize', measureTop); measureTop();
 
-  window.CX = { presenterData: presenterData, ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode, runTips: runTips };
+  window.CX = { posterHTML: posterHTML, presenterData: presenterData, ROOMS: ROOMS, STD: STD, standaloneHTML: standaloneHTML, answerLines: answerLines, finalCode: finalCode, runTips: runTips };
   route();
 })();

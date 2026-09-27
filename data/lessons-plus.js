@@ -11,7 +11,7 @@
 
   add('g5-sci-matter', {
     talk: ['Is air matter? How could you prove it to someone who says no?', 'Why do scientists measure mass with a balance instead of just guessing by how big something looks?', 'Melting ice and burning wood both change. What is the key difference between them?', 'The open cup lost mass. Where did that matter go? Is it gone forever?'],
-    wedo: { q: 'A sealed bag holds 40 g of vinegar and 5 g of baking soda. They fizz and the bag puffs up. What does the bag weigh now?', steps: ['Find the starting mass: 40 g + 5 g = 45 g.', 'Ask: Is the system open or closed? The bag is sealed, so it is closed.', 'The fizzing made a new gas (a chemical change), but the gas is trapped in the bag.', 'Nothing entered or left, so the mass stays the same.'], a: '45 g' },
+    wedo: { q: 'A sealed bag holds 40 g of vinegar and 5 g of baking soda. They fizz and the bag puffs up. What does the bag weigh now?', steps: ['Find the starting mass: 40 g + 5 g = 45 g.', 'Is the system open or closed? The bag is sealed, so it is closed.', 'The fizzing made a new gas (a chemical change), but the gas is trapped in the bag.', 'Nothing entered or left, so the mass stays the same.'], a: '45 g' },
     youdo: MC('An OPEN cup holds 150 g of water and a 10 g antacid tablet. After fizzing, the scale reads 157 g. What happened to the other 3 g?', ['It escaped into the air as a gas', 'It was destroyed', 'The scale is broken', 'It turned into water'], 0, '160 g − 157 g = 3 g of gas escaped the open cup. Matter is conserved.')
   });
   add('g5-sci-space', {

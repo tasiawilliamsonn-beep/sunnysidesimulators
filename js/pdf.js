@@ -314,7 +314,7 @@
     lesson.steps.forEach(function (st, i) {
       d.banner('Step ' + (i + 1) + ': ' + st.t, c);
       d.para(blanks(st.note, key), { size: 11, gap: 4, indent: 4 });
-      d.para('Do: ' + st.do, { size: 10, gray: 0.3, indent: 4, gap: 4 });
+      d.para('Do: ' + ((lesson.dos || [])[i] || st.do), { size: 10, gray: 0.3, indent: 4, gap: 4 });
       var ck = st.check;
       d.ensure(70);
       d.para('Try it: ' + ck.q, { size: 10.5, bold: true, indent: 4, gap: 2 });
@@ -357,7 +357,7 @@
       var tool = st.tool ? (st.tool.sim ? 'Simulation: ' + st.tool.sim.title : Array.isArray(st.tool) ? 'Visual models' : 'Visual: ' + (st.tool.caption || st.tool.kind)) : st.cards ? 'Flip cards: ' + st.cards.map(function (x) { return x[0]; }).join(', ') : 'Board and notes';
       var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' → ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
       d.sub('Step ' + (i + 1) + ' (3 min): ' + st.t);
-      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Guided notes', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
+      d.table([{ w: 0.2 }, { w: 0.8 }], [['Teach', st.say], ['Interactive tool', tool], ['Students do', (X.dos || [])[i] || st.do], ['Turn and talk', (X.talk || [])[i] || 'Explain the idea to a partner.'], ['Guided notes', blanks(st.note, true)], ['Check for understanding', ck.q + '  Answer: ' + ans]], c, { repeat: false });
     });
     d.sub('I do: model (think aloud)');
     d.para(L.model, { size: 10.5 });
@@ -388,6 +388,59 @@
     return d.bytes();
   }
 
-  global.CrossroadsPDF = { Doc: Doc, exitTicket: exitTicket, guide: guide, warmup: warmup, notes: notes, clean: clean };
+  // Teacher script that goes with the lesson presenter, slide by slide.
+  function script(room, std, lesson, taskName) {
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], L = std.lesson, X = lesson, n = 0;
+    header(d, 'PRESENTER SCRIPT  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title + ': teacher script', 'Use with the Lesson presenter (room page → Lesson presenter). Slides show only student cues; this script has what to say. Students need a notebook, the guided notes page, and a pencil.', c);
+    d.callout([{ label: 'Presenter keys:', text: 'Right/left arrows change slides. N shows short notes. T pauses the timer. P picks a student. F is fullscreen.' }, { label: 'Response routine:', text: 'Students write each answer in their notes, then show it with fingers (1 = A, 2 = B, 3 = C, 4 = D). Scan the room before revealing.' }], c, { size: 10 });
+    function slide(title, time, rows) {
+      n++;
+      d.banner('Slide ' + n + ': ' + title, c, time || '');
+      d.table([{ w: 0.2 }, { w: 0.8 }], rows.filter(function (r) { return r && r[1]; }), c, { repeat: false });
+    }
+    slide('Today\'s target', '1 min', [['Say', 'Today\'s learning target is: "' + L.target + '" Read it with me.'], ['Say', 'Here is how you will know you have it: the success criteria. You will prove it on the exit ticket at the end of class.'], ['Point to', 'The agenda and the key vocabulary. Tell students they need their notebook, guided notes page, and pencil.']]);
+    slide('Warm-up', '0:00–0:08', [['Say', 'Start a new notebook page: write today\'s date and "Warm-Up." Answer the three questions in complete sentences. You have 5 minutes of silent work. Go.'], ['Do', 'Start the 8:00 timer. Circulate. At 5 minutes say: "Turn to your partner and compare answers for 2 minutes."'], ['Look for', X.warmup.map(function (w, i) { return (i + 1) + ') ' + w[1]; }).join('  ')], ['Say', 'Call on 2–3 students for questions 1 and 2, then reveal. Say: "We will come back to question 3 at the end of class."']]);
+    slide('Hook', '1 min', [['Say', (X.hook ? 'Read the question on the screen: "' + X.hook.q + '" Write your prediction in your notes. Then vote.' : '')], ['Background', room.hook || L.hook], ['Do', 'Tap +1 for each vote. Do not give the answer. Say: "By the end of the lesson, you will be able to check your prediction."']]);
+    X.steps.forEach(function (st, i) {
+      var ck = st.check, ans = ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0];
+      slide('Learn ' + (i + 1) + ': ' + st.t, '3 min', [
+        ['Say', st.say],
+        ['Guided notes', 'Say: "Fill in step ' + (i + 1) + ' of your guided notes." Answers: ' + blanks(st.note, true) + ' (tap "Show the missing words" after students try.)'],
+        ['Explore', (st.tool ? (st.tool.sim ? 'Run the simulation: ' + st.tool.sim.title + '. Before each change, ask students to predict in their notes.' : 'Point to the model: ' + (st.tool.caption || 'the picture') + '. Ask: "What do you notice?"') : st.cards ? 'Flip each card only after students guess: ' + st.cards.map(function (x) { return x[0] + ' = ' + x[1]; }).join('; ') + '.' : '') + ' Students do: ' + ((X.dos || [])[i] || st.do)],
+        ['Turn and talk', 'Say: "' + ((X.talk || [])[i] || '') + '" Start the 1:00 timer. Then pick a pair to share.'],
+        ['Check', 'Read the question aloud. Students write, then show fingers. Scan, then reveal. Answer: ' + ans + (ck.explain ? '. ' + ck.explain : '')],
+        ['If < 80% correct', 'Go back to the Explore box and model a second example out loud, then re-ask the check with a partner discussion first. See "Misconceptions to watch for" at the end of this script.']
+      ]);
+    });
+    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into your notes.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
+    if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
+    if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own. Solve it in your notes with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
+    slide('Work time: ' + room.title, '0:20–0:48', [['Say', 'Open ' + room.title + ' on your device. Type your name, choose the level I assigned, and begin. Whisper voice with your partner only.'], ['Do', 'Start the 28:00 timer and leave this slide up. Circulate with the answer key.'], ['Checkpoints', 'At 10 minutes: ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'stage') + ' 2 done. At 20 minutes: stage 4 done; give a 5-minute warning for the ' + (taskName || 'final lock') + ' and turn-in.'], ['Turn-in', 'Students tap "Copy my work" and paste it into the Canvas assignment (Text Entry).']]);
+    slide('Debrief', '0:48–0:52', [['Ask', L.debrief.join('  |  ')], ['Say', 'Back to warm-up question 3 and our hook vote: were our predictions right? What evidence changed your mind?'], ['Answer', X.warmup[2][1]]]);
+    slide('Exit ticket', '0:52–1:00', [['Say', 'Clear your desk except a pencil. Work silently and on your own. For every answer, write "I know because..." and use evidence.'], ['Do', 'Hand out the exit ticket. Start the 8:00 timer. Collect and sort with page 3 (Mastered / Approaching / Beginning).']]);
+    d.banner('Misconceptions to watch for', c);
+    (L.misconceptions || []).forEach(function (m) { d.para('•  ' + m, { size: 10.5, indent: 6, gap: 3 }); });
+    d.footer('Crossroads Escapes · ' + std.code + ' · Presenter Script');
+    return d.bytes();
+  }
+
+  function galleryGuide(room, std) {
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2];
+    header(d, 'GALLERY WALK VIEWING GUIDE  ·  GRADE ' + room.grade + '  ·  ' + room.standard, room.title, 'Visit each poster. Find every numbered detail, then write what you see, think, and wonder.', c);
+    d.nameDate();
+    d.callout([{ label: 'Gallery etiquette:', text: 'Voice level 1. Stay with your group. Rotate when the timer sounds. Leave the poster the way you found it.' }], c, { size: 10 });
+    room.stages.forEach(function (s, i) {
+      if (!s.art) return;
+      d.banner(String.fromCharCode(65 + i) + '. ' + s.art.title, c, s.art.spots.length + ' details to find');
+      d.table([{ w: 0.33, h: 'I see... (2 details)' }, { w: 0.34, h: 'I think... (what it teaches)' }, { w: 0.33, h: 'I wonder...' }], [['', '', '']], c, { minH: 62 });
+    });
+    d.banner('After the walk', c);
+    d.para('Which exhibit taught you the most? Explain using one detail from the poster.', { size: 11, bold: true, gap: 2 });
+    d.writeLines(3);
+    d.footer('Crossroads Escapes · ' + room.title + ' · Gallery Walk Viewing Guide');
+    return d.bytes();
+  }
+
+  global.CrossroadsPDF = { Doc: Doc, exitTicket: exitTicket, guide: guide, warmup: warmup, notes: notes, galleryGuide: galleryGuide, script: script, clean: clean };
   if (typeof module !== 'undefined') module.exports = global.CrossroadsPDF;
 })(typeof window !== 'undefined' ? window : globalThis);

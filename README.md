@@ -19,6 +19,18 @@ Each room includes:
 - **Written evidence tasks** (`data/tasks.js`). RACE (ELA), CER (science), a historian's claim with a source check (social studies), and solve–show–explain (math). A live checklist has to be complete before the final code unlocks. Rooms with a task: g5-sci-missing-mass, g6-sci-cold-cocoa, g5-ss-midnight-messenger, g6-ss-plague-detective, g5-ela-context-caper, g6-ela-evidence-vault, g6-ela-theme-quest, g5-math-bakery-mystery, and g6-math-sale-scam. To add more, add entries to `data/tasks.js`.
 - **Turn-in.** The final screen builds a block of text with the student's name, level, completion code, stats, badges, and full written response. Students copy it into a Canvas Text Entry submission.
 
+## Live site and downloads
+
+The site is published with GitHub Pages at **https://tasiawilliamsonn-beep.github.io/thegreatescapes/** from this branch. Every push updates it. The header's **Download all (.zip)** link serves `downloads/crossroads-escapes.zip`: the full site plus every Canvas room file, exit ticket, warm-up, guided notes page, presenter script, facilitation guide, and set of gallery walk posters. `downloads/crossroads-escapes-website.html` is the whole teacher site as one file.
+
+## Gallery walks
+
+The 10 gallery rooms (`data/gallery-art.js`) teach through pictures. Students walk a hallway of framed exhibits. Each exhibit is an illustrated picture with 3–5 numbered "look closely" spots that reveal a fact when tapped. Students must find every spot and write I see / I think / I wonder notes before the exhibit's challenge opens, and the notes go on their turn-in. For a classroom gallery walk, the room page has printable posters (one per exhibit, plus setup directions) and a viewing guide PDF.
+
+## Presenter and script
+
+Presenter slides show only student-facing cues (`data/lessons-cues.js`): a hook vote, a worked example revealed step by step, "In your notes" tasks, turn-and-talks, and checks. Students need only a notebook, the guided notes page, and a pencil. Everything the teacher says is in the separate **Presenter script PDF**: slide by slide, with directions, questions, answers, and reteach moves.
+
 ## 60-minute lessons
 
 Every room page and facilitation guide follows the same 60-minute plan: warm-up (0:00–0:08), mini-lesson (0:08–0:20), activity (0:20–0:48), debrief (0:48–0:52), and exit ticket (0:52–1:00). Lesson content for all 24 standards is in `data/lessons.js`:

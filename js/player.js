@@ -928,6 +928,35 @@ function EscapePlayer(mount, room, opts) {
 .ep-say{background:rgba(255,209,102,.25);border-left:6px solid var(--accent2);padding:10px 14px;border-radius:0 10px 10px 0}
 .ep-notebox{border:3px dashed var(--line);border-radius:12px;padding:10px 14px}
 .ep-stepdots{display:flex;gap:6px}.ep-stepdots i{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;opacity:.5}.ep-stepdots i.cur{background:var(--accent2);opacity:1}.ep-stepdots i.done{background:currentColor;opacity:.8}
+.ep-exhibit{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start;margin-bottom:18px}
+.ep-gframe{display:block;padding:14px;background:linear-gradient(135deg,#b8862b,#f3d27a 40%,#a8741c 70%,#e6c066);border-radius:6px;box-shadow:0 12px 26px rgba(0,0,0,.35),inset 0 0 0 2px rgba(0,0,0,.25)}
+.ep-gframe.sm{padding:8px}
+.ep-mat{display:block;background:#f7f2e6;padding:12px;box-shadow:inset 0 0 8px rgba(0,0,0,.25)}
+.ep-gframe.sm .ep-mat{padding:6px}
+.ep-art{position:relative;display:block;line-height:0}.ep-art svg{width:100%;height:auto;display:block}
+.ep-spot{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;border:3px solid #fff;background:#C8272D;color:#fff;font:700 17px/1 "Atkinson Hyperlegible",sans-serif;cursor:pointer;box-shadow:0 0 0 3px rgba(200,39,45,.35),0 3px 8px rgba(0,0,0,.35);animation:ep-pulse 1.8s infinite}
+.ep-spot.found{background:#1f7a3a;animation:none;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+@keyframes ep-pulse{50%{box-shadow:0 0 0 10px rgba(200,39,45,0),0 3px 8px rgba(0,0,0,.35)}}
+.ep-plaque{background:#fffdf6;color:#2a2418;border:1px solid #d9cfb8;border-radius:4px;padding:16px 18px;box-shadow:0 6px 16px rgba(0,0,0,.2);font-size:17px}
+.ep-plaque h2{font-family:var(--display);font-weight:400;font-size:28px;margin:4px 0 2px;color:#2a2418;line-height:1.1}
+.ep-plaque .ep-kicker{color:#7a6a45;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.ep-medium{font-style:italic;color:#6b5d40;margin:0 0 10px;font-size:15px}
+.ep-look{background:#fff3cf;border-radius:8px;padding:8px 10px;font-size:15px}.ep-found{display:inline-block;margin-left:6px;font-weight:700;color:#1f7a3a}
+.ep-facts{margin:10px 0 0;padding-left:0;list-style:none;display:grid;gap:8px;font-size:15px;line-height:1.4}
+.ep-facts li.hid{color:#b3a78c}.ep-facts li.new{animation:ep-glow 1.2s}
+@keyframes ep-glow{0%{background:#fff3cf}100%{background:transparent}}
+.ep-placardcard{margin-bottom:18px}
+.ep-gnotes{margin-bottom:18px}.ep-gnrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ep-gnote{display:flex;flex-direction:column;gap:2px}.ep-gnote b{font-size:18px}.ep-gnote span{font-size:13px;opacity:.75}
+.ep-gnote textarea{font:inherit;font-size:16px;border:2px solid #9aa3b5;border-radius:10px;padding:8px;background:#fff;color:#1d2433;resize:vertical}
+.ep-lockedq{text-align:center;opacity:.85}
+.ep-hall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:26px 20px;padding:22px 18px 26px;background:linear-gradient(#0000 88%,rgba(0,0,0,.18) 88%),var(--card);border:3px solid var(--line);border-radius:var(--r);margin-bottom:6px}
+.ep-hallframe{display:flex;flex-direction:column;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:0;color:var(--card-ink);font:inherit}
+.ep-hallframe:hover .ep-gframe{transform:translateY(-3px)}.ep-hallframe .ep-gframe{transition:transform .15s;width:100%}
+.ep-hplaque{background:#fffdf6;color:#2a2418;border:1px solid #d9cfb8;border-radius:3px;padding:6px 10px;font-size:14px;text-align:center;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.ep-hallframe.done .ep-hplaque span{color:#1f7a3a;font-weight:700}
+.ep-hallnote{text-align:center;margin:0 0 16px}
+@media (max-width:760px){.ep-exhibit{grid-template-columns:1fr}.ep-gnrow{grid-template-columns:1fr}.ep-spot{width:32px;height:32px;font-size:15px}}
 .ep-i{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em}
 .ep-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .ep-pill{display:inline-flex;align-items:center;gap:5px}
@@ -1043,7 +1072,7 @@ function EscapePlayer(mount, room, opts) {
 
   /* ---------- state ---------- */
   var KEY = 'crossroads-escape-v2:' + room.id;
-  function blank() { return { name: '', started: false, elapsed: 0, solved: {}, firstTry: {}, tries: {}, hinted: {}, done: [], pi: {}, wrong: 0, finished: false, screen: 'start', current: 0, level: presetLevel() || 'agent', xp: 0, streak: 0, best: 0, hearts: {}, removed: {}, removesUsed: 0, drafts: {}, writing: {}, notes: '', sup: {}, gains: {} }; }
+  function blank() { return { name: '', started: false, elapsed: 0, solved: {}, firstTry: {}, tries: {}, hinted: {}, done: [], pi: {}, wrong: 0, finished: false, screen: 'start', current: 0, level: presetLevel() || 'agent', xp: 0, streak: 0, best: 0, hearts: {}, removed: {}, removesUsed: 0, drafts: {}, writing: {}, notes: '', sup: {}, gains: {}, spots: {}, gnotes: {}, studied: {} }; }
   var S = blank();
   if (!opts.preview) { try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.solved) S = Object.assign(blank(), saved); } catch (e) { } }
   if (presetLevel()) S.level = presetLevel();
@@ -1222,6 +1251,13 @@ function EscapePlayer(mount, room, opts) {
       });
       return hsvg(640, 360, b, 'Case board');
     }
+    // gallery wall of framed pictures (gallery walks with art)
+    if (stages.every(function (s) { return s.art; })) {
+      return '<div class="ep-hall">' + stages.map(function (s, i) {
+        var d = S.done[i], st = S.studied[i];
+        return '<button type="button" class="ep-hallframe' + (d ? ' done' : '') + '" data-hall="' + i + '"><span class="ep-gframe sm"><span class="ep-mat"><span class="ep-art">' + artSVG(s.art) + '</span></span></span><span class="ep-hplaque"><b>' + LETTERS[i] + '. ' + esc(s.art.title || stageTitle(i)) + '</b><span>' + (d ? '✓ Stamped · ' + esc(code[i]) : st ? 'Challenge open →' : 'Visit →') + '</span></span></button>';
+      }).join('') + '</div><p class="ep-small ep-hallnote">Walk the gallery in any order. At each exhibit: look closely, take notes, then solve the challenge.</p>';
+    }
     // museum floor plan
     var R = [[20, 20, 140, 120], [175, 20, 140, 120], [330, 20, 140, 120], [485, 20, 140, 120], [20, 170, 140, 120], [485, 170, 140, 120]];
     b = '<rect x="4" y="4" width="632" height="302" rx="10" class="hv-floor"/><rect x="200" y="190" width="240" height="100" rx="8" class="hv-lobby"/>' + tx(320, 236, ['LOBBY'], 16, 'hv-cardink b') + tx(320, 258, ['You are here'], 12, 'hv-cardink');
@@ -1276,7 +1312,7 @@ function EscapePlayer(mount, room, opts) {
     var ready = allDone();
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
       '<div class="ep-hero" style="margin-top:0">' + emblem('sm') + '<div><h1 class="ep-sign md">' + esc(room.hubTitle || fmt.map) + '</h1></div></div>' +
-      '<p class="ep-tag">' + esc(fmt.intro) + '</p><div class="ep-hubvis">' + hubVisual() + '</div><div class="ep-rooms">' + stages.map(function (s, i) {
+      '<p class="ep-tag">' + esc(fmt.intro) + '</p><div class="ep-hubvis">' + hubVisual() + '</div><div class="ep-rooms"' + (stages.every(function (x) { return x.art; }) ? ' hidden' : '') + '>' + stages.map(function (s, i) {
         var solved = !!S.done[i], open = stageOpen(i), cur = open && !solved && fmt.ordered && (i === 0 || S.done[i - 1]);
         var inProg = s.puzzles.filter(function (_, j) { return S.solved[i + '-' + j]; }).length;
         var state = solved ? '✓ ' + esc(code[i]) : !open ? 'Locked' : inProg ? inProg + '/' + s.puzzles.length + ' →' : fmt.verb + ' →';
@@ -1286,6 +1322,7 @@ function EscapePlayer(mount, room, opts) {
       '<div class="ep-card" style="margin-top:22px"><h2>' + esc(room.finalTitle || (GAME === 'boss' ? 'The final strike' : 'The final lock')) + '</h2><p>Your code pieces, in order:</p><div class="ep-digits">' + code.map(function (c, i) { return '<div class="ep-digit' + (S.done[i] ? '' : ' empty') + '">' + (S.done[i] ? esc(c) : '?') + '</div>'; }).join('') + '</div>' +
       '<div style="margin-top:18px"><button type="button" class="ep-btn full" id="ep-door"' + (ready ? '' : ' disabled') + '>' + (ready ? 'Go to the final lock' : 'Collect all ' + stages.length + ' pieces first') + '</button></div></div></div>';
     root.querySelectorAll('.ep-room:not([disabled])').forEach(function (b) { b.onclick = function () { go('stage', +b.getAttribute('data-i')); }; });
+    root.querySelectorAll('[data-hall]').forEach(function (b) { b.onclick = function () { go('stage', +b.getAttribute('data-hall')); }; });
     root.querySelectorAll('.ep-hn:not(.locked)').forEach(function (g) {
       g.addEventListener('click', function () { go('stage', +g.getAttribute('data-i')); });
       g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go('stage', +g.getAttribute('data-i')); } });
@@ -1300,16 +1337,59 @@ function EscapePlayer(mount, room, opts) {
     for (var k = 0; k < max; k++) s += '<span class="' + (k < h ? '' : 'lost') + '">' + ICON.heart + '</span>';
     return '<div class="ep-hearts" id="ep-hearts" role="img" aria-label="' + h + ' of ' + max + ' hearts">' + s + '<span class="ep-bossmini"><span>' + esc(room.boss || 'Boss') + '</span><span class="ep-hp sm"><i style="width:' + Math.round(bossHP() * 100) + '%"></i></span></span></div>';
   }
+  /* ---------- gallery walk: framed picture with look-closely spots, then See-Think-Wonder ---------- */
+  function artSVG(a, small) { var pic = a.pic; return V[pic.kind] ? V[pic.kind](pic, {}) : ''; }
+  function exhibitHTML(i) {
+    var s = stages[i], a = s.art, found = S.spots[i] || {}, n = a.spots.length, got = a.spots.filter(function (_, k) { return found[k]; }).length, W = a.pic.w || 600, H = a.pic.h || 380;
+    var marks = a.spots.map(function (sp, k) { return '<button type="button" class="ep-spot' + (found[k] ? ' found' : '') + '" data-spot="' + k + '" style="left:' + (sp.x / W * 100).toFixed(2) + '%;top:' + (sp.y / H * 100).toFixed(2) + '%" aria-label="Look closely: detail ' + (k + 1) + (found[k] ? ', ' + esc(sp.t) : '') + '">' + (k + 1) + '</button>'; }).join('');
+    var facts = a.spots.map(function (sp, k) { return found[k] ? '<li><b>' + (k + 1) + '. ' + esc(sp.t) + '</b> ' + esc(sp.d) + '</li>' : '<li class="hid">' + (k + 1) + '. ?</li>'; }).join('');
+    return '<div class="ep-exhibit"><div class="ep-gframe"><div class="ep-mat"><div class="ep-art">' + artSVG(a) + marks + '</div></div></div>' +
+      '<div class="ep-plaque"><div class="ep-kicker">' + esc(nodeName(i)) + '</div><h2>' + esc(a.title || stageTitle(i)) + '</h2><p class="ep-medium">' + esc(a.medium || '') + '</p>' +
+      '<div class="ep-look"><b>Look closely.</b> Tap each numbered spot on the picture. <span class="ep-found">' + got + ' of ' + n + ' found</span></div><ol class="ep-facts">' + facts + '</ol></div></div>';
+  }
+  function notesHTML(i) {
+    var g = S.gnotes[i] || {}, done = S.studied[i];
+    function box(k, label, tip) { return '<label class="ep-gnote"><b>' + label + '</b><span>' + tip + '</span><textarea data-gn="' + k + '" rows="2"' + (done ? ' readonly' : '') + '>' + esc(g[k] || '') + '</textarea></label>'; }
+    return '<div class="ep-card ep-gnotes"><h2>Gallery notes</h2><p class="ep-small">Write like a museum visitor. Your notes go on your turn-in page.</p><div class="ep-gnrow">' +
+      box('see', 'I see…', 'Name 2 details in the picture.') + box('think', 'I think…', 'What does the exhibit teach? Use a key word.') + box('wonder', 'I wonder…', 'A question you still have (optional).') + '</div>' +
+      (done ? '' : '<div class="ep-fb" id="ep-gfb" role="status"></div><div class="ep-row"><button type="button" class="ep-btn" id="ep-study">Start the exhibit challenge</button>' + (opts.preview ? '<button type="button" class="ep-btn small ep-teacher" id="ep-skipstudy">Teacher: skip</button>' : '') + '</div>') + '</div>';
+  }
+  function bindExhibit(i) {
+    var s = stages[i], a = s.art;
+    root.querySelectorAll('[data-spot]').forEach(function (b) {
+      b.onclick = function () {
+        var k = +b.getAttribute('data-spot'); S.spots[i] = S.spots[i] || {}; S.spots[i][k] = true; save();
+        var ex = root.querySelector('.ep-exhibit'); ex.outerHTML = exhibitHTML(i); bindExhibit(i); var gf = root.querySelector('#ep-gfb'); if (gf) { gf.className = 'ep-fb'; gf.textContent = ''; }
+        var li = root.querySelectorAll('.ep-facts li')[k]; if (li) { li.classList.add('new'); if (li.scrollIntoView) li.scrollIntoView({ block: 'nearest' }); }
+        var sp = a.spots[k]; if (S.sup.tap) speak(sp.t + '. ' + sp.d);
+      };
+    });
+  }
+  function bindNotes(i) {
+    root.querySelectorAll('[data-gn]').forEach(function (t) { t.addEventListener('input', function () { S.gnotes[i] = S.gnotes[i] || {}; S.gnotes[i][t.getAttribute('data-gn')] = t.value; saveSoon(); }); });
+    var st = root.querySelector('#ep-study'), fb = root.querySelector('#ep-gfb');
+    function open() { S.studied[i] = true; save(); renderStage(); var q = root.querySelector('#ep-qa'); if (q && q.scrollIntoView) q.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (st) st.onclick = function () {
+      var a = stages[i].art, found = S.spots[i] || {}, left = a.spots.filter(function (_, k) { return !found[k]; }).length, g = S.gnotes[i] || {};
+      if (left) { fb.className = 'ep-fb show warn'; fb.textContent = 'Look closely first: ' + left + ' numbered spot' + (left === 1 ? ' is' : 's are') + ' still hidden on the picture.'; return; }
+      if (wordCount(g.see) < 3 || wordCount(g.think) < 3) { fb.className = 'ep-fb show warn'; fb.textContent = 'Write at least a few words for "I see" and "I think" before the challenge.'; return; }
+      open();
+    };
+    var sk = root.querySelector('#ep-skipstudy'); if (sk) sk.onclick = function () { S.spots[i] = {}; stages[i].art.spots.forEach(function (_, k) { S.spots[i][k] = true; }); S.gnotes[i] = S.gnotes[i] || { see: 'Teacher preview', think: 'Teacher preview' }; open(); };
+  }
+
   function renderStage() {
     var i = S.current, s = stages[i];
     if (S.pi[i] == null) S.pi[i] = 0;
     var flips = s.cards ? '<div class="ep-flips">' + s.cards.map(function (c, k) { return '<button type="button" class="ep-flip" data-flip="' + k + '" aria-label="Flip card: ' + esc(strip(c[0])) + '"><span class="ep-flip-in"><span class="ep-flip-f">' + fx(c[0]) + '</span><span class="ep-flip-b">' + fx(c[1]) + '</span></span></button>'; }).join('') + '</div>' : '';
-    var back = { escape: '← Back to the locks', gallery: '← Back to the floor plan', fieldtrip: '← Back to the game board', mystery: '← Back to the case board', quest: '← Back to the quest map' }[room.format] || '← Back';
+    var back = { escape: '← Back to the locks', gallery: '← Back to the gallery', fieldtrip: '← Back to the game board', mystery: '← Back to the case board', quest: '← Back to the quest map' }[room.format] || '← Back';
     root.innerHTML = '<div class="ep-band thin"></div><div class="ep-wrap">' + statusBar() +
       (opts.teach ? '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back"' + (i ? '' : ' disabled') + '>← Previous step</button><span class="ep-spacer"></span><div class="ep-stepdots">' + stages.map(function (_, k) { return '<i class="' + (k === i ? 'cur' : k < i ? 'done' : '') + '"></i>'; }).join('') + '</div><span class="ep-spacer"></span><button type="button" class="ep-btn plain small" id="ep-fwd">' + (i < stages.length - 1 ? 'Next step →' : 'Finish →') + '</button></div>' :
       '<div class="ep-row" style="margin-bottom:14px"><button type="button" class="ep-btn plain small" id="ep-back">' + back + '</button><span class="ep-spacer"></span><span class="ep-small">' + esc(nodeName(i)) + ' of ' + stages.length + '</span></div>') + heartsHTML(i) +
-      '<div class="ep-card ep-stagecard">' + listenBtn('stage') + '<div class="ep-kicker">' + esc(opts.teach ? 'Step ' + (i + 1) + ' of ' + stages.length : nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips +
+      (s.art && !opts.teach ? exhibitHTML(i) + '<div class="ep-card ep-stagecard ep-placardcard">' + listenBtn('stage') + (/placard/i.test(String(s.content).slice(0, 40)) ? '' : '<div class="ep-kicker">Placard</div>') + fx(s.content) + visualHTML(s.visual) + flips :
+      '<div class="ep-card ep-stagecard">' + listenBtn('stage') + '<div class="ep-kicker">' + esc(opts.teach ? 'Step ' + (i + 1) + ' of ' + stages.length : nodeName(i)) + '</div><h2>' + esc(stageTitle(i)) + '</h2>' + fx(s.content) + visualHTML(s.visual) + flips) +
       (s.sim ? '<div class="ep-sim"><div class="ep-sim-h">' + esc(s.sim.title || 'Try it yourself') + '</div><div data-sim></div></div>' : '') + '</div>' +
+      (s.art && !opts.teach ? notesHTML(i) : '') +
       '<div id="ep-qa"></div></div>';
     if (opts.teach) {
       root.querySelector('#ep-back').onclick = function () { if (i) go('stage', i - 1); };
@@ -1318,7 +1398,10 @@ function EscapePlayer(mount, room, opts) {
     root.querySelectorAll('[data-flip]').forEach(function (b) { b.onclick = function () { b.classList.toggle('on'); }; });
     if (s.sim && SIMS[s.sim.kind]) { try { SIMS[s.sim.kind](root.querySelector('[data-sim]'), s.sim); } catch (e) { root.querySelector('[data-sim]').textContent = 'This simulation could not load.'; } }
     bindCommon();
-    if (S.done[i]) renderStageDone(i); else renderPuzzle(i);
+    if (s.art && !opts.teach) { bindExhibit(i); bindNotes(i); }
+    if (S.done[i]) renderStageDone(i);
+    else if (s.art && !opts.teach && !S.studied[i]) root.querySelector('#ep-qa').innerHTML = '<div class="ep-panel ep-qcard ep-lockedq"><h2>Exhibit challenge</h2><p>Study the picture and write your gallery notes. The challenge opens when every spot is found.</p></div>';
+    else renderPuzzle(i);
   }
 
   function renderStageDone(i) {
@@ -1484,6 +1567,11 @@ function EscapePlayer(mount, room, opts) {
   }
   function workText() {
     var L = curLevel(), lines = ['Crossroads Escapes: ' + room.title, 'Standard: ' + (room.standard || ''), 'Name: ' + (S.name || ''), 'Mission level: ' + L.name, 'Completion code: ' + completionCode(S.name), 'Time: ' + fmtTime(S.finishTime || S.elapsed) + ' | XP: ' + S.xp + ' | First-try accuracy: ' + accuracy() + '% | Hints: ' + Object.keys(S.hinted).length, 'Badges: ' + (badges().filter(function (b) { return b.on; }).map(function (b) { return b.n; }).join(', ') || 'none yet'), ''];
+    if (stages.some(function (s) { return s.art; })) {
+      lines.push('--- Gallery walk notes ---');
+      stages.forEach(function (s, i) { if (!s.art) return; var g = S.gnotes[i] || {}; lines.push(LETTERS[i] + '. ' + (s.art.title || stageTitle(i)), '  I see: ' + String(g.see || '').trim(), '  I think: ' + String(g.think || '').trim(), '  I wonder: ' + String(g.wonder || '').trim()); });
+      lines.push('');
+    }
     writeTasks().forEach(function (t) {
       var fr = FRAMES[t.p.frame] || FRAMES.RACE, v = S.writing[t.key] || (work[t.key] && work[t.key].v) || {};
       lines.push('--- ' + fr.name + ' ---', 'Task: ' + strip(t.p.q));

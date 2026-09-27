@@ -33,4 +33,9 @@
     if (t.boss) r.boss = t.boss;
     if (t.task) r.stages[r.stages.length - 1].puzzles.push(Object.assign({ type: 'write' }, t.task));
   });
+  // gallery walk artwork (data/gallery-art.js)
+  var ART = window.CX_ART || {};
+  (window.CX_ROOMS || []).forEach(function (r) {
+    (ART[r.id] || []).forEach(function (a, i) { if (r.stages[i]) r.stages[i].art = a; });
+  });
 })();
