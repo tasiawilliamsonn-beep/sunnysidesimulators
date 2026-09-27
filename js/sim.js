@@ -159,7 +159,20 @@ function SunnySim() {
     f.outline = function (x0, y0, z0, l, w, h, col) { var st = ' fill="none" stroke="' + (col || '#495057') + '" stroke-width="2" stroke-dasharray="5 4"'; function L(a, b) { return '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"' + st + '/>'; } var c = [P(x0, y0, z0), P(x0 + l, y0, z0), P(x0 + l, y0 + w, z0), P(x0, y0 + w, z0)], t = [P(x0, y0, z0 + h), P(x0 + l, y0, z0 + h), P(x0 + l, y0 + w, z0 + h), P(x0, y0 + w, z0 + h)], o = ''; for (var i = 0; i < 4; i++) { o += L(c[i], c[(i + 1) % 4]) + L(t[i], t[(i + 1) % 4]) + L(c[i], t[i]); } return o; };
     return f;
   }
-  var KIT = { iso: iso, shade: shade, gcd: gcd, lcm: lcm, simp: simp, fstr: fstr, fadd: fadd, fsub: fsub, fmul: fmul, fval: fval, esc: esc, el: el, svgEl: svgEl, clamp: clamp, round: round, fmt: fmt, money: money, hash: hash, rng: rng, norm: norm, words: words, parseNum: parseNum, slider: slider, btn: btn, readout: readout, toggle: toggle, seg: seg, drag: drag, graph: graph };
+  // Reading passages. Paragraph strings; {id|text} marks a sentence with a known id (for checks).
+  function passage(paras) {
+    var sents = [], n = 0, html = '';
+    paras.forEach(function (p, pi) {
+      var out = '', re = /\{(\w+)\|([^}]*)\}|[^{]+/g, m;
+      while ((m = re.exec(p))) {
+        if (m[1]) { sents.push({ id: m[1], text: m[2], p: pi }); out += '<span class="sn-s" data-sid="' + m[1] + '">' + esc(m[2]) + '</span> '; }
+        else { m[0].replace(/([.!?]+["”’)]*)\s+(?=["“(A-Z])/g, '$1\u0001').split('\u0001').forEach(function (t) { t = t.trim(); if (!t) return; var id = 's' + (++n); sents.push({ id: id, text: t, p: pi }); out += '<span class="sn-s" data-sid="' + id + '">' + esc(t) + '</span> '; }); }
+      }
+      html += '<p><span class="sn-pn">' + (pi + 1) + '</span>' + out + '</p>';
+    });
+    return { html: html, sentences: sents, text: sents.map(function (x) { return x.text; }).join(' ') };
+  }
+  var KIT = { passage: passage, iso: iso, shade: shade, gcd: gcd, lcm: lcm, simp: simp, fstr: fstr, fadd: fadd, fsub: fsub, fmul: fmul, fval: fval, esc: esc, el: el, svgEl: svgEl, clamp: clamp, round: round, fmt: fmt, money: money, hash: hash, rng: rng, norm: norm, words: words, parseNum: parseNum, slider: slider, btn: btn, readout: readout, toggle: toggle, seg: seg, drag: drag, graph: graph };
 
   /* ======================================================================
    * Levels and ranks
@@ -240,6 +253,7 @@ function SunnySim() {
         },
         after: function (ms, fn) { var t = setTimeout(fn, ms); timers.push(t); return t; },
         toast: toast,
+        answers: function () { return S.answers; },
         lock: function (names) { M.locked = names || []; if (model && model.lock) model.lock(M.locked); }
       };
       var maker = MODELS[def.model];
@@ -497,6 +511,7 @@ function SunnySim() {
       var t = ' ' + norm(txt) + ' ', rows = [], ok = true, n = words(txt).length;
       var min = q.min || 6; if (level === 'legend' && q.legendMin) min = q.legendMin;
       rows.push([n >= min, 'At least ' + min + ' words (' + n + ' so far)']);
+      if (q.max) rows.push([n <= q.max, 'No more than ' + q.max + ' words (keep it short)']);
       (q.need || []).forEach(function (g) {
         var grp = g.words || g, label = g.label || ('Uses an idea like "' + grp[0] + '"');
         var hit = grp.some(function (w) { w = norm(w); return w.indexOf(' ') >= 0 || w.length > 4 ? t.indexOf(w) >= 0 : new RegExp('[^a-z0-9]' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^a-z0-9]').test(t); });
@@ -504,7 +519,7 @@ function SunnySim() {
       });
       if (level === 'legend' && q.legendNeed) q.legendNeed.forEach(function (g) { var grp = g.words || g; rows.push([grp.some(function (w) { return t.indexOf(norm(w)) >= 0; }), (g.label || 'Legend: uses "' + grp[0] + '"')]); });
       if (q.number) rows.push([/\d/.test(txt), 'Includes a number from your data']);
-      if (q.quote) { var qs = (txt.match(/["“]([^"”]{4,})["”]/g) || []).map(function (x) { return norm(x.replace(/["“”]/g, '')); }); var src = norm(q.quote === true ? (def.passageText || '') : q.quote); rows.push([qs.length > 0 && qs.some(function (x) { return src.indexOf(x) >= 0; }), 'Quotes the text exactly, inside quotation marks']); }
+      if (q.quote) { var qs = (txt.match(/["“]([^"”]{4,})["”]/g) || []).map(function (x) { return norm(x.replace(/["“”]/g, '')); }); var src = norm(q.quote === true ? (def.passageText || '') : q.quote); var need = (level === 'legend' && q.legendQuotes) || q.quotes || 1, good = qs.filter(function (x) { return src.indexOf(x) >= 0; }).length; rows.push([good >= need, need > 1 ? 'Quotes the text exactly (' + need + ' separate quotes in quotation marks)' : 'Quotes the text exactly, inside quotation marks']); if (qs.length > good) rows.push([false, 'A quote doesn\'t match the text word for word. Copy it exactly.']); }
       if (q.avoid) q.avoid.forEach(function (a) { rows.push([t.indexOf(norm(a[0])) < 0, a[1]]); });
       rows.forEach(function (r) { if (!r[0]) ok = false; });
       return { ok: ok, list: '<ul class="sn-crit">' + rows.map(function (r) { return '<li class="' + (r[0] ? 'y' : 'n') + '">' + (r[0] ? '✓ ' : '✗ ') + esc(r[1]) + '</li>'; }).join('') + '</ul>' };
@@ -585,7 +600,7 @@ function SunnySim() {
     Q.write = function (st, q, body, fb) {
       var lv = LEVELS[S.level], d = S.drafts[st.key] || {};
       body.innerHTML = (q.passage ? '<blockquote class="sn-pass">' + fill(q.passage) + '</blockquote>' : '') + q.parts.map(function (p, k) {
-        var v = d[k]; if (v == null) v = lv.starters && p.starter ? p.starter : '';
+        var v = d[k]; if (v == null && p.prefill) { var pre = [].concat(p.prefill).map(function (id) { return typeof S.answers[id] === 'string' ? S.answers[id] : ''; }).filter(Boolean).join(' '); if (pre) v = pre; } if (v == null) v = lv.starters && p.starter ? p.starter : '';
         return '<div class="sn-wpart"><label><span class="sn-wl"><b>' + esc(p.label) + '</b>' + (p.help ? ' · ' + esc(p.help) : '') + '</span><textarea rows="' + (p.rows || 2) + '" data-p="' + k + '" placeholder="' + esc(p.placeholder || '') + '">' + esc(v) + '</textarea></label>' + (lv.starters && p.frames ? '<div class="sn-bank"><span>Starters:</span>' + p.frames.map(function (f) { return '<button type="button" class="sn-chip" data-fr="' + k + '" data-w="' + esc(f) + '">' + esc(f) + '</button>'; }).join('') + '</div>' : '') + '<div class="sn-pfb" data-pfb="' + k + '"></div></div>';
       }).join('') + '<button type="button" class="sn-b primary" data-check>Check my writing</button>';
       body.querySelectorAll('textarea').forEach(function (ta) { ta.addEventListener('input', function () { d[ta.getAttribute('data-p')] = ta.value; S.drafts[st.key] = d; save(); }); });
@@ -747,7 +762,7 @@ function SunnySim() {
     '.sn-seg{display:inline-flex;border:2px solid var(--sn-ink);border-radius:10px;overflow:hidden}.sn-seg button{border:0;background:#fff;padding:6px 11px;font-weight:700;cursor:pointer;border-right:1px solid var(--sn-line)}.sn-seg button:last-child{border-right:0}.sn-seg button.on{background:var(--sn-ink);color:#fff}',
     '.sn-scene>.sn-svg,.sn-scene>.sn-stagebox>.sn-svg{max-height:min(52vh,460px)}.sn-svg{overflow:hidden;width:100%;height:auto;display:block;border-radius:12px;background:var(--sn-card);border:1px solid var(--sn-line);user-select:none;-webkit-user-select:none;touch-action:manipulation}',
     '.sn-graph{margin:0;background:var(--sn-card);border:1px solid var(--sn-line);border-radius:12px;padding:6px}.sn-graph svg{width:100%;height:auto;display:block}.sn-graph figcaption{font-size:.8em;text-align:center;color:var(--sn-soft)}',
-    '.sn-note{font-size:.85em;color:var(--sn-soft)}.sn-missing{padding:30px;text-align:center;color:var(--sn-no)}',
+    '.sn-read-pass{background:#fffdf7;border:1px solid var(--sn-line);border-radius:12px;padding:14px 18px;font-family:Georgia,"Times New Roman",serif;font-size:1.05em;line-height:1.75;overflow:auto}.sn-read-pass h3{font-family:var(--sn-head);margin:0 0 2px}.sn-read-pass .sn-by{font-size:.85em;color:var(--sn-soft);font-family:var(--sn-font);margin-bottom:8px}.sn-read-pass p{margin:0 0 .8em}.sn-pn{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;background:var(--sn-bg);font:700 .7em var(--sn-font);margin-right:6px;vertical-align:2px;color:var(--sn-soft)}.sn-s{cursor:pointer;border-radius:3px;transition:background .15s;padding:1px 0}.sn-s:hover{background:#fff3bf}.sn-s.h-evidence{background:#ffe066;box-shadow:0 2px 0 #f59f00}.sn-s.h-key{background:#a5d8ff;box-shadow:0 2px 0 #1c7ed6}.sn-s.h-clue{background:#b2f2bb;box-shadow:0 2px 0 #2f9e44}.sn-s.h-other{background:#eebefa}.sn-w{border-bottom:2px dotted var(--sn-acc);cursor:pointer}.sn-w.on{background:#d0bfff}.sn-note{font-size:.85em;color:var(--sn-soft)}.sn-missing{padding:30px;text-align:center;color:var(--sn-no)}',
     '.sn-demo .sn-guide{display:none}.sn-demo .sn-body{grid-template-columns:1fr}.sn-demo .sn-top{display:none}',
     '@media (max-width:900px){.sn{height:auto;overflow:visible}.sn-body{grid-template-columns:1fr}.sn-guide{border-left:0;border-top:1px solid var(--sn-line)}.sn-stage{max-height:none}.sn-progress .sn-dot{display:none}}',
     '@media (prefers-reduced-motion:reduce){.sn *{transition:none!important;animation:none!important}}'
