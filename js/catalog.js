@@ -21,7 +21,7 @@
     '<section class="cat-wrap cat-how" aria-label="How it works"><div><b>1</b><span><strong>Warm up together.</strong> Open 🎬 Present for the warm-up, mini-lesson, and a live demo. Arrow keys or a clicker move the slides.</span></div><div><b>2</b><span><strong>Students explore.</strong> Each student plays the simulator at their level (Explorer, Investigator, or Legend) and fills in the 📄 lab sheet.</span></div><div><b>3</b><span><strong>Turn in paper.</strong> Students write their completion code on the sheet. Check it against the 🔑 key.</span></div></section>' +
     '<nav class="cat-wrap cat-bar" aria-label="Filters"><div class="cat-seg" role="group" aria-label="Grade" data-grade></div><div class="cat-chips" role="group" aria-label="Subject" data-subj></div><label class="cat-search"><span class="sr">Search</span><input type="search" placeholder="Search simulators…" data-q></label></nav>' +
     '<main class="cat-wrap" data-list></main>' +
-    '<footer class="cat-wrap cat-foot"><span>Sunnyside Simulators · Indiana Academic Standards, grades 5–6</span><a href="escapes.html">🔐 The Broncho Escape</a></footer>';
+    '<footer class="cat-wrap cat-foot"><span>Sunnyside Simulators · Indiana Academic Standards, grades 5–6</span><span><a href="downloads/sunnyside-simulators.zip" download>⬇ Download everything (.zip)</a> · <a href="escapes.html">🔐 The Broncho Escape</a></span></footer>';
 
   var gradeBox = app.querySelector('[data-grade]'), subjBox = app.querySelector('[data-subj]'), list = app.querySelector('[data-list]');
   app.querySelector('[data-q]').addEventListener('input', function (e) { st.q = e.target.value.trim().toLowerCase(); render(); });

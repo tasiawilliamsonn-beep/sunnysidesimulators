@@ -21,7 +21,7 @@ Each room includes:
 
 ## Live site and downloads
 
-The site is published with GitHub Pages at **https://tasiawilliamsonn-beep.github.io/thegreatescapes/** from this branch. Every push updates it. The header's **Download all (.zip)** link serves `downloads/crossroads-escapes.zip`: the full site plus every Canvas room file, exit ticket, warm-up, lesson worksheet (with key), presenter script, facilitation guide, and set of gallery walk posters. `downloads/crossroads-escapes-website.html` is the whole teacher site as one file.
+The site is published with GitHub Pages at **https://tasiawilliamsonn-beep.github.io/thegreatescapes/** from this branch. Every push updates it. The **Download everything (.zip)** links serve `downloads/sunnyside-simulators.zip`: the full site; a Canvas file, lab sheet PDF, and key PDF for every simulator (`simulators/`); and every Broncho Escape Canvas room file, exit ticket, warm-up, lesson worksheet (with key), presenter script, facilitation guide, and set of gallery walk posters (`broncho-escape/`). `downloads/broncho-escape-website.html` is The Broncho Escape site as one file.
 
 ## Gallery walks
 
