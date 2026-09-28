@@ -46,6 +46,13 @@ window.CX_FX = window.CX_FX || {};
   ] };
 
   /* ---------- rooms ---------- */
+  FX['g6-ela-summary-vault'] = { theme: 'library' };
+  FX['g6-ela-clue-express'] = { theme: 'travel' };
+  FX['g6-ela-plot-mountain'] = { theme: 'forest' };
+  FX['g6-ela-grammar-garage'] = { theme: 'warehouse' };
+  FX['g6-ela-sentence-case'] = { theme: 'detective' };
+  FX['g6-ela-paragraph-bakery'] = { theme: 'sweets' };
+
   FX['g6-ela-inference-files'] = {
     theme: 'detective',
     stages: {

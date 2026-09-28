@@ -84,6 +84,10 @@
     hook: { q: 'Would you rather be called "thrifty" or "cheap"?', options: ['Thrifty', 'Cheap', 'No difference'] },
     model: ['Sentence: "The old house stood on the hill."', 'Version 1: "The ancient mansion loomed over the hill." (creepy tone)', 'Version 2: "The cozy cottage perched on the hill." (warm tone)', 'Only a few words changed, but the connotation changed the whole tone.'],
     dos: ['Rank thin, slender, scrawny, skinny from most negative to most positive.', 'Rewrite "The kitten walked across the room" to sound sneaky, then playful.', 'Name the figurative language in "He has the Midas touch."', 'Use the root "male" (bad) to define "malevolent."'] });
+  add('g6-ela-writing', {
+    hook: { q: '"Went to the store. Bought apples we ate them." What is wrong?', options: ['Missing subjects', 'Sentences run together', 'Both'] },
+    model: ['Broken: "Went to the store. Bought apples we ate them."', 'Fix the fragment: add a subject. "My family went to the store."', 'Fix the run-on: "We bought apples, and we ate them."', 'Combine: "When my family went to the store, we bought apples."'],
+    dos: ['Circle the subject and underline the verb in each sentence.', 'Label each example: sentence, fragment, or run-on.', 'Combine two short sentences into a compound and a complex sentence.', 'Number the scrambled sentences to build a paragraph.'] });
   add('g5-math-fractions', {
     hook: { q: 'You ate 1/2 of a pizza and your friend ate 1/3. Did you eat 2/5 together?', options: ['Yes, 2/5', 'No, more than 2/5', 'No, less than 2/5'] },
     model: ['Problem: 1/2 + 1/3.', 'Step 1: Halves and thirds are different sizes. Both fit into sixths.', 'Step 2: 1/2 = 3/6 and 1/3 = 2/6.', 'Step 3: 3/6 + 2/6 = 5/6.', 'Check: 5/6 is close to 1, and half a pizza plus a third is almost a whole. 2/5 was wrong.'],

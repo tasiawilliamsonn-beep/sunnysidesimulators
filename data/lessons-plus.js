@@ -104,6 +104,11 @@
     wedo: { q: 'Change the tone: "The kitten walked across the room." Make it sound sneaky, then playful.', steps: ['Tone depends on word choice.', 'Sneaky: "The kitten crept across the room."', 'Playful: "The kitten bounced across the room."', 'Only the verb changed, but the connotation changed the whole feeling.'], a: '"crept" (sneaky) vs. "bounced" (playful)' },
     youdo: MC('"The council rammed through a greedy new fee." The author\'s tone toward the council is:', ['Critical', 'Neutral', 'Admiring', 'Humorous'], 0, '"Rammed" and "greedy" have negative connotations.')
   });
+  add('g6-ela-writing', {
+    talk: ['Why does "Me and Sam went" sound normal when we talk but is incorrect in formal writing?', 'Why would a reader get confused by a run-on sentence?', 'Why might a writer choose a complex sentence instead of two simple ones?', 'How is a paragraph like a sandwich? Where does the comparison break down?'],
+    wedo: { q: 'Fix and combine: "The storm was loud. We stayed inside. Because we were scared."', steps: ['"Because we were scared." is a fragment: it is not a complete thought.', 'Attach it to a sentence: "We stayed inside because we were scared."', 'Combine with the first sentence using a conjunction: "The storm was loud, so we stayed inside."', 'Final: "The storm was so loud that we stayed inside because we were scared."'], a: 'The storm was so loud that we stayed inside because we were scared.' },
+    youdo: MC('Which is the best topic sentence for a paragraph about school uniforms?', ['School uniforms can save families money and reduce distractions.', 'My shirt is blue.', 'In conclusion, uniforms are good.', 'Some schools are big.'], 0, 'It states a clear, focused main idea.')
+  });
   add('g5-math-fractions', {
     talk: ['Why can\'t you just add the denominators: 1/2 + 1/4 = 2/6? Use a picture to explain.', 'How do you choose the best common denominator?', 'When do you need to regroup a whole when subtracting mixed numbers?', 'Why does multiplying by a fraction less than 1 make a number smaller?'],
     wedo: { q: 'Solve: 2 1/3 + 1 3/4.', steps: ['Common denominator for 3 and 4 is 12.', '2 1/3 = 2 4/12 and 1 3/4 = 1 9/12.', 'Add wholes and fractions: 3 13/12.', '13/12 = 1 1/12, so the answer is 4 1/12.'], a: '4 1/12' },

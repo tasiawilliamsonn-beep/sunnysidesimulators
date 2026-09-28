@@ -424,6 +424,28 @@ window.CX_STANDARDS = [
     { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
   ]
 },
+{
+  id: 'g6-ela-writing', grade: 6, subject: 'ela', code: '6.W.3.2 · 6.W.6.1 · 6.W.6.2', sims: false,
+  title: 'Grammar, Sentence Structure & Paragraph Structure',
+  text: 'Use correct grammar and usage (parts of speech, subject-verb agreement, pronouns, and consistent verb tense), write complete simple, compound, and complex sentences without fragments or run-ons, and organize paragraphs with a topic sentence, supporting details, transitions, and a concluding sentence.',
+  lesson: {
+    target: 'I can write complete, correct sentences and organize them into a well-structured paragraph.',
+    vocab: [['Fragment', 'An incomplete sentence missing a subject, a verb, or a complete thought.'], ['Run-on', 'Two complete sentences joined with no punctuation or with only a comma.'], ['Compound sentence', 'Two independent clauses joined by a comma and a conjunction (FANBOYS) or a semicolon.'], ['Complex sentence', 'An independent clause plus a dependent clause that begins with a word like because, when, or although.'], ['Topic sentence', 'The sentence that states the main idea of a paragraph.'], ['Transition', 'A word or phrase that connects ideas, like for example, however, or in addition.']],
+    hook: 'Show: "Went to the store. Bought apples we ate them." Ask: "What\'s wrong here? How would you fix it?" Take ideas, then tell students today they become sentence and paragraph mechanics.',
+    teach: ['Grammar: a singular subject takes a singular verb, and a plural subject takes a plural verb. Use subject pronouns (I, she, they) for the doer and object pronouns (me, her, them) for the receiver. Keep verb tense consistent.', 'A complete sentence has a subject, a predicate, and a complete thought. A fragment is missing one of these. A run-on or comma splice jams two sentences together.', 'Sentence variety: simple (one independent clause), compound (two independent clauses joined by a comma + FANBOYS or a semicolon), and complex (an independent clause + a dependent clause starting with because, when, although, if).', 'Paragraph structure: a topic sentence states the main idea; supporting details prove it; transitions connect ideas; a concluding sentence wraps it up.'],
+    model: 'Fix "Went to the store. Bought apples we ate them." aloud: add a subject to the fragment ("My family went to the store"), then fix the run-on ("We bought apples, and we ate them"). Then combine into a complex sentence: "When my family went to the store, we bought apples."',
+    check: 'Students show thumbs up (complete sentence), sideways (fragment), or down (run-on): "Because the bell rang." (sideways) "The bell rang we left." (down) "The bell rang, so we left." (up)',
+    misconceptions: ['"A long sentence is a run-on." Length doesn\'t matter; a run-on joins complete sentences incorrectly.', '"A comma can join any two sentences." A comma alone creates a comma splice; add a conjunction.', '"Me and my friend" is correct as a subject. Use "My friend and I" when the pronoun is the subject.', '"A paragraph is just five sentences." A paragraph is organized around one main idea, with details that support it.'],
+    debrief: ['What are three ways to fix a run-on sentence?', 'Why do writers use a mix of simple, compound, and complex sentences?', 'How does a topic sentence help the reader?']
+  },
+  resources: [
+    { type: 'Practice', name: 'NoRedInk', url: 'https://www.noredink.com/', note: 'Adaptive grammar and sentence practice (free version available).' },
+    { type: 'Reference', name: 'Purdue OWL: Grammar', url: 'https://owl.purdue.edu/owl/general_writing/grammar/index.html', note: 'Clear explanations of sentence structure and usage.' },
+    { type: 'Practice', name: 'Khan Academy: Grammar', url: 'https://www.khanacademy.org/humanities/grammar', note: 'Videos and practice on parts of speech and sentences.' },
+    { type: 'Lessons', name: 'ReadWriteThink', url: 'https://www.readwritethink.org/', note: 'Lessons on paragraph structure and writing organization.' },
+    { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
+  ]
+},
 /* ======================= GRADE 5 MATH ======================= */
 {
   id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.C.4, 5.C.6, 5.AT.2',
