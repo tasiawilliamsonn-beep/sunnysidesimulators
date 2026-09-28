@@ -216,6 +216,7 @@ index.html        Sunnyside Simulators catalog (home page)
 escapes.html      The Broncho Escape (classic escape rooms)
 sheet.html        Printable lab sheet and teacher key (#<sim-id> or #key-<sim-id>)
 sim.html          Plays one simulator (#<sim-id>)
+present.html      Teacher presenter for one simulator (#<sim-id>); arrow keys or a clicker
 play.html         Student-only player (play.html#room-id), used for iframe embeds
 js/themes.js      35 visual themes (colors, fonts, patterns, emblems)
 js/kit.js         Drawings, diagrams, and simulations used by the puzzles

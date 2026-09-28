@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Present · Sunnyside Simulators</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+<style>
+:root { --red: #c1121f; --red2: #e63946; --ink: #111114; --paper: #f6f3f3; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--ink); color: #fff; font: 20px/1.45 "Atkinson Hyperlegible", system-ui, sans-serif; display: flex; flex-direction: column; }
+.pbar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: #000; border-bottom: 4px solid var(--red); font-size: 14px; flex-wrap: wrap; }
+.pbar b { font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+.pbar .sp { flex: 1; }
+.pbar button, .pbar a { font: 700 14px "Atkinson Hyperlegible", system-ui, sans-serif; background: #26262c; color: #fff; border: 1px solid #3a3a42; border-radius: 8px; padding: 6px 11px; cursor: pointer; text-decoration: none; }
+.pbar button.on { background: var(--red); border-color: var(--red2); }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 22px; height: 6px; border-radius: 3px; background: #3a3a42; cursor: pointer; }
+.dots i.on { background: var(--red2); }
+.stage { flex: 1; display: flex; min-height: 0; }
+.slide { flex: 1; overflow: auto; padding: clamp(16px, 4vw, 56px); display: flex; flex-direction: column; gap: 16px; }
+.slide.light { background: var(--paper); color: var(--ink); }
+.kick { font-size: 15px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--red2); }
+.slide.light .kick { color: var(--red); }
+h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(34px, 5.5vw, 68px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(28px, 4vw, 48px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.big { font-size: clamp(22px, 2.4vw, 30px); max-width: 60ch; }
+.icon { font-size: clamp(60px, 9vw, 120px); line-height: 1; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.card { background: #fff; color: var(--ink); border-radius: 16px; padding: 16px 18px; border-top: 6px solid var(--red); box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+.card b { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1.1em; }
+.reveal { color: var(--red); font-weight: 700; margin-top: 6px; }
+.reveal.hide { visibility: hidden; }
+ul.pts { margin: 0; padding-left: 1.1em; max-width: 70ch; } ul.pts li { margin: 0 0 10px; }
+.demo { flex: 1; min-height: 420px; border-radius: 14px; overflow: hidden; border: 3px solid var(--red); background: #fff; color: var(--ink); }
+.timer { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(90px, 16vw, 200px); line-height: 1; font-variant-numeric: tabular-nums; }
+.timer.done { color: var(--red2); }
+.tbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+.tbtns button { font: 700 18px "Atkinson Hyperlegible", system-ui, sans-serif; background: var(--red); color: #fff; border: 0; border-radius: 12px; padding: 10px 18px; cursor: pointer; }
+.tbtns button.alt { background: #26262c; }
+.notes { width: min(380px, 38vw); background: #1c1c21; border-left: 3px solid var(--red); padding: 16px; overflow: auto; font-size: 15px; color: #e6dede; }
+.notes h3 { margin: 0 0 6px; color: #fff; font-size: 16px; }
+.notes[hidden] { display: none; }
+.hint { font-size: 13px; color: #9a9aa4; }
+@media (max-width: 760px) { .notes { position: fixed; inset: auto 0 0 0; width: auto; max-height: 45vh; border-left: 0; border-top: 3px solid var(--red); } }
+</style>
+</head>
+<body>
+<div class="pbar"><b>🎬 <span data-t></span></b><span class="sp"></span><div class="dots" data-dots></div><button type="button" data-prev aria-label="Previous">◀</button><button type="button" data-next aria-label="Next">▶</button><button type="button" data-notes>📝 Notes</button><button type="button" data-full>⛶ Full screen</button><a href="index.html">✕ Exit</a></div>
+<div class="stage"><section class="slide" data-slide aria-live="polite"></section><aside class="notes" data-notesbox hidden></aside></div>
+<script src="js/sim.js"></script>
+<script src="js/models-science.js"></script>
+<script src="js/models-math.js"></script>
+<script src="js/models-ela.js"></script>
+<script src="js/models-social.js"></script>
+<script src="data/standards.js"></script>
+<script src="data/sims-g5-science.js"></script>
+<script src="data/sims-g6-science.js"></script>
+<script src="data/sims-g5-math.js"></script>
+<script src="data/sims-g6-math.js"></script>
+<script src="data/sims-g5-ela.js"></script>
+<script src="data/sims-g6-ela.js"></script>
+<script src="data/sims-g5-social.js"></script>
+<script src="js/present.js"></script>
+</body>
+</html>
