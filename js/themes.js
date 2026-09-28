@@ -1,5 +1,5 @@
 /*
- * Crossroads Escapes: visual themes.
+ * The Broncho Escape: visual themes.
  * EscapeThemes() returns every theme. Like EscapePlayer, it must stay
  * self-contained because its source is copied into exported rooms.
  *

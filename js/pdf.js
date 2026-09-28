@@ -283,7 +283,7 @@
       [a + '–' + (m - 1) + ' pts', 'Approaching', 'Quick reteach (5–10 min): replay the mini-lesson presenter steps tied to the missed items, then 2 similar practice questions.'],
       ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: review the lesson worksheet, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
     d.para('Evidence to look for: Did the student use vocabulary correctly, cite specific data or text, and explain the connection? A correct choice without a reason shows recognition, not yet mastery.', { size: 10, gap: 4 });
-    d.footer('Crossroads Escapes · ' + room.title + ' · Exit Ticket');
+    d.footer('The Broncho Escape · ' + room.title + ' · Exit Ticket');
     return d.bytes();
   }
 
@@ -300,7 +300,7 @@
     header(d, 'TEACHER KEY  ·  WARM-UP', std.title, 'What to look for in student answers.', c);
     d.table([{ w: 0.06, h: '#' }, { w: 0.44, h: 'Question' }, { w: 0.5, h: 'Look for' }], lesson.warmup.map(function (w, i) { return [String(i + 1), w[0], w[1]]; }), c);
     d.para('Use the warm-up to activate prior knowledge. Call on 2–3 students, and write one strong answer on the board as a model. Question 3 previews today\'s lesson, so do not correct it yet; come back to it in the debrief.', { size: 10.5 });
-    d.footer('Crossroads Escapes · ' + std.code + ' · Warm-Up');
+    d.footer('The Broncho Escape · ' + std.code + ' · Warm-Up');
     return d.bytes();
   }
 
@@ -368,7 +368,7 @@
     d.para('3 things I learned today:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(3, 'Three accurate facts from the lesson.');
     d.para('2 vocabulary words used correctly in a sentence:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, 'Two vocabulary words used correctly.');
     d.para('1 question I still have:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(1, 'Any genuine question.');
-    d.footer('Crossroads Escapes · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
+    d.footer('The Broncho Escape · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
     return d.bytes();
   }
 
@@ -425,7 +425,7 @@
     d.banner('Answer key: ' + room.title, c);
     answerLines.forEach(function (a) { d.para(a, { size: 9.5, indent: 6, gap: 1 }); });
     d.para('Final code: ' + room.finalCode, { size: 11, bold: true, gap: 6 });
-    d.footer('Crossroads Escapes · ' + room.title + ' · Facilitation Guide');
+    d.footer('The Broncho Escape · ' + room.title + ' · Facilitation Guide');
     return d.bytes();
   }
 
@@ -461,7 +461,7 @@
     slide('Exit ticket', '0:52–1:00', [['Say', 'Clear your desk except a pencil. Work silently and on your own. For every answer, write "I know because..." and use evidence.'], ['Do', 'Hand out the exit ticket. Start the 8:00 timer. Collect and sort with page 3 (Mastered / Approaching / Beginning).']]);
     d.banner('Misconceptions to watch for', c);
     (L.misconceptions || []).forEach(function (m) { d.para('•  ' + m, { size: 10.5, indent: 6, gap: 3 }); });
-    d.footer('Crossroads Escapes · ' + std.code + ' · Presenter Script');
+    d.footer('The Broncho Escape · ' + std.code + ' · Presenter Script');
     return d.bytes();
   }
 
@@ -478,7 +478,7 @@
     d.banner('After the walk', c);
     d.para('Which exhibit taught you the most? Explain using one detail from the poster.', { size: 11, bold: true, gap: 2 });
     d.writeLines(3);
-    d.footer('Crossroads Escapes · ' + room.title + ' · Gallery Walk Viewing Guide');
+    d.footer('The Broncho Escape · ' + room.title + ' · Gallery Walk Viewing Guide');
     return d.bytes();
   }
 

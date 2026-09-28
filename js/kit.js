@@ -1,5 +1,5 @@
 /*
- * Crossroads Escapes: visual kit.
+ * The Broncho Escape: visual kit.
  * EscapeKit() returns { V: diagram renderers, SIMS: hands-on simulations }.
  * Self-contained so its source can be copied into exported rooms.
  */

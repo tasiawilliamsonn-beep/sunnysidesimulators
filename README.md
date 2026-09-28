@@ -1,4 +1,4 @@
-# Crossroads Escapes
+# Sunnyside Simulators & The Broncho Escape
 
 72 interactive, no-prep escape rooms, gallery walks, virtual field trips, mystery cases, and quests for **Indiana grades 5 and 6**, built on power standards in **Science, Social Studies, ELA, and Math**. Each activity takes 25–30 minutes on a student device, and nothing needs to be printed.
 
@@ -212,7 +212,10 @@ The standards shown are the Indiana Academic Standards for grades 5 and 6 that a
 ## Project layout
 
 ```
-index.html        Teacher site
+index.html        Sunnyside Simulators catalog (home page)
+escapes.html      The Broncho Escape (classic escape rooms)
+sheet.html        Printable lab sheet and teacher key (#<sim-id> or #key-<sim-id>)
+sim.html          Plays one simulator (#<sim-id>)
 play.html         Student-only player (play.html#room-id), used for iframe embeds
 js/themes.js      35 visual themes (colors, fonts, patterns, emblems)
 js/kit.js         Drawings, diagrams, and simulations used by the puzzles

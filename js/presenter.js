@@ -1,5 +1,5 @@
 /*
- * Crossroads Escapes: 60-minute lesson presenter.
+ * The Broncho Escape: 60-minute lesson presenter.
  *
  * LessonPresenter(mount, P, opts) shows a projectable slide deck for one lesson:
  * target and agenda, warm-up, hook, four teaching steps (interactive tool, turn and talk,

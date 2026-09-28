@@ -1,4 +1,4 @@
-/* Crossroads Escapes — teacher site */
+/* The Broncho Escape — teacher site */
 (function () {
   var STANDARDS = window.CX_STANDARDS || [];
   var STD = {};
@@ -372,7 +372,7 @@
     });
     html += '</div></div>';
     $('#main').innerHTML = html;
-    document.title = 'Crossroads Escapes';
+    document.title = 'The Broncho Escape';
   }
 
   function renderRoom(r) {
@@ -460,7 +460,7 @@
 
     html += '</div></div></div></div>';
     $('#main').innerHTML = html;
-    document.title = r.title + ' · Crossroads Escapes';
+    document.title = r.title + ' · The Broncho Escape';
     window.scrollTo(0, 0);
 
     var vn = $('#vname');
@@ -521,7 +521,7 @@
   function renderHelp() {
     setNav('help');
     $('#main').innerHTML = '<div class="wrap"><div class="help">' +
-      '<h1>Using Crossroads Escapes with Canvas</h1>' +
+      '<h1>Using The Broncho Escape with Canvas</h1>' +
       '<p class="lede">Each room is a single web page. Students need a Chromebook, laptop, or tablet and a browser. Nothing to print.</p>' +
       '<div class="method"><h3>Before class</h3><ol><li>Open a room\'s teacher guide and read the mini-lesson.</li><li>Click <b>View as student</b> to try it. Teacher preview adds a "show answer" button on each puzzle so you can move quickly.</li><li>Download the exit ticket PDF (page 2 is the answer key).</li></ol></div>' +
       '<div class="method"><h3>Put it in Canvas</h3><ol><li>Click <b>Download for Canvas (.html)</b> on the room page.</li><li>Canvas → Files → Upload.</li><li>New Assignment → in the editor, Insert → Document → Course Documents → choose the file.</li><li>Submission type: Text Entry (students paste their completion code).</li></ol><p class="lede">If your district blocks HTML files in Canvas Files, host this site with GitHub Pages and use the embed code on each room page instead.</p></div>' +
@@ -529,7 +529,7 @@
       '<div class="method"><h3>About the standards</h3><p>Rooms are grouped by Indiana Academic Standards for grades 5 and 6 that are commonly treated as power (priority) standards: the ones that carry the most weight on ILEARN and in the next grade. Codes follow the Indiana Academic Standards documents. Your district\'s priority list may differ slightly, so confirm against the current IDOE framework.</p></div>' +
       '<div class="method"><h3>Privacy</h3><p>Nothing is sent anywhere. Progress and names stay in the student\'s own browser.</p></div>' +
       '</div></div>';
-    document.title = 'Canvas help · Crossroads Escapes';
+    document.title = 'Canvas help · The Broncho Escape';
   }
 
   /* ---------- routing ---------- */

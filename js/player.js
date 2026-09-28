@@ -1,5 +1,5 @@
 /*
- * Crossroads Escapes: student game engine (v2).
+ * The Broncho Escape: student game engine (v2).
  *
  * EscapePlayer(mount, room, options) plays one room. Its source, together with
  * EscapeThemes() and EscapeKit(), is copied into each exported room file, so it
@@ -1566,7 +1566,7 @@ function EscapePlayer(mount, room, opts) {
     return (f >= .95 ? 'Legendary ' : f >= .8 ? 'Master ' : f >= .6 ? 'Expert ' : 'Rising ') + role;
   }
   function workText() {
-    var L = curLevel(), lines = ['Crossroads Escapes: ' + room.title, 'Standard: ' + (room.standard || ''), 'Name: ' + (S.name || ''), 'Mission level: ' + L.name, 'Completion code: ' + completionCode(S.name), 'Time: ' + fmtTime(S.finishTime || S.elapsed) + ' | XP: ' + S.xp + ' | First-try accuracy: ' + accuracy() + '% | Hints: ' + Object.keys(S.hinted).length, 'Badges: ' + (badges().filter(function (b) { return b.on; }).map(function (b) { return b.n; }).join(', ') || 'none yet'), ''];
+    var L = curLevel(), lines = ['The Broncho Escape: ' + room.title, 'Standard: ' + (room.standard || ''), 'Name: ' + (S.name || ''), 'Mission level: ' + L.name, 'Completion code: ' + completionCode(S.name), 'Time: ' + fmtTime(S.finishTime || S.elapsed) + ' | XP: ' + S.xp + ' | First-try accuracy: ' + accuracy() + '% | Hints: ' + Object.keys(S.hinted).length, 'Badges: ' + (badges().filter(function (b) { return b.on; }).map(function (b) { return b.n; }).join(', ') || 'none yet'), ''];
     if (stages.some(function (s) { return s.art; })) {
       lines.push('--- Gallery walk notes ---');
       stages.forEach(function (s, i) { if (!s.art) return; var g = S.gnotes[i] || {}; lines.push(LETTERS[i] + '. ' + (s.art.title || stageTitle(i)), '  I see: ' + String(g.see || '').trim(), '  I think: ' + String(g.think || '').trim(), '  I wonder: ' + String(g.wonder || '').trim()); });

@@ -1,0 +1,11 @@
+/* The two-collection switch shown at the top of index.html and escapes.html. */
+.modes { background: #0d0d0f; padding: 14px 16px; border-bottom: 5px solid #c1121f; }
+.modes-in { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mode { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #f2eded; background: #1c1c21; border: 2px solid #34343c; border-radius: 16px; padding: 14px 18px; font-family: "Bricolage Grotesque", "Atkinson Hyperlegible", system-ui, sans-serif; transition: border-color .15s, background .15s; }
+.mode:hover { border-color: #e63946; }
+.mode .mi { font-size: 34px; line-height: 1; }
+.mode b { display: block; font-size: clamp(18px, 2.4vw, 24px); line-height: 1.15; }
+.mode small { display: block; font: 400 14px "Atkinson Hyperlegible", system-ui, sans-serif; color: #b9b0b0; margin-top: 2px; }
+.mode[aria-current="page"] { background: #c1121f; border-color: #e63946; color: #fff; box-shadow: 0 6px 20px rgba(193, 18, 31, .35); }
+.mode[aria-current="page"] small { color: #ffe3e5; }
+@media (max-width: 640px) { .modes-in { grid-template-columns: 1fr; } .mode { padding: 10px 14px; } .mode .mi { font-size: 26px; } }
