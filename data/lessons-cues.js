@@ -56,6 +56,10 @@
     hook: { q: 'Indianapolis (40° N) and Madrid, Spain (40° N) are the same distance from the Equator. Will their weather be the same?', options: ['Yes', 'No', 'Not sure'] },
     model: ['Problem: find 20° S, 60° W on the grid.', 'Step 1: Start at the Equator (0°). Move DOWN to 20° S.', 'Step 2: Start at the Prime Meridian (0°). Move LEFT to 60° W.', 'Step 3: Where they meet is in South America.', 'Remember: latitude first, then longitude.'],
     dos: ['Write the coordinates of the point where the Equator meets the Prime Meridian.', 'Write London\'s coordinates from the grid (latitude first).', 'Compare London and Montréal. Which is colder? Why?', 'Sort the flip cards into adapt, depend, and modify.'] });
+  add('g6-ss-ancient', {
+    hook: { q: 'Your class must make a rule. Who should decide?', options: ['Everyone votes', 'Elected leaders vote', 'One leader decides'] },
+    model: ['G.R.A.P.E.S. chart: Greece | Rome.', 'Geography, Greece: mountains and islands split the land into city-states.', 'Geography, Rome: seven hills by the Tiber River and fertile plains, easier to unite.', 'Conclusion: geography helps explain why Rome became one large empire.'],
+    dos: ['Match each Greek god to its Roman name.', 'Sort the achievement cards into Greece or Rome.', 'Complete the T-chart: Athenian democracy vs. Roman Republic.', 'Label the social classes of Athens and of Rome.'] });
   add('g5-ela-theme', {
     hook: { q: 'The tortoise beats the hare. Is "a race" the lesson of the story?', options: ['Yes', 'No', 'Not sure'] },
     model: ['Formula: Character + challenge + response + change → lesson.', 'Character: the tortoise. Challenge: racing a much faster hare.', 'Response: keeps moving steadily. Change: wins while the hare naps.', 'Lesson: "The tortoise learned slow and steady wins."', 'Make it universal (remove the name): "Slow and steady effort can beat talent without effort."'],

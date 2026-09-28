@@ -268,6 +268,28 @@ window.CX_STANDARDS = [
     { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
   ]
 },
+{
+  id: 'g6-ss-ancient', grade: 6, subject: 'social', code: '6.H.1 · 6.H.3 · 6.C.2 · 6.C.3 · 6.G.1 · 6.G.4 · 6.E.1 · 6.E.2 · 6.E.4', sims: false,
+  title: 'Ancient Greece vs. Ancient Rome (G.R.A.P.E.S.)',
+  text: 'Compare ancient Greece and ancient Rome using G.R.A.P.E.S.: how geography shaped each civilization, their religions, achievements, political systems (Athenian democracy and the Roman Republic), economies and trade, and social structures, and explain how both influenced the United States today.',
+  lesson: {
+    target: 'I can use G.R.A.P.E.S. to compare ancient Greece and ancient Rome and explain how each one influenced the United States.',
+    vocab: [['G.R.A.P.E.S.', 'Geography, Religion, Achievements, Politics, Economics, Social structure: six categories for studying a civilization.'], ['City-state (polis)', 'An independent city and the land around it, with its own government, like Athens or Sparta.'], ['Direct democracy', 'Citizens vote on laws themselves (Athens).'], ['Republic', 'Citizens elect representatives to make laws (Rome, and the U.S. today).'], ['Polytheism', 'Belief in many gods.'], ['Patricians / plebeians', 'Wealthy Roman nobles / ordinary Roman citizens.']],
+    hook: 'Ask: "Your class needs to make a rule. Should EVERY student vote on it, or should you ELECT a few leaders to decide?" Tell students one choice is Greek and one is Roman.',
+    teach: ['Geography: Greece is a rocky, mountainous peninsula with many islands. Mountains separated people into independent city-states, and the sea led Greeks to fish, trade, and start colonies. Rome began on seven hills by the Tiber River in the middle of the Italian peninsula, with fertile plains that were easier to unite.', 'Religion: Both were polytheistic. Greek gods lived on Mount Olympus (Zeus, Athena, Poseidon). Romans adopted many Greek gods with new names (Jupiter, Minerva, Neptune). Later, Christianity spread in the Roman Empire and became its official religion in 380 CE.', 'Achievements: Greece gave us democracy, philosophy (Socrates, Plato, Aristotle), the Olympic Games, drama, and columns like the Parthenon\'s. Rome gave us arches, concrete, aqueducts, 50,000+ miles of paved roads, the Colosseum, written law (the Twelve Tables), and Latin.', 'Politics: Athens created direct democracy (about 508 BCE), where adult male citizens voted on laws. Sparta was ruled by two kings and a council. Rome became a republic in 509 BCE, with elected consuls and a Senate, then an empire under Augustus in 27 BCE.', 'Economics and social structure: Greeks traded olive oil, wine, and pottery by sea and used coins like the drachma. Rome traded across its empire using roads and the denarius. Both relied on enslaved labor. Athens had citizens, women, metics (foreigners), and enslaved people; Rome had patricians, plebeians, and enslaved people.'],
+    model: 'Draw a two-column G.R.A.P.E.S. chart (Greece | Rome) with six rows. Fill in Geography while thinking aloud: "Mountains split Greece into city-states, but Rome\'s plains were easier to unite. So geography helps explain why Rome became one big empire."',
+    check: 'Call out a clue; students hold up G for Greece or R for Rome: "Parthenon" (G), "aqueducts" (R), "direct democracy" (G), "Senate and consuls" (R), "Olympics" (G), "Twelve Tables" (R).',
+    misconceptions: ['"Greece and Rome were the same civilization." They were different peoples, languages, and governments, though Rome borrowed heavily from Greek culture.', '"Everyone in Athens could vote." Only free adult men who were citizens could vote. Women, foreigners, and enslaved people could not.', '"Rome was always an empire." Rome was a kingdom, then a republic for almost 500 years, and only then an empire.', '"The Romans copied everything from Greece." Rome added its own achievements, like concrete, arches, roads, and written law.'],
+    debrief: ['Which G.R.A.P.E.S. category shows the biggest difference between Greece and Rome? Why?', 'How did geography help Rome build a larger empire than Greece?', 'Which idea from Greece or Rome can you see in the United States today?']
+  },
+  resources: [
+    { type: 'Reference', name: 'World History Encyclopedia', url: 'https://www.worldhistory.org/', note: 'Reliable articles and images on ancient Greece and Rome.' },
+    { type: 'Media library', name: 'National Geographic Education', url: 'https://education.nationalgeographic.org/', note: 'Encyclopedia entries and maps of the ancient Mediterranean.' },
+    { type: 'Practice', name: 'Khan Academy: World History', url: 'https://www.khanacademy.org/humanities/world-history', note: 'Videos on ancient Greece and Rome.' },
+    { type: 'Virtual tour', name: 'Google Arts & Culture', url: 'https://artsandculture.google.com/', note: 'Search "Acropolis" or "Colosseum" for 360° tours.' },
+    { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
+  ]
+},
 /* ======================= GRADE 5 ELA ======================= */
 {
   id: 'g5-ela-theme', grade: 5, subject: 'ela', code: '5.RL.2.2',

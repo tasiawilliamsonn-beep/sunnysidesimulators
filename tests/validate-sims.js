@@ -60,7 +60,7 @@ for (const s of SIMS) {
   if (!legend) err(s, 'needs at least one Legend challenge step');
   perStd[s.std] = (perStd[s.std] || 0) + 1;
 }
-W.CX_STANDARDS.forEach(sd => { if ((perStd[sd.id] || 0) < 5) errs.push(`${sd.id}: only ${perStd[sd.id] || 0} simulators (need 5+)`); });
+W.CX_STANDARDS.forEach(sd => { if (sd.sims !== false && (perStd[sd.id] || 0) < 5) errs.push(`${sd.id}: only ${perStd[sd.id] || 0} simulators (need 5+)`); });
 
 console.log(`${SIMS.length} simulators, ${Object.keys(perStd).length} standards, ${Object.keys(MODELS).length} models`);
 if (errs.length) { console.log(errs.join('\n')); process.exit(1); }

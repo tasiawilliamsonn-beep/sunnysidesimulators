@@ -210,6 +210,10 @@ window.CX_FX = window.CX_FX || {};
   }
 
   /* ---------- rooms ---------- */
+  FX['g6-ss-grapes-escape'] = { theme: 'museum' };
+  FX['g6-ss-mediterranean-trip'] = { theme: 'travel' };
+  FX['g6-ss-scroll-mystery'] = { theme: 'parchment' };
+
   FX['g6-ss-three-empires'] = {
     theme: 'temple',
     stages: {

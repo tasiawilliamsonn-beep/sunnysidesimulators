@@ -381,5 +381,146 @@ window.CX_ROOMS.push(
     { q: 'Why was the Panama Canal built where it is?', choices: ['Panama is a narrow isthmus between two oceans', 'Panama has no people', 'Panama is in Europe', 'Panama has the highest mountains'], answer: 0 },
     { q: 'Give one example of people modifying their environment. Describe one benefit and one cost.', answer: 'Example: Clearing the Amazon for farms. Benefit: farmland and jobs. Cost: loss of habitats and more carbon dioxide in the air.', lines: 4 }
   ]
+},
+
+/* ---------- Ancient Greece vs. Ancient Rome (G.R.A.P.E.S.) ---------- */
+{
+  id: 'g6-ss-grapes-escape', std: 'g6-ss-ancient', format: 'escape',
+  title: 'Escape the Hall of Empires: Greece vs. Rome',
+  tagline: 'Six locked doors, one for each letter of G.R.A.P.E.S. Compare Greece and Rome to break out of the museum.',
+  story: '<p>You stayed too late in the museum\'s new <b>Hall of Empires</b>, and the bronze doors have locked for the night. A marble statue of the goddess Athena (the Romans called her Minerva) speaks: <b>"Only a true historian may leave. Compare Greece and Rome, letter by letter."</b></p><p>Six doors stand between you and the exit, one for each part of <b>G.R.A.P.E.S.</b>: Geography, Religion, Achievements, Politics, Economics, and Social structure.</p>',
+  code: 'GRAPES',
+  stages: [
+    { title: 'Door G: Geography', content: '<p>Two giant maps hang on the wall.</p><ul><li><b>Greece</b> is a rocky, <b>mountainous peninsula</b> with hundreds of islands in the Aegean and Ionian Seas. Only about one-fifth of the land is good for farming. Mountains separated communities, so Greeks formed independent <b>city-states</b> (each one a <i>polis</i>) like Athens and Sparta. The sea became their highway for fishing, trade, and starting colonies.</li><li><b>Rome</b> began on <b>seven hills beside the Tiber River</b> in the middle of the <b>Italian peninsula</b>. Fertile plains and a central spot in the Mediterranean Sea made it easier to grow food, unite the peninsula, and reach other lands.</li></ul>',
+      puzzles: [
+        { type: 'mc', q: 'Why did ancient Greece form many separate city-states instead of one kingdom?', choices: ['Mountains and seas divided the land into separate communities', 'The Greek gods did not allow kings', 'Rome ruled all of Greece from the start', 'Greece was a flat, open plain'], answer: 0 },
+        { type: 'sort', q: 'Which geography fact describes each civilization?', buckets: ['Greece', 'Rome'], items: [['Mountainous peninsula with hundreds of islands', 0], ['Seven hills beside the Tiber River', 1], ['Little farmland, so people turned to the sea', 0], ['Fertile plains in the center of a peninsula', 1]] },
+        { type: 'mc', q: 'How did Rome\'s central location in the Mediterranean help it?', choices: ['It could reach and trade with lands all around the sea', 'It kept Rome completely cut off from other peoples', 'It meant Rome never needed an army', 'It gave Rome the coldest climate in Europe'], answer: 0 }
+      ] },
+    { title: 'Door R: Religion', content: '<p>A row of statues lines the hall. Both the Greeks and the Romans were <b>polytheistic</b>: they believed in many gods who controlled nature and human life. The Greeks believed their chief gods lived on <b>Mount Olympus</b>.</p><p>The Romans admired Greek culture and <b>adopted many Greek gods</b>, giving them new Roman names. Both built great temples: the <b>Parthenon</b> in Athens honored Athena, and the <b>Pantheon</b> in Rome honored all the gods.</p><p>Later, a new religion, <b>Christianity</b>, spread through the Roman Empire. Christians were sometimes persecuted, but Emperor Constantine allowed Christianity in 313 CE, and in 380 CE it became the empire\'s official religion.</p>',
+      puzzles: [
+        { type: 'match', q: 'Match each Greek god to the Roman god with the same role.', pairs: [['Zeus (king of the gods)', 'Jupiter'], ['Athena (wisdom)', 'Minerva'], ['Poseidon (the sea)', 'Neptune'], ['Ares (war)', 'Mars']] },
+        { type: 'mc', q: 'What does "polytheistic" mean?', choices: ['Believing in many gods', 'Believing in one god', 'Not believing in any gods', 'Worshipping only emperors'], answer: 0 },
+        { type: 'tf', q: 'True or false: Christianity became the official religion of the Roman Empire in 380 CE.', answer: true, explain: 'Constantine allowed Christianity in 313 CE, and it became the official religion in 380 CE under Theodosius.' }
+      ] },
+    { title: 'Door A: Achievements', content: '<p>Glass cases hold models of each civilization\'s greatest achievements.</p><p><b>Greece:</b> democracy; philosophy (Socrates, Plato, Aristotle); the <b>Olympic Games</b> (first held in 776 BCE); theater and drama; mathematics (Pythagoras, Euclid); and columns like those on the Parthenon.</p><p><b>Rome:</b> the <b>arch</b> and <b>concrete</b>, which let Romans build huge domes and bridges; <b>aqueducts</b> that carried fresh water into cities; more than <b>50,000 miles of paved roads</b>; the Colosseum; the <b>Twelve Tables</b>, Rome\'s first written laws; and <b>Latin</b>, the root of Spanish, French, Italian, and many English words.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Sort each achievement to the civilization that created it.', buckets: ['Greece', 'Rome'], items: [['The Olympic Games', 0], ['Aqueducts', 1], ['Philosophy of Socrates and Plato', 0], ['Concrete and the arch', 1], ['The Twelve Tables (written laws)', 1], ['Theater and drama', 0]] },
+        { type: 'input', q: 'The first recorded Olympic Games were held in 776 BCE. The Twelve Tables were written around 450 BCE. How many years apart were they?', answer: ['326'], unit: 'years', hint: 'For BCE dates, subtract the smaller number from the bigger one: 776 − 450.' },
+        { type: 'mc', q: 'Why were Roman aqueducts so important?', choices: ['They carried fresh water long distances into cities', 'They were used for chariot races', 'They were temples for the gods', 'They kept invaders out of Rome'], answer: 0 }
+      ] },
+    { title: 'Door P: Politics', content: '<p>Two voting boxes sit on a stone table.</p><p><b>Athens:</b> Around 508 BCE, Athens created <b>direct democracy</b>. Citizens met in the <b>Assembly</b> and voted on laws themselves. Only free adult men who were citizens could vote. (Sparta was different: two kings and a council of elders ruled, and the city focused on the army.)</p><p><b>Rome:</b> In 509 BCE, Romans overthrew their king and created a <b>republic</b>. Citizens <b>elected representatives</b>: two <b>consuls</b> led the government for one year, a <b>Senate</b> advised them, and tribunes protected ordinary citizens. In 27 BCE, Augustus became the first emperor, and the Republic became the <b>Roman Empire</b>.</p><p>The United States uses ideas from both: citizens vote (democracy) and elect representatives to Congress and the Senate (republic).</p>',
+      puzzles: [
+        { type: 'mc', q: 'What is the main difference between direct democracy and a republic?', choices: ['In a direct democracy citizens vote on laws themselves; in a republic they elect representatives', 'A republic has a king; a democracy does not', 'Only a direct democracy has laws', 'There is no difference'], answer: 0 },
+        { type: 'sort', q: 'Which government does each feature describe?', buckets: ['Athenian democracy', 'Roman Republic'], items: [['Citizens voted on laws in the Assembly', 0], ['Two consuls elected each year', 1], ['A Senate advised the leaders', 1], ['Every citizen man could speak and vote on laws', 0]] },
+        { type: 'order', q: 'Put these events in order from earliest to latest.', items: ['Rome overthrows its king and becomes a republic (509 BCE)', 'Athens creates direct democracy (about 508 BCE)', 'Augustus becomes Rome\'s first emperor (27 BCE)'] },
+        { type: 'mc', q: 'The U.S. Senate is named after a body from which civilization?', choices: ['Rome', 'Greece', 'Egypt', 'Mesopotamia'], answer: 0 }
+      ] },
+    { title: 'Door E: Economics', content: '<p>A merchant\'s stall displays goods and coins.</p><p><b>Greece:</b> With little farmland, Greeks grew crops that fit rocky hills, especially <b>olives</b> and <b>grapes</b>. They <b>traded</b> olive oil, wine, and painted pottery across the Mediterranean for grain and metals, and paid with silver coins like the Athenian <b>drachma</b>.</p><p><b>Rome:</b> As Rome conquered more land, it built a huge trading network. <b>Roads</b> and sea routes moved grain, olive oil, wine, and metals across the empire, and one currency, the silver <b>denarius</b>, was used almost everywhere. Conquered provinces paid <b>taxes</b> to Rome.</p><p>Both economies <b>specialized</b>: people produced what their land did best and traded for the rest.</p>',
+      puzzles: [
+        { type: 'mc', q: 'Why did the Greeks trade olive oil and wine for grain?', choices: ['Their rocky land grew olives and grapes better than grain', 'They did not like to eat bread', 'Grain was illegal in Greece', 'Rome forced them to'], answer: 0 },
+        { type: 'mc', q: 'How did one currency, the denarius, help the Roman economy?', choices: ['Traders across the empire could buy and sell with the same money', 'It meant no one had to pay taxes', 'It replaced the need for roads', 'It was only used by the emperor'], answer: 0 },
+        { type: 'input', q: 'A Greek merchant trades 3 jars of olive oil for 5 sacks of grain. How many sacks of grain will 12 jars of olive oil buy?', answer: ['20'], unit: 'sacks', hint: '12 jars is 4 times as many as 3 jars.' }
+      ] },
+    { title: 'Door S: Social structure', content: '<p>The last door shows two social pyramids.</p><p><b>Athens:</b> At the top were <b>citizens</b>: free adult men born to Athenian parents, the only people who could vote. Women were citizens but could not vote or hold office. <b>Metics</b> (foreigners) could work and trade but not vote. <b>Enslaved people</b>, often captured in war, had no rights.</p><p><b>Rome:</b> <b>Patricians</b> were wealthy landowning families who at first held most of the power. <b>Plebeians</b> were ordinary citizens: farmers, workers, and merchants. After years of struggle, plebeians won the right to elect <b>tribunes</b> to protect them. <b>Enslaved people</b> did much of the labor. Roman women could own property but could not vote.</p>',
+      puzzles: [
+        { type: 'match', q: 'Match each group to its description.', pairs: [['Patricians', 'Wealthy Roman landowning families'], ['Plebeians', 'Ordinary Roman citizens'], ['Metics', 'Foreigners living in Athens'], ['Tribunes', 'Officials elected to protect plebeians']] },
+        { type: 'tf', q: 'True or false: Every adult who lived in Athens could vote in the Assembly.', answer: false, explain: 'Only free adult male citizens could vote. Women, metics, and enslaved people could not.' },
+        { type: 'mc', q: 'Which statement is true of BOTH Athens and Rome?', choices: ['Both depended on the labor of enslaved people', 'Both let women vote', 'Both had patricians and plebeians', 'Both were ruled by two kings'], answer: 0 }
+      ] }
+  ],
+  finale: '<p>The sixth lock clicks, and the bronze doors swing open. The statue of Athena nods. "Geography, religion, achievements, politics, economics, and social structure. You didn\'t just escape; you compared two civilizations whose ideas still shape your country, from its Senate to its courthouse columns."</p>',
+  exit: [
+    { q: 'Which achievement came from ancient Rome?', choices: ['The Olympic Games', 'Aqueducts', 'Direct democracy', 'Greek drama'], answer: 1 },
+    { q: 'In the Roman Republic, citizens...', choices: ['voted on every law themselves', 'elected representatives such as consuls and senators', 'were ruled by a pharaoh', 'had no government'], answer: 1 },
+    { q: 'Choose ONE G.R.A.P.E.S. category. Explain one way Greece and Rome were similar and one way they were different.', answer: 'Example (Politics): Both let some citizens take part in government. Athens used direct democracy, where citizens voted on laws themselves, but Rome was a republic, where citizens elected consuls and senators to decide for them.', lines: 5 }
+  ]
+},
+{
+  id: 'g6-ss-mediterranean-trip', std: 'g6-ss-ancient', format: 'fieldtrip',
+  title: 'Field Trip: Athens to Rome',
+  tagline: 'A virtual tour of the ancient Mediterranean, from the Acropolis to the Roman Forum.',
+  story: '<p>Grab your passport and your notebook! Your class is taking a virtual trip across the ancient Mediterranean. You\'ll start in <b>Greece</b>, visit Sparta and Olympia, then sail west to <b>Rome</b>. At each stop, record G.R.A.P.E.S. evidence to compare the two civilizations.</p>',
+  code: 'FORUM',
+  stages: [
+    { title: 'Stop 1: The Acropolis, Athens', content: '<p>You climb a rocky hill above Athens to the <b>Acropolis</b>. At the top stands the <b>Parthenon</b>, a marble temple finished in 438 BCE to honor <b>Athena</b>, goddess of wisdom and protector of the city. Its rows of columns still inspire buildings around the world, including many U.S. courthouses and the Lincoln Memorial.</p><p>Below the hill was the <b>agora</b>, the busy marketplace and meeting place, and the <b>Pnyx</b>, a hillside where citizens gathered in the Assembly to debate and vote on laws.</p>',
+      puzzles: [
+        { type: 'mc', q: 'Which goddess did the Parthenon honor?', choices: ['Athena', 'Aphrodite', 'Hera', 'Minerva'], answer: 0 },
+        { type: 'mc', q: 'What happened at the Pnyx?', choices: ['Citizens met in the Assembly to vote on laws', 'Athletes raced chariots', 'Enslaved people were sold', 'Soldiers trained for war'], answer: 0 },
+        { type: 'tf', q: 'True or false: Buildings in the United States still copy the columns of Greek temples.', answer: true, explain: 'Many courthouses, banks, and memorials use Greek-style columns.' }
+      ] },
+    { title: 'Stop 2: Sparta', content: '<p>Sparta was a very different Greek city-state. Its government was an <b>oligarchy</b>: two kings and a council of elders held power. Spartan life centered on the <b>army</b>. At age 7, boys left home to train as soldiers. Spartan women had more freedom than Athenian women; they could own land and exercised to stay strong.</p><p>Much of the farm work was done by <b>helots</b>, people the Spartans had conquered and forced to work the land.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Which city-state does each description fit?', buckets: ['Athens', 'Sparta'], items: [['Citizens voted on laws in the Assembly', 0], ['Boys began military training at age 7', 1], ['Two kings and a council held power', 1], ['Famous for philosophy and drama', 0]] },
+        { type: 'mc', q: 'Who were the helots?', choices: ['Conquered people forced to farm for Spartans', 'Spartan kings', 'Olympic athletes', 'Roman senators'], answer: 0 }
+      ] },
+    { title: 'Stop 3: Olympia', content: '<p>At <b>Olympia</b>, you walk through the stadium where the first recorded <b>Olympic Games</b> were held in <b>776 BCE</b>, honoring Zeus. Athletes from city-states all over Greece competed in running, wrestling, boxing, and chariot racing. During the games, a sacred truce let athletes and fans travel safely, even between city-states at war.</p><p>Winners received a crown of olive leaves, not gold medals.</p>',
+      puzzles: [
+        { type: 'mc', q: 'Which god were the ancient Olympic Games held to honor?', choices: ['Zeus', 'Jupiter', 'Mars', 'Poseidon'], answer: 0 },
+        { type: 'input', q: 'The Olympics were held every 4 years. How many Olympic Games would there be from 776 BCE to 752 BCE, counting both?', answer: ['7'], hint: '776 − 752 = 24 years. 24 ÷ 4 = 6 gaps, so count the games at both ends.' },
+        { type: 'mc', q: 'What does the Olympic truce tell you about the Greeks?', choices: ['Even rival city-states shared a common culture and religion', 'Greece was one united country', 'Wars were not allowed in Greece', 'Only Athens could compete'], answer: 0 }
+      ] },
+    { title: 'Stop 4: The Roman Forum', content: '<p>You sail west across the Mediterranean to <b>Rome</b>, built on seven hills by the <b>Tiber River</b>. At the center of the city is the <b>Forum</b>, the heart of Roman government, religion, and business.</p><p>Here stood the <b>Senate House</b>, where senators debated. During the Republic (509–27 BCE), citizens elected two <b>consuls</b> each year. The Twelve Tables, Rome\'s first written laws, were displayed in public so every citizen could know the law. The letters <b>SPQR</b> stood for "the Senate and People of Rome."</p>',
+      puzzles: [
+        { type: 'mc', q: 'Why were the Twelve Tables displayed in public?', choices: ['So every citizen could know the laws', 'To decorate the Forum', 'To honor Jupiter', 'So only patricians could read them'], answer: 0 },
+        { type: 'mc', q: 'How long did the Roman Republic last, from 509 BCE to 27 BCE?', choices: ['482 years', '536 years', '27 years', '509 years'], answer: 0, hint: 'For BCE dates, subtract: 509 − 27.' }
+      ] },
+    { title: 'Stop 5: The Colosseum and the Aqueducts', content: '<p>Your last stop is the <b>Colosseum</b>, finished in 80 CE. This arena held about <b>50,000 people</b> who came to watch gladiator fights and shows. Its strength came from Roman <b>arches</b> and <b>concrete</b>.</p><p>Outside the city, tall stone <b>aqueducts</b> carried fresh water from the hills into Rome using only <b>gravity</b>. By around 100 CE, Rome had hundreds of miles of aqueducts feeding public fountains, baths, and toilets.</p>',
+      puzzles: [
+        { type: 'mc', q: 'What made Roman buildings like the Colosseum so strong?', choices: ['Arches and concrete', 'Steel beams', 'Mud bricks only', 'Wooden walls'], answer: 0 },
+        { type: 'mc', q: 'How did aqueducts move water without pumps?', choices: ['They sloped gently downhill so gravity pulled the water', 'Enslaved people carried buckets', 'Wind pushed the water', 'They used electric motors'], answer: 0 },
+        { type: 'order', q: 'Put these in order from earliest to latest.', items: ['First Olympic Games (776 BCE)', 'Roman Republic begins (509 BCE)', 'Parthenon finished (438 BCE)', 'Colosseum finished (80 CE)'] }
+      ] }
+  ],
+  finale: '<p>Your trip ends at sunset beside the Colosseum. Your notebook is full: temples and democracy in Athens, soldiers in Sparta, athletes in Olympia, and senators, arches, and aqueducts in Rome. Two civilizations, one sea, and ideas that still shape the world.</p>',
+  exit: [
+    { q: 'Which city-state was famous for direct democracy?', choices: ['Sparta', 'Athens', 'Rome', 'Olympia'], answer: 1 },
+    { q: 'What did Roman aqueducts do?', choices: ['Held gladiator games', 'Carried fresh water into cities', 'Stored laws', 'Trained soldiers'], answer: 1 },
+    { q: 'Compare Athens and Sparta. Give one way they were different, using evidence from the trip.', answer: 'Example: Athens was a democracy where citizen men voted on laws in the Assembly, but Sparta was ruled by two kings and a council and focused on training boys as soldiers from age 7.', lines: 4 }
+  ]
+},
+{
+  id: 'g6-ss-scroll-mystery', std: 'g6-ss-ancient', format: 'mystery',
+  title: 'The Case of the Mixed-Up Scrolls',
+  tagline: 'A museum\'s scrolls got scrambled. Use G.R.A.P.E.S. evidence to decide which are Greek and which are Roman.',
+  story: '<p>Disaster at the <b>Mediterranean Archive</b>! A storm knocked over the shelves, and hundreds of ancient scrolls and artifacts are mixed together. Half came from <b>Greece</b> and half from <b>Rome</b>.</p><p>As the archive\'s detective, you\'ll examine five evidence files. Use G.R.A.P.E.S. clues to figure out where each item belongs, and solve the case.</p>',
+  code: 'STOIC',
+  stages: [
+    { title: 'Evidence File #1: The Voting Stones', content: '<p>A box holds pieces of broken pottery called <b>ostraca</b>, each scratched with a man\'s name. In <b>Athens</b>, citizens could vote once a year to exile a powerful person they feared might become a tyrant. They wrote the name on a pottery shard, and if enough votes were cast, that person had to leave the city for 10 years. This is where the word <b>ostracize</b> comes from.</p>',
+      puzzles: [
+        { type: 'mc', q: 'Which civilization do the ostraca come from?', choices: ['Greece (Athens)', 'Rome', 'Egypt', 'Sparta'], answer: 0 },
+        { type: 'mc', q: 'What does ostracism show about Athenian democracy?', choices: ['Citizens had power to protect their government from would-be tyrants', 'Kings made all the decisions', 'Voting was not allowed', 'Only enslaved people voted'], answer: 0 },
+        { type: 'mc', q: 'Today, "ostracize" means to exclude someone. Which G.R.A.P.E.S. category does this clue mainly belong to?', choices: ['Politics', 'Geography', 'Religion', 'Economics'], answer: 0 }
+      ] },
+    { title: 'Evidence File #2: The Coin Tray', content: '<p>Two coins sit in a tray.</p><ul><li>Coin A shows an <b>owl</b>, the symbol of Athena, and the letters ΑΘΕ. It is a silver <b>drachma</b>.</li><li>Coin B shows the face of an <b>emperor</b> wearing a laurel wreath, with Latin letters around the edge. It is a silver <b>denarius</b>.</li></ul><p>Coins tell historians about trade, leaders, and beliefs.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Which civilization made each coin?', buckets: ['Greece', 'Rome'], items: [['Silver coin with an owl (drachma)', 0], ['Coin with an emperor\'s face (denarius)', 1], ['Letters ΑΘΕ (Greek alphabet)', 0], ['Latin letters around the edge', 1]] },
+        { type: 'mc', q: 'Why would an emperor put his face on coins used across the empire?', choices: ['To show his power to people everywhere who used the money', 'Because the coins were worthless', 'Because Greek gods required it', 'To hide who was in charge'], answer: 0 }
+      ] },
+    { title: 'Evidence File #3: The Blueprints', content: '<p>Rolled-up plans show two buildings.</p><ul><li>Plan A: a temple with rows of tall <b>columns</b> made of marble and a triangular roof, dedicated to Athena.</li><li>Plan B: a huge oval arena built from <b>concrete</b> and stacked rows of <b>arches</b>, able to seat 50,000 people.</li></ul>',
+      puzzles: [
+        { type: 'mc', q: 'Plan A is most likely the...', choices: ['Parthenon in Athens', 'Colosseum in Rome', 'Great Pyramid', 'Pantheon'], answer: 0 },
+        { type: 'mc', q: 'Which clue in Plan B is the strongest evidence that it is Roman?', choices: ['Concrete and rows of arches', 'It is a building', 'People could sit in it', 'It is oval'], answer: 0 },
+        { type: 'tf', q: 'True or false: The Romans admired Greek architecture and used Greek-style columns in many of their own buildings.', answer: true, explain: 'Rome borrowed Greek columns and added its own arches, domes, and concrete.' }
+      ] },
+    { title: 'Evidence File #4: The Law Tablet', content: '<p>A bronze tablet is carved with rules in Latin. A note says it copies part of the <b>Twelve Tables</b> (about 450 BCE). Plebeians had demanded written laws because patrician judges could interpret unwritten customs however they liked. Once the laws were written down and posted in the Forum, everyone could know the rules.</p>',
+      puzzles: [
+        { type: 'mc', q: 'Why did plebeians want the laws written down?', choices: ['So patrician judges could not change the rules unfairly', 'Because they could not speak Latin', 'So the laws would be secret', 'To honor Jupiter'], answer: 0 },
+        { type: 'mc', q: 'Which modern American idea connects to the Twelve Tables?', choices: ['Laws are written down and apply to everyone', 'The President writes all laws alone', 'Laws are kept secret', 'Only judges may read the law'], answer: 0 }
+      ] },
+    { title: 'Evidence File #5: Close the Case', content: '<p>You have examined all the evidence. Now sort the remaining items and write your case summary.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Sort the last items from the archive.', buckets: ['Greece', 'Rome'], items: [['A playscript for a tragedy performed in a hillside theater', 0], ['A map of 50,000 miles of paved roads', 1], ['An olive crown from Olympia', 0], ['A list of the year\'s two elected consuls', 1], ['Notes from Socrates\' student Plato', 0], ['A tax record from a conquered province', 1]] },
+        { type: 'match', q: 'Match each G.R.A.P.E.S. category to a piece of evidence from the case.', pairs: [['Politics', 'Ostraca used to vote someone out of Athens'], ['Economics', 'Drachma and denarius coins'], ['Achievements', 'Columns and concrete arches'], ['Social structure', 'Plebeians demanding written laws from patricians']] },
+        { type: 'mc', q: 'Which conclusion is BEST supported by all the evidence?', choices: ['Rome borrowed many Greek ideas but added its own achievements in law, engineering, and government', 'Greece and Rome had nothing in common', 'Rome invented democracy', 'Greece built the Colosseum'], answer: 0 }
+      ] }
+  ],
+  finale: '<p>The archive is back in order: Greek items on the east shelves, Roman items on the west. The head curator shakes your hand. "Great detective work. You used G.R.A.P.E.S. to see how two civilizations were connected, and how they were different."</p>',
+  exit: [
+    { q: 'An ostracon (pottery shard with a name on it) was used for...', choices: ['trading grain', 'voting to exile someone from Athens', 'building aqueducts', 'honoring Jupiter'], answer: 1 },
+    { q: 'Why were the Twelve Tables important?', choices: ['They were Rome\'s first written laws, so everyone could know the rules', 'They were Greek plays', 'They listed Olympic winners', 'They were Roman coins'], answer: 0 },
+    { q: 'Pick one artifact from the case. Explain which civilization it came from and what it shows about that civilization, using a G.R.A.P.E.S. category.', answer: 'Example: The denarius coin came from Rome. It shows economics, because one currency with the emperor\'s face let people trade across the whole empire and reminded them who ruled.', lines: 4 }
+  ]
 }
+
 );
