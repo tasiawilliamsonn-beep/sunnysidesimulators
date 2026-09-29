@@ -18,7 +18,7 @@ var SS_BG = {
 
 /* =============== Native Americans, exploration & the thirteen colonies =============== */
 SUNNY_SIMS.push({
-  id: 'g5-ss-colonial-roadtrip', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.1.4–5.1.8',
+  id: 'g5-ss-colonial-roadtrip', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.G.8–5.G.10',
   title: 'Colonial Road Trip 1750', model: 'expedition', minutes: 30, icon: '🐴',
   setup: {
     title: 'The thirteen colonies', bg: SS_BG.coast, avatar: '🐴', start: 'boston', scale: { per: 2.5, unit: 'miles' },
@@ -55,7 +55,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-colony-builder', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.1.7 · 5.4.1',
+  id: 'g5-ss-colony-builder', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.G.5 · 5.G.10',
   title: 'Colony Builder', model: 'colonySim', minutes: 25, icon: '🏘',
   setup: {
     settlers: 10,
@@ -88,7 +88,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-native-nations', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.1.1–5.1.2',
+  id: 'g5-ss-native-nations', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.H.1 · 5.H.3 · 5.G.6',
   title: 'Nations of North America', model: 'expedition', minutes: 25, icon: '🪶',
   setup: {
     title: 'Native culture regions of North America', bg: SS_BG.nations, avatar: '🧭', start: 'wood', compass: true,
@@ -123,7 +123,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-jamestown', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.1.4 · 5.1.6',
+  id: 'g5-ss-jamestown', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.H.4 · 5.H.6',
   title: 'Survive Jamestown', model: 'turnSim', minutes: 25, icon: '🏚',
   setup: {
     role: 'You are a leader of the Jamestown colony', endTitle: 'Jamestown survives',
@@ -158,7 +158,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-columbian-exchange', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.1.3',
+  id: 'g5-ss-columbian-exchange', std: 'g5-ss-colonial', subject: 'social', grade: 5, code: '5.H.2 · 5.E.1',
   title: 'Columbian Exchange Cargo Hold', model: 'sortLab', minutes: 20, icon: '🚢',
   setup: {
     prompt: 'After 1492, ships carried plants, animals, and diseases across the Atlantic. Load each item onto the right ship.',
@@ -186,7 +186,7 @@ SUNNY_SIMS.push({
 
 /* ======================= The American Revolution ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-ss-tax-crisis', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.1.9–5.1.10',
+  id: 'g5-ss-tax-crisis', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.H.7 · 5.H.8',
   title: 'The Tax Crisis: Advisor to the King', model: 'turnSim', minutes: 25, icon: '👑',
   setup: {
     role: 'You advise King George III and Parliament, 1763–1774', endTitle: 'April 1775: Shots at Lexington',
@@ -222,7 +222,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-revolution-timeline', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.1.9–5.1.14',
+  id: 'g5-ss-revolution-timeline', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.H.8–5.H.13',
   title: 'Road to Independence Timeline', model: 'timeline', minutes: 20, icon: '📅',
   setup: {
     events: [['fiw', 1763, 'French and Indian War ends', 'Britain wins but owes huge debts', '⚔️'], ['stamp', 1765, 'Stamp Act', 'Tax on printed paper', '📜'], ['massacre', 1770, 'Boston Massacre', 'British soldiers kill five colonists', '💥'], ['tea', 1773, 'Boston Tea Party', 'Patriots dump British tea', '🫖'], ['intol', 1774, 'Intolerable Acts', 'Boston Harbor is closed', '⛓'], ['lex', 1775, 'Lexington and Concord', 'The first battles', '🔫'], ['decl', 1776, 'Declaration of Independence', 'Colonies announce independence', '🗽'], ['sara', 1777, 'Victory at Saratoga', 'A turning point', '🎖'], ['york', 1781, 'Victory at Yorktown', 'British army surrenders', '🏳️'], ['paris', 1783, 'Treaty of Paris', 'Britain recognizes the United States', '🤝']],
@@ -248,7 +248,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-midnight-ride', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.1.11',
+  id: 'g5-ss-midnight-ride', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.H.10 · 5.G.7',
   title: 'The Midnight Ride, April 18–19, 1775', model: 'expedition', minutes: 25, icon: '🐎',
   setup: {
     title: 'Boston to Concord', bg: SS_BG.boston, avatar: '🐎', start: 'church', scale: { per: 0.042, unit: 'miles' },
@@ -283,7 +283,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-declaration-lab', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.1.12 · 5.2.1',
+  id: 'g5-ss-declaration-lab', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.H.9 · 5.C.3',
   title: 'Declaration Decoder', model: 'reader', minutes: 25, icon: '📜',
   setup: { title: 'The Declaration of Independence (excerpts)', genre: 'Primary source', by: 'Continental Congress, July 4, 1776', img: '📜🖋', tools: [['idea', '🟨 Big idea about government'], ['grief', '🟦 Complaint against the king']], paragraphs: [
     '{d1|We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness.} {d2|That to secure these rights, Governments are instituted among Men, deriving their just powers from the consent of the governed.} {d3|That whenever any Form of Government becomes destructive of these ends, it is the Right of the People to alter or to abolish it.}',
@@ -315,7 +315,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-war-room', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.1.13–5.1.14',
+  id: 'g5-ss-war-room', std: 'g5-ss-revolution', subject: 'social', grade: 5, code: '5.H.10 · 5.H.11',
   title: 'Washington\'s War Room', model: 'turnSim', minutes: 25, icon: '⚔️',
   setup: {
     role: 'You are General George Washington, 1776–1781', endTitle: 'The Treaty of Paris, 1783',
@@ -350,7 +350,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Founding documents & our government ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-ss-bill-to-law', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.2.3–5.2.5',
+  id: 'g5-ss-bill-to-law', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.C.5',
   title: 'Bill-to-Law Machine', model: 'lawMachine', minutes: 25, icon: '🏛',
   setup: { bills: [
     { title: 'The Clean Parks Act', text: 'Gives money to clean up and protect national parks.', ok: true, why: 'Congress has the power to spend money on federal lands.' },
@@ -378,7 +378,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-dc-fieldtrip', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.2.2–5.2.4',
+  id: 'g5-ss-dc-fieldtrip', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.C.1 · 5.C.5',
   title: 'Capital Field Trip', model: 'expedition', minutes: 25, icon: '🏛',
   setup: {
     title: 'Washington, D.C.', bg: SS_BG.mall, avatar: '🧒', start: 'archives', compass: true,
@@ -412,7 +412,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-rights-court', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.2.6–5.2.7',
+  id: 'g5-ss-rights-court', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.H.15 · 5.C.3',
   title: 'Bill of Rights Court', model: 'sortLab', minutes: 20, icon: '⚖️',
   setup: {
     prompt: 'You are a judge. For each case, decide which amendment in the Bill of Rights protects the person.',
@@ -439,7 +439,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-convention-1787', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.2.1–5.2.2',
+  id: 'g5-ss-convention-1787', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.H.14',
   title: 'Summer of 1787: The Convention', model: 'turnSim', minutes: 25, icon: '🖋',
   setup: {
     role: 'You are a delegate at the Constitutional Convention, Philadelphia', endTitle: 'September 17, 1787: The Constitution is signed',
@@ -473,7 +473,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ss-branch-powers', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.2.3–5.2.4',
+  id: 'g5-ss-branch-powers', std: 'g5-ss-civics', subject: 'social', grade: 5, code: '5.C.5',
   title: 'Three Branches Sorting Office', model: 'sortLab', minutes: 15, icon: '🗂',
   setup: {
     prompt: 'The mailroom mixed up the power cards! Deliver each power to the branch that has it.',

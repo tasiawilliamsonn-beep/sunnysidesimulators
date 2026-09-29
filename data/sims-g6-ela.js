@@ -27,7 +27,7 @@ SUNNY_TEXTS.violin = {
 
 /* ======================= Textual evidence, inference & theme ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ela-race-studio', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RL.2.1 · 6.W.3.1',
+  id: 'g6-ela-race-studio', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RC.1 · 6.RC.2',
   title: 'RACE Writing Studio 6: Two Pieces of Evidence', model: 'raceStudio', minutes: 30, icon: '✍️',
   setup: {
     passages: [SUNNY_TEXTS.moving, SUNNY_TEXTS.violin],
@@ -67,7 +67,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-inference-board', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RL.2.1',
+  id: 'g6-ela-inference-board', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RC.1',
   title: 'Inference Detective Board', model: 'inferenceCase', minutes: 20, icon: '🕵️',
   setup: {
     passage: { title: 'The Fifth Plate', genre: 'Short story', paragraphs: [
@@ -100,7 +100,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-evidence-meter', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RL.2.1',
+  id: 'g6-ela-evidence-meter', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RC.1',
   title: 'Evidence Strength Meter', model: 'evidenceMeter', minutes: 20, icon: '📏',
   setup: {
     claim: 'In "Moving Day," Tessa begins to feel at home in Sunnyside.',
@@ -134,7 +134,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-theme-tracker', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RL.2.2',
+  id: 'g6-ela-theme-tracker', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RC.2',
   title: 'Theme Tracker: The Broken Violin', model: 'reader', minutes: 25, icon: '🎻',
   setup: { title: SUNNY_TEXTS.violin.title, genre: SUNNY_TEXTS.violin.genre, by: SUNNY_TEXTS.violin.by, paragraphs: SUNNY_TEXTS.violin.paragraphs, img: '🎻', tools: [['begin', '🟨 Conflict / temptation'], ['turn', '🟦 Turning point'], ['end', '🟩 Result / lesson']] },
   place: 'Sunnyside Reading Room · Theme Lab',
@@ -157,7 +157,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-explicit-implicit', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RL.2.1',
+  id: 'g6-ela-explicit-implicit', std: 'g6-ela-evidence', subject: 'ela', grade: 6, code: '6.RC.1',
   title: 'Says vs. Suggests', model: 'reader', minutes: 20, icon: '👀',
   setup: { title: 'The Lunch Table', genre: 'Short story', img: '🍎🥪', tools: [['says', '🟨 Text SAYS directly'], ['clue', '🟦 Clue for an inference']], paragraphs: [
     "Jordan carried her tray to the corner table, the one by the trash cans where nobody ever sat. {x1|She was the new girl, and it was her third day at Sunnyside Middle School.}",
@@ -185,7 +185,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Central idea & argument ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ela-argument-tree', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RN.4.1',
+  id: 'g6-ela-argument-tree', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RC.8',
   title: 'Argument Tree: School Start Times', model: 'argumentTree', minutes: 25, icon: '🌳',
   setup: {
     passage: { title: 'Let Us Sleep: Why Middle School Should Start Later', genre: 'Opinion article', paragraphs: [
@@ -216,7 +216,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-central-idea', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RN.2.2',
+  id: 'g6-ela-central-idea', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RC.5',
   title: 'Central Idea Builder: City Trees', model: 'organizer', minutes: 25, icon: '🌳',
   setup: {
     passage: { title: 'Why Cities Are Planting Trees', genre: 'Informational article', paragraphs: [
@@ -247,7 +247,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-debate-judge', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RN.4.1',
+  id: 'g6-ela-debate-judge', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RC.8',
   title: 'Debate Judge', model: 'debateJudge', minutes: 25, icon: '🎤',
   setup: {
     topic: 'Should Sunnyside Middle School ban cell phones during the school day?',
@@ -279,7 +279,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-claim-checker', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RN.4.1',
+  id: 'g6-ela-claim-checker', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RC.8',
   title: 'Claim Checker: Video Games & Learning', model: 'evidenceMeter', minutes: 20, icon: '🎮',
   setup: {
     claim: 'Some video games can help students learn.',
@@ -310,7 +310,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-tiny-houses', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RN.2.2 · 6.RN.4.1',
+  id: 'g6-ela-tiny-houses', std: 'g6-ela-central', subject: 'ela', grade: 6, code: '6.RC.5 · 6.RC.8',
   title: 'Two Sides: Tiny Houses', model: 'twoTexts', minutes: 25, icon: '🏠',
   setup: {
     a: { title: 'The Case for Tiny Homes', genre: 'Opinion article', paragraphs: ['A tiny house is usually under 400 square feet, about the size of a big classroom. Supporters say tiny homes cost far less to build and heat. The average tiny house costs around $50,000, compared to more than $300,000 for a typical home.', 'Tiny homes also use less energy and fewer materials, which is better for the environment. Many owners say that living with less stuff helps them focus on experiences instead of things.'] },
@@ -337,7 +337,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Word meaning, connotation & figurative language ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ela-connotation', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RV.3.3',
+  id: 'g6-ela-connotation', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RC.12',
   title: 'Connotation Spectrum', model: 'connotation', minutes: 20, icon: '🌈',
   setup: { sets: [
     { context: 'Describing someone who saves money', words: [['thrifty', 1], ['frugal', 0], ['cheap', -1], ['stingy', -1], ['economical', 1]] },
@@ -362,7 +362,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-tone-mixer', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RV.3.3',
+  id: 'g6-ela-tone-mixer', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RC.12',
   title: 'Tone Mixer', model: 'toneMixer', minutes: 15, icon: '🎛️',
   setup: {
     text: 'The new cafeteria menu arrived on Monday. The pizza was {0}, the salad bar looked {1}, and the line moved {2}. Students {3} about the changes all afternoon.',
@@ -385,7 +385,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-word-forge', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RV.2.1',
+  id: 'g6-ela-word-forge', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RC.13',
   title: 'Greek & Latin Word Forge 6', model: 'wordLab', minutes: 20, icon: '🔨',
   setup: {
     prefixes: [['auto', 'self'], ['micro', 'small'], ['tele', 'far'], ['photo', 'light']],
@@ -413,7 +413,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-city-poem', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RV.3.3',
+  id: 'g6-ela-city-poem', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RC.10',
   title: 'Figurative Language: City at Night', model: 'figTranslator', minutes: 20, icon: '🌃',
   setup: { title: 'City at Night', by: 'A Sunnyside original poem', lines: [
     { id: 'g1', t: 'The city is a restless giant', type: 'metaphor' }, 'that never shuts its eyes.',
@@ -444,7 +444,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ela-two-reviews', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RV.3.3',
+  id: 'g6-ela-two-reviews', std: 'g6-ela-vocab', subject: 'ela', grade: 6, code: '6.RC.12',
   title: 'Word Choice Detective: Two Reviews', model: 'reader', minutes: 20, icon: '🍕',
   setup: { title: 'Two Reviews of Pizza Palace', genre: 'Reviews', img: '🍕⭐', tools: [['pos', '🟩 Positive word choice'], ['neg', '🟨 Negative word choice']], paragraphs: [
     "Review 1 (★★★★★): {r1|Pizza Palace is a hidden gem!} The crust is {r2|golden and crispy}, and the cheese stretches for miles. {r3|The cozy dining room buzzes with friendly chatter.} We waited 20 minutes for our table, and it was absolutely worth it.",

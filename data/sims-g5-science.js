@@ -6,7 +6,7 @@
 var SUNNY_SIMS = window.SUNNY_SIMS = window.SUNNY_SIMS || [];
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-melting-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.1–5.PS.2',
+  id: 'g5-sci-melting-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-2',
   title: 'Melting Lab', model: 'meltLab', minutes: 25, icon: '🧊',
   place: 'Sunnyside Science Lab · Bench 3',
   mission: 'The lab\'s ice samples are melting, and a student claims the lab is "losing matter." Use the hot plate, the lid, and the digital scale to find out what really happens to mass when ice melts, water freezes, and water evaporates.',
@@ -68,7 +68,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-fizz-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.1–5.PS.2',
+  id: 'g5-sci-fizz-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-2 · 5-PS1-4',
   title: 'Fizz Lab', model: 'fizzLab', minutes: 25, icon: '🫧',
   place: 'Sunnyside Science Lab · Chemistry Corner',
   mission: 'When vinegar and baking soda mix, they fizz and make a gas. Some students say the fizz makes matter vanish. Mix them on a digital scale with an open flask, a balloon, and a stopper to find out where the mass goes.',
@@ -113,7 +113,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-measure-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.1',
+  id: 'g5-sci-measure-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-3',
   title: 'Measure Lab: Mass & Volume', model: 'measureLab', minutes: 25, icon: '⚖️',
   place: 'Sunnyside Science Lab · Measuring Station',
   mission: 'The lab needs a measurement report for 5 mystery objects. Weigh them on the balance and use water displacement in a graduated cylinder to find the volume of objects with weird shapes.',
@@ -156,7 +156,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-property-bench', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.1',
+  id: 'g5-sci-property-bench', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-3',
   title: 'Property Detective Bench', model: 'propBench', minutes: 25, icon: '🧲',
   place: 'Sunnyside Science Lab · Testing Bench',
   mission: 'A mystery sample X was found in the lab. Test known materials with a magnet, an electric circuit, and water. Then use the properties to figure out what sample X is made of.',
@@ -194,7 +194,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-mix-separate', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.2',
+  id: 'g5-sci-mix-separate', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-4',
   title: 'Mix & Separate Lab', model: 'mixLab', minutes: 25, icon: '🥣',
   place: 'Sunnyside Science Lab · Recycling Station',
   mission: 'The recycling station received a messy mixture of sand, salt, iron filings, and water. Make the mixture on a scale, then separate every part and weigh it. Can you get back ALL the mass?',
@@ -234,7 +234,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-dissolve-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5.PS.1–5.PS.2',
+  id: 'g5-sci-dissolve-lab', std: 'g5-sci-matter', subject: 'science', grade: 5, code: '5-PS1-1 · 5-PS1-2',
   title: 'Sugar Dissolve Lab', model: 'dissolveLab', minutes: 25, icon: '🍬',
   place: 'Sunnyside Science Lab · Kitchen Chemistry',
   mission: 'The cafeteria wants to make lemonade faster. Test how water temperature and stirring change how fast sugar dissolves, and prove the sugar is still there even after you can\'t see it.',
@@ -269,7 +269,7 @@ SUNNY_SIMS.push({
 
 /* ======================= 5.ESS: Earth, Sun, Moon & space ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-sci-shadow-clock', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1–5.ESS.2',
+  id: 'g5-sci-shadow-clock', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-2',
   title: 'Shadow Clock', model: 'shadowLab', minutes: 25, icon: '🕰️',
   place: 'Sunnyside School Playground · Sundial Garden',
   mission: 'The school garden is building a sundial. Move the Sun across the sky, mark the stick\'s shadow at different times and seasons, and discover the pattern that makes a shadow clock work.',
@@ -299,7 +299,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-day-night', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  id: 'g5-sci-day-night', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-2',
   title: 'Day & Night Spinner', model: 'spinEarth', minutes: 20, icon: '🌍',
   place: 'Sunnyside Space Center · Mission Control',
   mission: 'Mission Control needs to call astronauts\' families in Indiana, London, and Tokyo, but it is always a different time somewhere! Spin Earth to figure out how rotation creates day, night, and time zones.',
@@ -327,7 +327,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-night-sky', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  id: 'g5-sci-night-sky', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-2',
   title: 'Seasonal Night Sky', model: 'orbitSky', minutes: 20, icon: '✨',
   place: 'Sunnyside Planetarium',
   mission: 'The planetarium needs a star guide for the whole school year. Move Earth around its orbit and find out which constellations can be seen at midnight each season, and why they change.',
@@ -353,7 +353,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-moon-phases', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.1',
+  id: 'g5-sci-moon-phases', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-2',
   title: 'Moon Phase Viewer', model: 'moonPhase', minutes: 25, icon: '🌓',
   place: 'Sunnyside Observatory',
   mission: 'The observatory\'s moon calendar got scrambled. Move the Moon around Earth, compare the top view with the view from Earth, and rebuild the calendar in the right order.',
@@ -376,7 +376,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-solar-scale', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.2',
+  id: 'g5-sci-solar-scale', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-1',
   title: 'Solar System to Scale', model: 'solarScale', minutes: 25, icon: '🪐',
   place: 'Sunnyside Space Center · Flight Planning',
   mission: 'Flight Planning is designing a mission to the outer planets. Explore the solar system to scale: how far apart the planets are, how big they are, and how long a spacecraft would travel.',
@@ -399,7 +399,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-star-brightness', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5.ESS.2',
+  id: 'g5-sci-star-brightness', std: 'g5-sci-space', subject: 'science', grade: 5, code: '5-ESS1-1',
   title: 'Star Brightness Lab', model: 'starBright', minutes: 20, icon: '⭐',
   place: 'Sunnyside Observatory · Light Lab',
   mission: 'Why does the Sun look so much brighter than every other star? Test lamps and light meters in the dark lab, then use real star data to answer the question.',
@@ -425,7 +425,7 @@ SUNNY_SIMS.push({
 
 /* ======================= 5.LS: Ecosystems ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-sci-food-web', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.1–5.LS.3',
+  id: 'g5-sci-food-web', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-LS2-1',
   title: 'Food Web Builder', model: 'foodWeb', minutes: 25, icon: '🕸️',
   place: 'Sunnyside Nature Preserve · Meadow Station',
   mission: 'The nature preserve needs a food web poster for visitors. Draw the energy arrows between the meadow organisms, label their roles, and trace where the hawk\'s energy really comes from.',
@@ -453,7 +453,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-meadow-populations', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.3',
+  id: 'g5-sci-meadow-populations', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-LS2-1',
   title: 'Meadow Population Simulator', model: 'ecoPop', minutes: 25, icon: '🐇',
   place: 'Sunnyside Nature Preserve · Wildlife Office',
   mission: 'Farmers near the preserve want to remove the foxes because foxes sometimes take chickens. Before they decide, run the meadow forward in time and predict what would happen to the rabbits and the grass.',
@@ -482,7 +482,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-decomposer-lab', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  id: 'g5-sci-decomposer-lab', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-LS2-1',
   title: 'Decomposer Garden Lab', model: 'decompLab', minutes: 25, icon: '🍄',
   place: 'Sunnyside School Garden · Compost Corner',
   mission: 'The school garden wants to know if compost is worth it. Compare two sealed garden boxes of fallen leaves: one with decomposers and one without. Then plant seeds and see which soil grows better beans.',
@@ -510,7 +510,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-plant-chamber', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.1',
+  id: 'g5-sci-plant-chamber', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-LS1-1',
   title: 'Plant Growth Chamber', model: 'plantLab', minutes: 25, icon: '🌱',
   place: 'Sunnyside Greenhouse',
   mission: 'Most people think plants "eat" soil. The greenhouse manager doesn\'t believe it. Grow plants in a sealed chamber, weigh the plant and the soil, and find out where a plant\'s mass really comes from.',
@@ -539,7 +539,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-energy-pyramid', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  id: 'g5-sci-energy-pyramid', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-PS3-1',
   title: 'Energy Pyramid Lab', model: 'energyPyramid', minutes: 20, icon: '🔺',
   place: 'Sunnyside Nature Preserve · Energy Lab',
   mission: 'The preserve has lots of grass but only two hawks. Pass energy up the food chain level by level and discover why there are so few top predators.',
@@ -563,7 +563,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-sci-trail-cam', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5.LS.2',
+  id: 'g5-sci-trail-cam', std: 'g5-sci-eco', subject: 'science', grade: 5, code: '5-LS2-1',
   title: 'Trail Camera Detective', model: 'ecoCam', minutes: 20, icon: '📹',
   place: 'Sunnyside Nature Preserve · Trail Camera Network',
   mission: 'The preserve\'s trail cameras recorded eight clips overnight. Watch each clip, look for evidence of how each organism gets its energy, and tag its role for the wildlife database.',

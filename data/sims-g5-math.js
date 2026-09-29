@@ -6,7 +6,7 @@ var SUNNY_SIMS = window.SUNNY_SIMS = window.SUNNY_SIMS || [];
 
 /* ======================= Fractions ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-math-pizza-kitchen', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.C.4',
+  id: 'g5-math-pizza-kitchen', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.CA.3 · 5.CA.4',
   title: 'Pizza Kitchen', model: 'fracKitchen', minutes: 25, icon: '🍕',
   place: 'Sunnyside Pizza Kitchen',
   mission: 'Orders are piling up at Sunnyside Pizza! Customers want leftover slices from different pizzas combined into one box. You can\'t add slices of different sizes, so re-cut the pizzas until every slice is the same size.',
@@ -35,7 +35,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-ribbon-shop', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.C.4',
+  id: 'g5-math-ribbon-shop', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.CA.4',
   title: 'Ribbon Shop', model: 'ribbonShop', minutes: 25, icon: '🎀',
   place: 'Sunnyside Craft Shop',
   mission: 'The craft shop sells ribbon by the yard. Customers keep asking for strange lengths like 2 3/4 yards. Measure on the ruler and count up to find out how much ribbon is left on each spool, without the standard algorithm.',
@@ -62,7 +62,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-recipe-scaler', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.C.6',
+  id: 'g5-math-recipe-scaler', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.CA.5 · 5.CA.7',
   title: 'Recipe Scaler', model: 'recipeScale', minutes: 20, icon: '🥣',
   place: 'Sunnyside Bakery',
   mission: 'The bakery\'s granola bar recipe makes 12 bars, but orders come in for half batches, double batches, and 1½ batches. Measure scoops to see what multiplying a fraction really means.',
@@ -88,7 +88,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-community-garden', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.C.6',
+  id: 'g5-math-community-garden', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.CA.5 · 5.M.2',
   title: 'Community Garden Planner', model: 'areaModel', minutes: 20, icon: '🍅',
   place: 'Sunnyside Community Garden',
   mission: 'The community garden committee divides the land again and again: part for vegetables, then part of that for tomatoes. Use an area model to find what fraction of the WHOLE garden each crop gets.',
@@ -112,7 +112,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-trail-relay', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.C.4 · 5.AT.2',
+  id: 'g5-math-trail-relay', std: 'g5-math-fractions', subject: 'math', grade: 5, code: '5.NS.1 · 5.CA.4',
   title: 'Trail Relay', model: 'fracLine', minutes: 20, icon: '🏃',
   place: 'Sunnyside Park · Fitness Trail',
   mission: 'Relay teams must run at least 2 miles to earn a medal. Before running, estimate with benchmark fractions (0, ½, 1). Then run each leg on the number line to check.',
@@ -138,7 +138,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Decimals ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-math-grocery', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.C.7',
+  id: 'g5-math-grocery', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.CA.10',
   title: 'Sunnyside Grocery', model: 'grocery', minutes: 25, icon: '🛒',
   place: 'Sunnyside Grocery · Aisle 5',
   mission: 'You have $20 and a shopping list for the family. Shop the aisles, estimate before you check out, add prices using place value, and make sure you get the right change.',
@@ -190,7 +190,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-unit-price', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.C.7',
+  id: 'g5-math-unit-price', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.CA.9 · 5.CA.10',
   title: 'Unit Price Detective', model: 'unitPrice', minutes: 20, icon: '🔎',
   place: 'Sunnyside Grocery · Snack Aisle',
   mission: 'Is the big package ALWAYS the better deal? Split prices into equal parts to find the cost of one item, then decide which package to buy.',
@@ -214,7 +214,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-cashier', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.C.7',
+  id: 'g5-math-cashier', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.CA.10',
   title: 'Cashier Challenge', model: 'cashier', minutes: 20, icon: '💵',
   place: 'Sunnyside Grocery · Checkout Lane 3',
   mission: 'It\'s your first shift at the register and the change machine is broken! Make exact change by counting up with bills and coins, just like real cashiers do.',
@@ -236,7 +236,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-powers-of-ten', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.NS.1 · 5.C.7',
+  id: 'g5-math-powers-of-ten', std: 'g5-math-decimals', subject: 'math', grade: 5, code: '5.NS.3',
   title: 'Powers of Ten Machine', model: 'powersTen', minutes: 20, icon: '🔟',
   place: 'Sunnyside Makerspace',
   mission: 'The makerspace\'s place value machine multiplies and divides by 10, 100, and 1,000. Feed it numbers, watch the digits slide, and figure out the pattern that lets you skip the calculator.',
@@ -332,7 +332,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-math-aquarium', std: 'g5-math-volume', subject: 'math', grade: 5, code: '5.M.4',
+  id: 'g5-math-aquarium', std: 'g5-math-volume', subject: 'math', grade: 5, code: '5.M.5',
   title: 'Aquarium Planner', model: 'aquarium', minutes: 20, icon: '🐠',
   place: 'Sunnyside Pet Store · Fish Room',
   mission: 'The pet store needs to know how many liters of water each fish tank holds and how deep the water will be. Pour water, watch the depth change, and connect cubic centimeters to liters.',

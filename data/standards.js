@@ -2,9 +2,9 @@
 window.CX_STANDARDS = [
 /* ======================= GRADE 5 SCIENCE ======================= */
 {
-  id: 'g5-sci-matter', grade: 5, subject: 'science', code: '5.PS.1–5.PS.2',
+  id: 'g5-sci-matter', grade: 5, subject: 'science', code: '5-PS1-1–5-PS1-4',
   title: 'Properties of Matter & Conservation of Mass',
-  text: 'Describe and measure the volume and mass of a sample of a material, and demonstrate that when substances are heated, cooled, or mixed, the total mass of matter is conserved.',
+  text: 'Develop a model showing that matter is made of particles too small to be seen; measure and graph to show that the total weight of matter is conserved when substances are heated, cooled, or mixed; identify materials by their properties; and investigate whether mixing substances forms new substances.',
   lesson: {
     target: 'I can measure and describe properties of matter and explain why mass stays the same when matter changes.',
     vocab: [['Matter', 'Anything that has mass and takes up space.'], ['Mass', 'The amount of matter in an object, measured in grams (g).'], ['Volume', 'The amount of space something takes up, measured in mL or cm³.'], ['Physical change', 'A change in size, shape, or state that makes no new substance.'], ['Chemical change', 'A change that makes a new substance (clues: gas, color change, heat, light).'], ['Conservation of mass', 'In a closed system, mass before a change equals mass after.']],
@@ -24,9 +24,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5.ESS.1–5.ESS.2',
+  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5-PS2-1 · 5-ESS1-1 · 5-ESS1-2',
   title: 'Earth, Sun, Moon & the Solar System',
-  text: 'Analyze the scale of the solar system and its components, and use models to explain how Earth\'s rotation and orbit cause day and night, changing shadows, seasons, and the Moon\'s phases.',
+  text: 'Support an argument that Earth\'s gravity pulls objects down and that the apparent brightness of the sun and stars is due to their distance from Earth; represent data to reveal patterns in shadows, day and night, and the seasonal appearance of stars.',
   lesson: {
     target: 'I can use a model to explain patterns caused by Earth\'s rotation and orbit and describe the scale of the solar system.',
     vocab: [['Rotation', 'Spinning on an axis. Earth rotates once about every 24 hours.'], ['Revolution / orbit', 'Traveling around another object. Earth orbits the Sun in about 365 days.'], ['Axis', 'An imaginary line through Earth from pole to pole; it is tilted about 23.5°.'], ['Moon phase', 'The shape of the lit part of the Moon we see from Earth.'], ['Star', 'A ball of hot gas that makes its own light. The Sun is our closest star.']],
@@ -46,9 +46,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-sci-eco', grade: 5, subject: 'science', code: '5.LS.1–5.LS.3',
+  id: 'g5-sci-eco', grade: 5, subject: 'science', code: '5-PS3-1 · 5-LS1-1 · 5-LS2-1',
   title: 'Ecosystems & Food Webs',
-  text: 'Classify organisms as producers, consumers, and decomposers, model the flow of energy and matter through food chains and food webs, and explain how changes to an ecosystem affect the organisms living in it.',
+  text: 'Use models to describe that the energy in animals\' food was once energy from the sun, support an argument that plants get the materials they need for growth chiefly from air and water, and model the movement of matter among plants, animals, decomposers, and the environment.',
   lesson: {
     target: 'I can model how energy and matter move through an ecosystem and predict what happens when part of it changes.',
     vocab: [['Producer', 'An organism that makes its own food from sunlight (plants, algae).'], ['Consumer', 'An organism that eats other organisms (herbivore, carnivore, omnivore).'], ['Decomposer', 'An organism that breaks down dead matter and returns nutrients to soil (fungi, bacteria, worms).'], ['Food web', 'Many connected food chains in one ecosystem.'], ['Ecosystem', 'All the living and nonliving things interacting in an area.']],
@@ -69,9 +69,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SCIENCE ======================= */
 {
-  id: 'g6-sci-particles', grade: 6, subject: 'science', code: '6.PS.1–6.PS.2',
+  id: 'g6-sci-particles', grade: 6, subject: 'science', code: 'MS-PS1-4',
   title: 'Particle Model of Matter & States of Matter',
-  text: 'Develop a model showing that matter is made of particles in constant motion, and explain how adding or removing thermal energy changes particle motion, temperature, and state of matter.',
+  text: 'Develop a model that predicts and describes changes in particle motion, temperature, and state of a pure substance when thermal energy is added or removed. (NGSS middle school standard; not part of Indiana\'s 2023 Grade 6 list.)',
   lesson: {
     target: 'I can use the particle model to explain the states of matter and changes of state.',
     vocab: [['Particle', 'A tiny piece of matter (atom or molecule) too small to see.'], ['Thermal energy', 'The total energy of moving particles in a substance.'], ['Temperature', 'A measure of the average motion (kinetic energy) of particles.'], ['Melting / freezing', 'Solid to liquid / liquid to solid.'], ['Evaporation / condensation', 'Liquid to gas / gas to liquid.'], ['Sublimation', 'Solid directly to gas (dry ice).']],
@@ -91,9 +91,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-sci-energy', grade: 6, subject: 'science', code: '6.PS.3–6.PS.4',
+  id: 'g6-sci-energy', grade: 6, subject: 'science', code: 'MS-PS3-1–MS-PS3-5',
   title: 'Kinetic & Potential Energy and Heat Transfer',
-  text: 'Compare kinetic and potential energy and the factors that affect them, and describe how thermal energy transfers by conduction, convection, and radiation.',
+  text: 'Describe kinetic and potential energy, and investigate how thermal energy is transferred and how the amount of energy transferred depends on the type and mass of matter. (NGSS middle school standards; not part of Indiana\'s 2023 Grade 6 list.)',
   lesson: {
     target: 'I can explain how energy changes between kinetic and potential forms and identify conduction, convection, and radiation.',
     vocab: [['Kinetic energy', 'Energy of motion. More mass or more speed means more kinetic energy.'], ['Potential energy', 'Stored energy. Gravitational potential energy increases with height and mass.'], ['Conduction', 'Heat transfer through direct contact.'], ['Convection', 'Heat transfer by the movement of fluids (liquids and gases) in currents.'], ['Radiation', 'Heat transfer by waves, even through empty space.'], ['Law of conservation of energy', 'Energy is not created or destroyed; it changes form.']],
@@ -113,9 +113,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-sci-space', grade: 6, subject: 'science', code: '6.ESS.1–6.ESS.2',
+  id: 'g6-sci-space', grade: 6, subject: 'science', code: 'MS-ESS1-1–MS-ESS1-3',
   title: 'Gravity & the Earth–Sun–Moon System',
-  text: 'Use models of the Earth–Sun–Moon system to explain lunar phases, eclipses, tides, and seasons, and describe the role of gravity in the motions of objects in the solar system.',
+  text: 'Develop and use a model of the Earth-sun-moon system to describe the cyclic patterns of lunar phases, eclipses, and seasons; describe the role of gravity in the motions within galaxies and the solar system; and analyze data to determine scale properties of objects in the solar system.',
   lesson: {
     target: 'I can use a model of the Earth–Sun–Moon system to explain phases, eclipses, tides, and seasons, and explain how gravity keeps objects in orbit.',
     vocab: [['Gravity', 'A force of attraction between all objects with mass. More mass and less distance means stronger gravity.'], ['Orbit', 'The curved path of one object around another, caused by gravity and forward motion.'], ['Solar eclipse', 'The Moon passes between the Sun and Earth, blocking sunlight.'], ['Lunar eclipse', 'Earth passes between the Sun and the Moon; Earth\'s shadow falls on the Moon.'], ['Tide', 'The daily rise and fall of sea level, caused mostly by the Moon\'s gravity.'], ['Waxing / waning', 'The lit part of the Moon growing / shrinking.']],
@@ -136,9 +136,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 SOCIAL STUDIES ======================= */
 {
-  id: 'g5-ss-colonial', grade: 5, subject: 'social', code: '5.1.1–5.1.8',
+  id: 'g5-ss-colonial', grade: 5, subject: 'social', code: '5.H.1–5.H.6 · 5.G.5–5.G.10 · 5.E.1',
   title: 'Native Americans, Exploration & the Thirteen Colonies',
-  text: 'Describe early Native American cultures, European exploration of North America, and the founding, geography, economies, and daily life of the New England, Middle, and Southern colonies.',
+  text: 'Describe early Native American cultures and European exploration, compare the reasons for colonization, and explain the political, social, and economic organization of the New England, Middle, and Southern colonies.',
   lesson: {
     target: 'I can compare Native American cultures and the three colonial regions and explain how geography shaped how people lived.',
     vocab: [['Colony', 'A settlement ruled by a faraway country.'], ['Cash crop', 'A crop grown to sell, like tobacco or rice.'], ['Indentured servant', 'A person who worked for several years to pay for passage to America.'], ['Culture region', 'An area where groups share similar ways of life shaped by environment.'], ['Columbian Exchange', 'The movement of plants, animals, people, and diseases between the Americas and Europe/Africa after 1492.']],
@@ -158,9 +158,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ss-revolution', grade: 5, subject: 'social', code: '5.1.9–5.1.14',
+  id: 'g5-ss-revolution', grade: 5, subject: 'social', code: '5.H.7–5.H.13',
   title: 'The American Revolution',
-  text: 'Explain the causes of the American Revolution, key events, people, and documents including the Declaration of Independence, and the outcome and results of the war.',
+  text: 'Explain how political, religious, and economic ideas brought about the American Revolution, analyze its causes as outlined in the Declaration of Independence, and describe key leaders, events, contributions, and consequences of the war.',
   lesson: {
     target: 'I can explain the causes, key events, and results of the American Revolution in the order they happened.',
     vocab: [['Tax', 'Money people must pay to a government.'], ['Boycott', 'Refusing to buy goods as a protest.'], ['Patriot / Loyalist', 'A colonist who supported independence / a colonist loyal to the king.'], ['Declaration of Independence', 'The 1776 document explaining why the colonies were breaking from Britain.'], ['Treaty of Paris (1783)', 'The agreement that ended the war and recognized U.S. independence.']],
@@ -180,9 +180,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.2.1–5.2.7',
+  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.H.14–5.H.15 · 5.C.1–5.C.5',
   title: 'Founding Documents & Our Government',
-  text: 'Explain the principles in the Declaration of Independence and U.S. Constitution, the three branches of government and checks and balances, and the rights protected in the Bill of Rights.',
+  text: 'Explain why the Constitution was created and how the Bill of Rights was drafted, the purposes in the Preamble, key ideas in the founding documents, and the functions of the three branches of government.',
   lesson: {
     target: 'I can explain how the Constitution divides power among three branches and which rights the Bill of Rights protects.',
     vocab: [['Constitution', 'The supreme law of the United States, written in 1787.'], ['Legislative branch', 'Congress (Senate and House). Makes laws.'], ['Executive branch', 'The President. Carries out and enforces laws.'], ['Judicial branch', 'The Supreme Court and federal courts. Interpret laws.'], ['Checks and balances', 'Each branch can limit the power of the others.'], ['Amendment', 'A change or addition to the Constitution. The first ten are the Bill of Rights.']],
@@ -292,9 +292,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 ELA ======================= */
 {
-  id: 'g5-ela-theme', grade: 5, subject: 'ela', code: '5.RL.2.2',
+  id: 'g5-ela-theme', grade: 5, subject: 'ela', code: '5.RC.1 & 5.RC.2',
   title: 'Theme & Summary',
-  text: 'Determine a theme of a story, drama, or poem from details in the text, including how characters respond to challenges, and summarize the text.',
+  text: 'Quote accurately from a text when explaining what it says explicitly and when drawing inferences; determine the theme of a story, play, or poem from details in the text, including how characters respond to challenges; summarize the text.',
   lesson: {
     target: 'I can determine a theme from how characters respond to challenges and write an objective summary.',
     vocab: [['Theme', 'The message or life lesson the author wants readers to understand. It is written as a full sentence.'], ['Topic', 'What the story is about in one or two words (friendship, courage). A topic is not a theme.'], ['Summary', 'A short retelling of the most important events in order, without opinions.'], ['Conflict', 'The problem or challenge the main character faces.'], ['Resolution', 'How the conflict is solved.']],
@@ -314,9 +314,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ela-info', grade: 5, subject: 'ela', code: '5.RN.2.2 & 5.RN.3.2',
+  id: 'g5-ela-info', grade: 5, subject: 'ela', code: '5.RC.6 & 5.RC.8',
   title: 'Main Ideas & Text Structure',
-  text: 'Determine two or more main ideas of an informational text and explain how key details support them, and identify how a text is organized (chronology, comparison, cause/effect, problem/solution, description).',
+  text: 'Determine two or more main ideas of a text and explain how they are supported by key details; summarize the text; compare and contrast the organizational structure of events, ideas, concepts, or information in two or more texts.',
   lesson: {
     target: 'I can find the main ideas of an informational text, choose the details that support them, and name the text structure.',
     vocab: [['Main idea', 'The most important point the author makes about the topic.'], ['Key detail', 'A fact, example, or reason that supports the main idea.'], ['Text structure', 'How an author organizes information.'], ['Signal words', 'Words that hint at structure: first/then (sequence), because/as a result (cause-effect), however/both (compare), problem/solution.'], ['Chronological', 'In time order.']],
@@ -336,9 +336,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ela-vocab', grade: 5, subject: 'ela', code: '5.RV.2.1, 5.RV.2.4, 5.RV.3.3',
+  id: 'g5-ela-vocab', grade: 5, subject: 'ela', code: '5.RC.11–5.RC.14',
   title: 'Context Clues, Roots & Figurative Language',
-  text: 'Use context clues and Greek and Latin affixes and roots to determine the meanings of unknown words, and explain figurative language such as similes, metaphors, idioms, and personification.',
+  text: 'Use context clues, word relationships, Greek and Latin affixes and roots, and knowledge of figurative language (similes, metaphors, hyperbole, idioms) to determine the meanings of words and phrases.',
   lesson: {
     target: 'I can use context clues and word parts to figure out new words and explain what figurative language means.',
     vocab: [['Context clues', 'Hints in nearby words or sentences that help you figure out a word.'], ['Root', 'The main part of a word that carries meaning (port = carry).'], ['Prefix / suffix', 'A word part added to the beginning / end of a root (re- = again; -less = without).'], ['Simile', 'A comparison using like or as.'], ['Metaphor', 'A comparison that says one thing IS another.'], ['Idiom', 'A saying whose meaning is different from its literal words ("break a leg").'], ['Personification', 'Giving human qualities to non-human things.']],
@@ -359,9 +359,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 ELA ======================= */
 {
-  id: 'g6-ela-evidence', grade: 6, subject: 'ela', code: '6.RL.2.1 & 6.RL.2.2',
+  id: 'g6-ela-evidence', grade: 6, subject: 'ela', code: '6.RC.1–6.RC.3',
   title: 'Textual Evidence, Inference & Theme',
-  text: 'Cite textual evidence to support analysis of what a literary text says explicitly as well as inferences drawn from it, and determine how a theme is conveyed through particular details.',
+  text: 'Analyze what a text says explicitly and draw inferences by citing textual evidence; determine how a theme is conveyed through particular details and provide an objective summary; analyze how a sentence, chapter, or scene fits into the overall structure and develops the theme, characterization, setting, or plot.',
   lesson: {
     target: 'I can make inferences about a literary text and support them with the strongest evidence, and explain how details develop a theme.',
     vocab: [['Inference', 'A logical conclusion based on text clues plus what you already know.'], ['Explicit', 'Stated directly in the text.'], ['Textual evidence', 'Words or sentences from the text that support an idea.'], ['Theme', 'A universal message about life developed through the story.'], ['Characterization', 'How an author reveals what a character is like: speech, thoughts, actions, and effects on others.']],
@@ -381,9 +381,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-central', grade: 6, subject: 'ela', code: '6.RN.2.2 & 6.RN.4.1',
+  id: 'g6-ela-central', grade: 6, subject: 'ela', code: '6.RC.5 & 6.RC.8',
   title: 'Central Idea & Author\'s Argument',
-  text: 'Determine the central idea of an informational text and how it is conveyed through details, and trace and evaluate an argument and specific claims, distinguishing claims supported by reasons and evidence from those that are not.',
+  text: 'Determine how a central idea of a text is conveyed through particular details and provide an objective summary; trace and evaluate the argument and specific claims in a text, distinguishing supported claims from unsupported ones.',
   lesson: {
     target: 'I can determine the central idea of a text and evaluate whether an author\'s claims are supported by evidence.',
     vocab: [['Central idea', 'The most important idea of the whole text.'], ['Claim', 'A statement the author wants you to believe.'], ['Reason', 'Why the author believes the claim.'], ['Evidence', 'Facts, statistics, examples, or expert quotes that prove a reason.'], ['Counterclaim', 'An opposing view the author addresses.'], ['Fact vs. opinion', 'A fact can be proven; an opinion is a belief or feeling.']],
@@ -403,9 +403,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-vocab', grade: 6, subject: 'ela', code: '6.RV.2.1 & 6.RV.3.3',
+  id: 'g6-ela-vocab', grade: 6, subject: 'ela', code: '6.RC.10, 6.RC.12 & 6.RC.13',
   title: 'Word Meaning, Connotation & Figurative Language',
-  text: 'Use context and word parts to determine the meanings of words, and interpret figurative language and connotation to explain how an author\'s word choice affects meaning and tone.',
+  text: 'Use context to determine the meaning of words and phrases, distinguish among the connotations of words with similar denotations, and use Greek and Latin affixes and roots as clues to word meaning.',
   lesson: {
     target: 'I can figure out word meanings from context and explain how connotation and figurative language shape tone.',
     vocab: [['Denotation', 'The dictionary definition of a word.'], ['Connotation', 'The feeling a word suggests: positive, negative, or neutral.'], ['Tone', 'The author\'s attitude toward the subject (hopeful, bitter, playful).'], ['Hyperbole', 'Extreme exaggeration for effect.'], ['Allusion', 'A reference to a well-known story, person, or event.'], ['Imagery', 'Language that appeals to the five senses.']],
@@ -425,9 +425,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-writing', grade: 6, subject: 'ela', code: '6.W.3.2 · 6.W.6.1 · 6.W.6.2', sims: false,
+  id: 'g6-ela-writing', grade: 6, subject: 'ela', code: '6.W.2 · 6.W.6 · 6.W.7', sims: false,
   title: 'Grammar, Sentence Structure & Paragraph Structure',
-  text: 'Use correct grammar and usage (parts of speech, subject-verb agreement, pronouns, and consistent verb tense), write complete simple, compound, and complex sentences without fragments or run-ons, and organize paragraphs with a topic sentence, supporting details, transitions, and a concluding sentence.',
+  text: 'Organize informative writing with a clear topic, relevant details, transitions, and a concluding statement; use subject, object, and possessive pronouns correctly; write simple, compound, complex, and compound-complex sentences and correct fragments and run-ons; and use commas, semicolons, and colons correctly.',
   lesson: {
     target: 'I can write complete, correct sentences and organize them into a well-structured paragraph.',
     vocab: [['Fragment', 'An incomplete sentence missing a subject, a verb, or a complete thought.'], ['Run-on', 'Two complete sentences joined with no punctuation or with only a comma.'], ['Compound sentence', 'Two independent clauses joined by a comma and a conjunction (FANBOYS) or a semicolon.'], ['Complex sentence', 'An independent clause plus a dependent clause that begins with a word like because, when, or although.'], ['Topic sentence', 'The sentence that states the main idea of a paragraph.'], ['Transition', 'A word or phrase that connects ideas, like for example, however, or in addition.']],
@@ -448,9 +448,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 MATH ======================= */
 {
-  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.C.4, 5.C.6, 5.AT.2',
+  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.CA.3–5.CA.8',
   title: 'Adding, Subtracting & Multiplying Fractions',
-  text: 'Add and subtract fractions and mixed numbers with unlike denominators, multiply fractions by whole numbers and by fractions, and solve real-world problems involving fractions.',
+  text: 'Add and subtract fractions and mixed numbers with unlike denominators, use visual fraction models to multiply and divide fractions, and solve real-world problems involving all four operations with fractions and mixed numbers.',
   lesson: {
     target: 'I can add, subtract, and multiply fractions with unlike denominators and use them to solve real-world problems.',
     vocab: [['Denominator', 'The bottom number: how many equal parts make a whole.'], ['Numerator', 'The top number: how many parts we have.'], ['Common denominator', 'A shared multiple of the denominators, used to add or subtract.'], ['Equivalent fractions', 'Fractions that name the same amount (1/2 = 3/6).'], ['Mixed number', 'A whole number and a fraction (2 1/4).'], ['Simplest form', 'A fraction whose numerator and denominator share no common factor except 1.']],
@@ -470,9 +470,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-math-decimals', grade: 5, subject: 'math', code: '5.NS.1, 5.NS.4, 5.C.7',
+  id: 'g5-math-decimals', grade: 5, subject: 'math', code: '5.NS.1 · 5.NS.3 · 5.CA.9–5.CA.10',
   title: 'Decimal Place Value & Operations',
-  text: 'Read, write, compare, and round decimals to the thousandths, and add, subtract, multiply, and divide decimals to the hundredths using place value strategies.',
+  text: 'Compare and order decimals to thousandths, explain place-value patterns when multiplying or dividing by powers of 10, and add, subtract, multiply, and divide decimals to hundredths to solve real-world problems, including money.',
   lesson: {
     target: 'I can compare and round decimals and add, subtract, multiply, and divide decimals using place value.',
     vocab: [['Tenths / hundredths / thousandths', 'The first, second, and third places to the right of the decimal point.'], ['Expanded form', 'A number written as a sum of each digit\'s value (3.45 = 3 + 0.4 + 0.05).'], ['Round', 'Change a number to a nearby, simpler value.'], ['Power of ten', '10, 100, 1,000... Multiplying by 10 moves each digit one place left.']],
@@ -494,7 +494,7 @@ window.CX_STANDARDS = [
 {
   id: 'g5-math-volume', grade: 5, subject: 'math', code: '5.M.4–5.M.5',
   title: 'Volume of Rectangular Prisms',
-  text: 'Understand volume as the number of unit cubes needed to fill a solid, and find volumes of rectangular prisms and composite figures using V = l × w × h and V = B × h.',
+  text: 'Find the volume of right rectangular prisms by packing them with unit cubes, and apply V = l × w × h and V = B × h to solve real-world problems.',
   lesson: {
     target: 'I can find the volume of rectangular prisms and composite figures and explain what volume means.',
     vocab: [['Volume', 'The amount of space inside a 3-D figure, measured in cubic units.'], ['Cubic unit', 'A cube 1 unit on each side (cm³, in³, ft³).'], ['Rectangular prism', 'A 3-D figure with 6 rectangular faces, like a box.'], ['Base (B)', 'The area of the bottom face: length × width.'], ['Composite figure', 'A solid made of two or more prisms joined together.']],
@@ -515,9 +515,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 MATH ======================= */
 {
-  id: 'g6-math-ratios', grade: 6, subject: 'math', code: '6.NS.9–6.NS.10',
+  id: 'g6-math-ratios', grade: 6, subject: 'math', code: '6.RP.1–6.RP.5',
   title: 'Ratios, Rates & Percents',
-  text: 'Use ratio and rate reasoning to solve real-world problems, including unit rates, tables of equivalent ratios, and finding a percent of a quantity.',
+  text: 'Convert between fractions, decimals, and percents; understand unit rates; make tables of equivalent ratios; and solve real-world rate and ratio problems using tables, tape diagrams, double number lines, and equations.',
   lesson: {
     target: 'I can use ratios, unit rates, and percents to solve real-world problems.',
     vocab: [['Ratio', 'A comparison of two quantities (3 to 2, 3:2, 3/2).'], ['Rate', 'A ratio comparing quantities with different units (miles per hour).'], ['Unit rate', 'A rate per 1 unit ($2 per pound).'], ['Equivalent ratios', 'Ratios that make the same comparison (2:3 = 4:6).'], ['Percent', 'A ratio out of 100 (45% = 45/100).']],
@@ -537,9 +537,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-math-expressions', grade: 6, subject: 'math', code: '6.AF.1–6.AF.4',
+  id: 'g6-math-expressions', grade: 6, subject: 'math', code: '6.AF.1–6.AF.4 · 6.NS.7',
   title: 'Expressions & One-Step Equations',
-  text: 'Write, evaluate, and simplify expressions with variables, apply properties of operations to create equivalent expressions, and solve one-step equations and inequalities.',
+  text: 'Write and evaluate expressions with variables, create equivalent expressions using properties of operations, use substitution to test solutions, solve one-step equations, and write inequalities to represent real-world constraints.',
   lesson: {
     target: 'I can write and evaluate expressions and solve one-step equations using inverse operations.',
     vocab: [['Variable', 'A letter that stands for an unknown number.'], ['Expression', 'Numbers, variables, and operations with no equal sign (3x + 2).'], ['Equation', 'A statement that two expressions are equal (3x + 2 = 11).'], ['Coefficient', 'The number multiplied by a variable (the 3 in 3x).'], ['Like terms', 'Terms with the same variable part (4x and 2x).'], ['Inverse operations', 'Operations that undo each other (+ and −, × and ÷).']],
@@ -559,9 +559,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-math-integers', grade: 6, subject: 'math', code: '6.NS.1–6.NS.3',
+  id: 'g6-math-integers', grade: 6, subject: 'math', code: '6.NS.1–6.NS.3 · 6.AF.5',
   title: 'Integers, Absolute Value & the Coordinate Plane',
-  text: 'Understand positive and negative numbers in real-world contexts, compare and order integers, interpret absolute value, and locate and find distances between points in all four quadrants of the coordinate plane.',
+  text: 'Use positive and negative numbers to represent real-world quantities, explain opposites on the number line, compare and order rational numbers, and graph points on the coordinate plane to solve problems.',
   lesson: {
     target: 'I can use integers to describe real-world situations, compare them, find absolute value, and graph points in all four quadrants.',
     vocab: [['Integer', 'Whole numbers and their opposites (…−2, −1, 0, 1, 2…).'], ['Opposite', 'A number the same distance from 0 on the other side (5 and −5).'], ['Absolute value', 'A number\'s distance from 0, always positive or zero. |−7| = 7.'], ['Quadrant', 'One of four regions of the coordinate plane, numbered I–IV counterclockwise.'], ['Ordered pair', '(x, y): move along the x-axis first, then the y-axis.']],

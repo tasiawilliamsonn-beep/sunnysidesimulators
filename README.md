@@ -61,55 +61,55 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 
 ## Rooms by standard
 
-**Grade 5 Science · 5.PS.1–5.PS.2 Properties of Matter & Conservation of Mass**
+**Grade 5 Science · 5-PS1-1–5-PS1-4 Properties of Matter & Conservation of Mass**
 
 - The Melting Lab Lockdown (Escape Room)
 - Museum of Marvelous Matter (Gallery Walk)
 - The Case of the Missing Mass (Mystery Case)
 
-**Grade 5 Science · 5.ESS.1–5.ESS.2 Earth, Sun, Moon & the Solar System**
+**Grade 5 Science · 5-PS2-1 · 5-ESS1-1 · 5-ESS1-2 Earth, Sun, Moon & the Solar System**
 
 - Grand Tour of the Solar System (Virtual Field Trip)
 - Shadow Clock Escape (Escape Room)
 - Moonlight Quest (Quest)
 
-**Grade 5 Science · 5.LS.1–5.LS.3 Ecosystems & Food Webs**
+**Grade 5 Science · 5-PS3-1 · 5-LS1-1 · 5-LS2-1 Ecosystems & Food Webs**
 
 - Hoosier Habitat Hike (Virtual Field Trip)
 - Who Crashed the Food Web? (Mystery Case)
 - Decomposer Dash (Quest)
 
-**Grade 6 Science · 6.PS.1–6.PS.2 Particle Model of Matter & States of Matter**
+**Grade 6 Science · MS-PS1-4 Particle Model of Matter & States of Matter**
 
 - Particle Panic at Polar Station (Escape Room)
 - The Water Molecule's Quest (Quest)
 - The Museum of Moving Particles (Gallery Walk)
 
-**Grade 6 Science · 6.PS.3–6.PS.4 Kinetic & Potential Energy and Heat Transfer**
+**Grade 6 Science · MS-PS3-1–MS-PS3-5 Kinetic & Potential Energy and Heat Transfer**
 
 - Roller Coaster Lockdown (Escape Room)
 - The Case of the Cold Cocoa (Mystery Case)
 - Power Up Indiana Field Trip (Virtual Field Trip)
 
-**Grade 6 Science · 6.ESS.1–6.ESS.2 Gravity & the Earth–Sun–Moon System**
+**Grade 6 Science · MS-ESS1-1–MS-ESS1-3 Gravity & the Earth–Sun–Moon System**
 
 - Eclipse Chasers: April 8, 2024 (Virtual Field Trip)
 - Gravity Station Escape (Escape Room)
 - The Tides & Seasons Quest (Quest)
 
-**Grade 5 Social Studies · 5.1.1–5.1.8 Native Americans, Exploration & the Thirteen Colonies**
+**Grade 5 Social Studies · 5.H.1–5.H.6 · 5.G.5–5.G.10 · 5.E.1 Native Americans, Exploration & the Thirteen Colonies**
 
 - Colonial Road Trip, 1750 (Virtual Field Trip)
 - Nations Before Us (Gallery Walk)
 - Lost at Sea: The Explorer's Escape (Escape Room)
 
-**Grade 5 Social Studies · 5.1.9–5.1.14 The American Revolution**
+**Grade 5 Social Studies · 5.H.7–5.H.13 The American Revolution**
 
 - Escape from 1776 (Escape Room)
 - The Midnight Messenger Mystery (Mystery Case)
 - Voices of the Revolution (Gallery Walk)
 
-**Grade 5 Social Studies · 5.2.1–5.2.7 Founding Documents & Our Government**
+**Grade 5 Social Studies · 5.H.14–5.H.15 · 5.C.1–5.C.5 Founding Documents & Our Government**
 
 - Branches of Power Quest (Quest)
 - Bill of Rights Breakout (Escape Room)
@@ -133,49 +133,49 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - Grand Tour of Two Continents (Virtual Field Trip)
 - The Case of the Changing Landscape (Mystery Case)
 
-**Grade 5 ELA · 5.RL.2.2 Theme & Summary**
+**Grade 5 ELA · 5.RC.1 & 5.RC.2 Theme & Summary**
 
 - The Story Gallery (Gallery Walk)
 - Escape the Lost Library (Escape Room)
 - Summary Showdown (Quest)
 
-**Grade 5 ELA · 5.RN.2.2 & 5.RN.3.2 Main Ideas & Text Structure**
+**Grade 5 ELA · 5.RC.6 & 5.RC.8 Main Ideas & Text Structure**
 
 - Flight of the Monarchs (Virtual Field Trip)
 - The Case of the Scrambled Articles (Mystery Case)
 - Escape the Science Magazine (Escape Room)
 
-**Grade 5 ELA · 5.RV.2.1, 5.RV.2.4, 5.RV.3.3 Context Clues, Roots & Figurative Language**
+**Grade 5 ELA · 5.RC.11–5.RC.14 Context Clues, Roots & Figurative Language**
 
 - The Word Wizard's Tower (Escape Room)
 - The Figurative Language Art Show (Gallery Walk)
 - The Context Clue Caper (Mystery Case)
 
-**Grade 6 ELA · 6.RL.2.1 & 6.RL.2.2 Textual Evidence, Inference & Theme**
+**Grade 6 ELA · 6.RC.1–6.RC.3 Textual Evidence, Inference & Theme**
 
 - The Inference Files (Mystery Case)
 - The Evidence Vault (Escape Room)
 - Character Quest: How Themes Grow (Quest)
 
-**Grade 6 ELA · 6.RN.2.2 & 6.RN.4.1 Central Idea & Author's Argument**
+**Grade 6 ELA · 6.RC.5 & 6.RC.8 Central Idea & Author's Argument**
 
 - Debate Club Lockdown (Escape Room)
 - Newsroom Field Trip (Virtual Field Trip)
 - The Viral Post Investigation (Mystery Case)
 
-**Grade 6 ELA · 6.RV.2.1 & 6.RV.3.3 Word Meaning, Connotation & Figurative Language**
+**Grade 6 ELA · 6.RC.10, 6.RC.12 & 6.RC.13 Word Meaning, Connotation & Figurative Language**
 
 - The Shades of Meaning Gallery (Gallery Walk)
 - The Poet's Locked Notebook (Escape Room)
 - Word Detective Quest (Quest)
 
-**Grade 5 Math · 5.C.4, 5.C.6, 5.AT.2 Adding, Subtracting & Multiplying Fractions**
+**Grade 5 Math · 5.CA.3–5.CA.8 Adding, Subtracting & Multiplying Fractions**
 
 - The Pizza Parlor Lockdown (Escape Room)
 - Fraction Trail Quest (Quest)
 - The Bakery Recipe Mystery (Mystery Case)
 
-**Grade 5 Math · 5.NS.1, 5.NS.4, 5.C.7 Decimal Place Value & Operations**
+**Grade 5 Math · 5.NS.1 · 5.NS.3 · 5.CA.9–5.CA.10 Decimal Place Value & Operations**
 
 - Speedway Decimal Field Trip (Virtual Field Trip)
 - Bank Vault Breakout (Escape Room)
@@ -187,19 +187,19 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - The Aquarium Builder Quest (Quest)
 - The Case of the Stolen Sand (Mystery Case)
 
-**Grade 6 Math · 6.NS.9–6.NS.10 Ratios, Rates & Percents**
+**Grade 6 Math · 6.RP.1–6.RP.5 Ratios, Rates & Percents**
 
 - The Smoothie Shop Lockdown (Escape Room)
 - Hoosier Road Trip (Virtual Field Trip)
 - The Sale Price Scam (Mystery Case)
 
-**Grade 6 Math · 6.AF.1–6.AF.4 Expressions & One-Step Equations**
+**Grade 6 Math · 6.AF.1–6.AF.4 · 6.NS.7 Expressions & One-Step Equations**
 
 - The Algebra Vault (Escape Room)
 - The Balance Scale Quest (Quest)
 - The Variable Villain (Mystery Case)
 
-**Grade 6 Math · 6.NS.1–6.NS.3 Integers, Absolute Value & the Coordinate Plane**
+**Grade 6 Math · 6.NS.1–6.NS.3 · 6.AF.5 Integers, Absolute Value & the Coordinate Plane**
 
 - Extreme Earth Field Trip (Virtual Field Trip)
 - Treasure Map Escape (Escape Room)

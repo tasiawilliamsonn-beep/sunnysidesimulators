@@ -5,7 +5,7 @@ var SUNNY_SIMS = window.SUNNY_SIMS = window.SUNNY_SIMS || [];
 
 /* ======================= Ratios, rates & percents ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-math-smoothie-mixer', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.NS.9',
+  id: 'g6-math-smoothie-mixer', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.RP.3',
   title: 'Smoothie Mixer', model: 'smoothie', minutes: 20, icon: '🥤',
   place: 'Sunnyside Smoothie Bar',
   mission: 'The smoothie bar\'s famous Berry Blast uses 2 cups of strawberries for every 3 cups of yogurt. Customers order different sizes, and every size must taste exactly the same. Mix, taste-test, and build a ratio table.',
@@ -29,7 +29,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-race-rates', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.NS.10',
+  id: 'g6-math-race-rates', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.RP.2 · 6.RP.4',
   title: 'Animal Race Rates', model: 'raceRates', minutes: 20, icon: '🐆',
   place: 'Sunnyside Nature Center · Speed Track',
   mission: 'The nature center measured how far animals ran in different amounts of time. That makes them hard to compare! Find each unit rate (meters per 1 second), predict distances, then race them to check.',
@@ -52,7 +52,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-sale-day', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.NS.10',
+  id: 'g6-math-sale-day', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.RP.1 · 6.RP.4',
   title: 'Sale Day Percents', model: 'percentStore', minutes: 20, icon: '🏷️',
   place: 'Sunnyside Mall · Big Sale',
   mission: 'Everything at the mall is on sale, and shoppers want to know what they\'ll really pay. Use a percent bar (a tape diagram) to find the discount and the sale price, without a calculator.',
@@ -73,7 +73,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-road-trip', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.NS.9–6.NS.10',
+  id: 'g6-math-road-trip', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.RP.4 · 6.RP.5',
   title: 'Road Trip Map Scale', model: 'mapScale', minutes: 20, icon: '🗺️',
   place: 'Sunnyside Travel Agency',
   mission: 'A family is planning a road trip through five towns. Measure the roads on the map with a ruler, use the map scale to find real distances, and figure out how long the drive will take.',
@@ -95,7 +95,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-paint-mixer', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.NS.9–6.NS.10',
+  id: 'g6-math-paint-mixer', std: 'g6-math-ratios', subject: 'math', grade: 6, code: '6.RP.3 · 6.RP.4',
   title: 'Paint Mixer', model: 'paintMix', minutes: 20, icon: '🎨',
   place: 'Sunnyside Hardware · Paint Counter',
   mission: 'The school is painting a mural. The paint counter mixes custom colors by ratio. Match each color exactly in bigger batches, then find what part and what percent of each can is blue.',
@@ -142,7 +142,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-function-machine', std: 'g6-math-expressions', subject: 'math', grade: 6, code: '6.AF.1–6.AF.2',
+  id: 'g6-math-function-machine', std: 'g6-math-expressions', subject: 'math', grade: 6, code: '6.AF.1 · 6.RP.5',
   title: 'Function Machine', model: 'funcMachine', minutes: 20, icon: '⚙️',
   place: 'Sunnyside Makerspace · Mystery Machines',
   mission: 'The makerspace has five mystery machines. Each one follows a secret rule. Feed them inputs, study the table, and write each rule as an expression with a variable.',
@@ -164,7 +164,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-algebra-tiles', std: 'g6-math-expressions', subject: 'math', grade: 6, code: '6.AF.2',
+  id: 'g6-math-algebra-tiles', std: 'g6-math-expressions', subject: 'math', grade: 6, code: '6.NS.7',
   title: 'Algebra Tile Workshop', model: 'algebraTiles', minutes: 20, icon: '🧩',
   place: 'Sunnyside Math Lab · Tile Table',
   mission: 'Two expressions can look different but always give the same answer. Build groups of algebra tiles, copy them, and sort like tiles to prove expressions are equivalent.',
@@ -278,7 +278,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-bank-account', std: 'g6-math-integers', subject: 'math', grade: 6, code: '6.NS.3',
+  id: 'g6-math-bank-account', std: 'g6-math-integers', subject: 'math', grade: 6, code: '6.NS.1 · 6.NS.3',
   title: 'Bank Account Tracker', model: 'bankAccount', minutes: 20, icon: '🏦',
   place: 'Sunnyside Community Bank · Kids\' Savings',
   mission: 'Your savings account starts with $25. Earn money, spend money, and see what happens when you spend more than you have. Use absolute value to describe how much you owe.',
@@ -301,7 +301,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-math-treasure-map', std: 'g6-math-integers', subject: 'math', grade: 6, code: '6.NS.3 · 6.GM.4',
+  id: 'g6-math-treasure-map', std: 'g6-math-integers', subject: 'math', grade: 6, code: '6.AF.5',
   title: 'Treasure Island Coordinates', model: 'coordMap', minutes: 25, icon: '🏴‍☠️',
   place: 'Sunnyside Island · Captain\'s Map',
   mission: 'An old captain\'s map uses a four-quadrant grid. Sail to landmarks, find their coordinates, decode reflection clues, and dig for the treasure.',

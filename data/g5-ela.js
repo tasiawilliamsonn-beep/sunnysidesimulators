@@ -2,7 +2,7 @@
 window.CX_ROOMS = window.CX_ROOMS || [];
 window.CX_ROOMS.push(
 
-/* ---------- 5.RL.2.2 Theme & Summary ---------- */
+/* ---------- 5.RC.1 & 5.RC.2 Theme & Summary ---------- */
 {
   id: 'g5-ela-story-gallery', std: 'g5-ela-theme', format: 'gallery',
   title: 'The Story Gallery',

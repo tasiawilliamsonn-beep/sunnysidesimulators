@@ -39,7 +39,7 @@ SUNNY_TEXTS.kite = {
 
 /* ======================= Theme & summary ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-ela-lighthouse-theme', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RL.2.2',
+  id: 'g5-ela-lighthouse-theme', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RC.2',
   title: 'Theme Detective: The Lighthouse', model: 'reader', minutes: 25, icon: '🗼',
   setup: { title: SUNNY_TEXTS.lighthouse.title, genre: SUNNY_TEXTS.lighthouse.genre, by: SUNNY_TEXTS.lighthouse.by, paragraphs: SUNNY_TEXTS.lighthouse.paragraphs, img: '🗼🌊', tools: [['fear', '🟨 Nora is afraid'], ['brave', '🟦 Nora acts bravely'], ['lesson', '🟩 Lesson clue']] },
   place: 'Sunnyside Reading Room · Mystery Shelf',
@@ -69,7 +69,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-race-studio', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RL.2.2 · 5.W.3.1',
+  id: 'g5-ela-race-studio', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RC.1 · 5.RC.2',
   title: 'RACE Writing Studio', model: 'raceStudio', minutes: 30, icon: '✍️',
   setup: {
     passages: [SUNNY_TEXTS.lighthouse, SUNNY_TEXTS.volcano],
@@ -113,7 +113,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-summary-builder', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RL.2.2',
+  id: 'g5-ela-summary-builder', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RC.2',
   title: 'Summary Builder', model: 'summaryBuilder', minutes: 20, icon: '🗂️',
   setup: { passage: SUNNY_TEXTS.kite, events: [['Priya wants to win the kite contest and won\'t let Dev help.', 0], ['Priya builds a huge dragon kite.', 0], ['The paper smelled like glue for days.', 3], ['The kite crashes into a tree, and its tail rips.', 1], ['Dev helps Priya fix the kite with tape and string.', 1], ['Dev\'s kite is small and blue.', 3], ['The fixed kite flies high, and they win second place.', 2], ['Priya shares the ribbon and thanks Dev.', 2], ['The contest is held at Miller Park.', 3]] },
   place: 'Sunnyside Reading Room · Book Talk Table',
@@ -137,7 +137,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-found-wallet', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RL.2.2',
+  id: 'g5-ela-found-wallet', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RC.2',
   title: 'The Found Wallet: Choose the Path', model: 'choiceMap', minutes: 25, icon: '👛',
   setup: { title: 'The Found Wallet', start: 'start', decision: 'decision', nodes: {
     start: { img: '🚏', text: 'Mateo was waiting for the bus after school when he spotted a brown wallet under the bench. Inside were two twenty-dollar bills and a library card that said ROSA DELGADO.\nForty dollars! Mateo had been saving for months to buy the new Galaxy Racers game, and it cost exactly forty dollars. Nobody else was at the bus stop. Nobody had seen him pick it up.', choices: [['Keep reading', 'decision']] },
@@ -168,7 +168,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-theme-match', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RL.2.2 · 5.RL.3.2',
+  id: 'g5-ela-theme-match', std: 'g5-ela-theme', subject: 'ela', grade: 5, code: '5.RC.2 · 5.RC.5',
   title: 'Fable & Poem Theme Match', model: 'themeMatch', minutes: 20, icon: '🦁',
   setup: {
     texts: [
@@ -201,7 +201,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Main ideas & text structure ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-ela-structure-lab', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.3.2',
+  id: 'g5-ela-structure-lab', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RC.8',
   title: 'Text Structure Lab', model: 'structureLab', minutes: 25, icon: '🦋',
   setup: { items: [
     { title: 'A Monarch\'s Life', structure: 'chronology', text: 'A monarch\'s life begins as an egg no bigger than a pinhead. [[First]], a tiny caterpillar hatches and eats its own eggshell. [[Next]], it munches milkweed leaves for about two weeks. [[After]] that, it hangs upside down and forms a green case called a chrysalis. [[Finally]], about ten days [[later]], an adult butterfly climbs out.' },
@@ -231,7 +231,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-wetlands-main-ideas', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2',
+  id: 'g5-ela-wetlands-main-ideas', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RC.6',
   title: 'Main Idea Organizer: Wetlands', model: 'organizer', minutes: 25, icon: '🦆',
   setup: {
     passage: { title: 'Wetlands: Nature\'s Sponges', genre: 'Informational article', paragraphs: [
@@ -265,7 +265,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-news-desk', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2',
+  id: 'g5-ela-news-desk', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RC.6',
   title: 'Sunnyside News Desk', model: 'newsDesk', minutes: 20, icon: '📰',
   setup: { articles: [
     { headlines: ['Students Plant Carrots', 'School Garden Feeds 40 Families', 'It Rained in June', 'Mr. Lee Likes Gardens'], best: 1, paragraphs: ['Sunnyside Elementary\'s fifth graders harvested more than 300 pounds of vegetables from their school garden this summer. Instead of taking the food home, the students donated all of it to the Sunnyside Food Pantry.', '"We wanted to help families who need fresh food," said student Ava Martin. Thanks to the donation, about 40 families received tomatoes, carrots, and green beans each week. Next year, the class plans to double the size of the garden.'] },
@@ -289,7 +289,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-bee-texts', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2 · 5.RN.4.3',
+  id: 'g5-ela-bee-texts', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RC.6 · 5.RC.10',
   title: 'Two Texts, One Topic: Bees', model: 'twoTexts', minutes: 25, icon: '🐝',
   setup: {
     a: { title: 'Busy Bees', genre: 'Science article', paragraphs: ['A honeybee hive can hold 50,000 bees, and every bee has a job. Worker bees collect nectar and pollen, build wax honeycomb, and guard the entrance. The queen bee lays up to 2,000 eggs a day.', 'Bees are important pollinators. As a bee moves from flower to flower, pollen sticks to its fuzzy body and spreads to other flowers. This helps plants make fruits and seeds. About one out of every three bites of food we eat depends on pollinators like bees.'] },
@@ -316,7 +316,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-creek-report', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RN.2.2 · 5.RN.3.2',
+  id: 'g5-ela-creek-report', std: 'g5-ela-info', subject: 'ela', grade: 5, code: '5.RC.6 · 5.RC.8',
   title: 'Creek Clean-Up Brief', model: 'reader', minutes: 20, icon: '🏞️',
   setup: { title: 'Saving Sunnyside Creek', genre: 'Informational article', img: '🏞️', tools: [['problem', '🟨 Problem'], ['cause', '🟦 Cause'], ['solution', '🟩 Solution']], paragraphs: [
     "Last spring, fifth graders at Sunnyside Elementary noticed something wrong with Sunnyside Creek. {p1|The water looked cloudy, and there were far fewer minnows than the year before.}",
@@ -345,7 +345,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Vocabulary & figurative language ======================= */
 SUNNY_SIMS.push({
-  id: 'g5-ela-clue-decoder', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.1',
+  id: 'g5-ela-clue-decoder', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RC.11',
   title: 'Context Clue Decoder', model: 'clueDecoder', minutes: 20, icon: '🔍',
   setup: { items: [
     { s: 'The [[arid]] desert had not seen rain in months, so the ground was cracked and dry.', clue: ['dry', 'rain', 'cracked'], type: 'synonym', choices: ['very dry', 'very cold', 'crowded'], answer: 0 },
@@ -371,7 +371,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-word-forge', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.4',
+  id: 'g5-ela-word-forge', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RC.13',
   title: 'Greek & Latin Word Forge', model: 'wordLab', minutes: 20, icon: '🔨',
   setup: {
     prefixes: [['re', 'again, back'], ['pre', 'before'], ['in', 'not'], ['trans', 'across'], ['tele', 'far']],
@@ -399,7 +399,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-figurative-poem', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.3.3',
+  id: 'g5-ela-figurative-poem', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RC.14',
   title: 'Figurative Language Translator', model: 'figTranslator', minutes: 20, icon: '🎨',
   setup: { title: 'Saturday at Sunnyside Park', by: 'A Sunnyside original poem', lines: [
     { id: 'f1', t: 'The morning sun was a golden coin', type: 'metaphor' }, 'tossed high above the trees.',
@@ -427,7 +427,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-idiom-street', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.3.3',
+  id: 'g5-ela-idiom-street', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RC.14',
   title: 'Idiom Street', model: 'idiomStreet', minutes: 15, icon: '🏘️',
   setup: { people: [
     { who: 'The mail carrier', emoji: '👮', says: 'It\'s raining cats and dogs out here!', literal: '🌧🐱🐶', choices: ['Animals are falling from the sky', 'It is raining very hard', 'The pets are wet'], answer: 1 },
@@ -452,7 +452,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g5-ela-pumpkin-words', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RV.2.1',
+  id: 'g5-ela-pumpkin-words', std: 'g5-ela-vocab', subject: 'ela', grade: 5, code: '5.RC.11',
   title: 'Vocabulary in Action: The Pumpkin Regatta', model: 'reader', minutes: 20, icon: '🎃',
   setup: { title: 'The Great Pumpkin Regatta', genre: 'Informational article', img: '🎃🚣', tools: [['word', '🟪 Tricky word'], ['clue', '🟩 Context clue']], paragraphs: [
     "Every October, a small town holds a {w1|regatta}, a boat race, with a very unusual kind of boat. The racers paddle giant hollowed-out pumpkins across a lake!",
