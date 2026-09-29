@@ -203,9 +203,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SOCIAL STUDIES ======================= */
 {
-  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '2026 code pending',
+  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '6.H.1–6.H.3 · 6.H.7 · 6.H.13',
   title: 'Early Civilizations of the Americas',
-  text: 'Compare the Maya, Aztec, and Inca civilizations, including their geography, government, economy, religion, and achievements, and explain the effects of their encounters with Europeans.',
+  text: 'Summarize the rise, decline, and cultural achievements of ancient civilizations in Mesoamerica and South America; describe their beliefs and the development of their political, social, and economic systems; and analyze the voyages of discovery and conquest that changed the Americas.',
   lesson: {
     target: 'I can compare the Maya, Aztec, and Inca and explain how geography shaped their achievements.',
     vocab: [['Civilization', 'A complex society with cities, government, specialized jobs, and a system of writing or records.'], ['Chinampa', 'An Aztec floating garden built in a shallow lake.'], ['Terrace farming', 'Cutting flat steps into mountainsides to farm (Inca).'], ['Quipu', 'Knotted strings the Inca used to keep records.'], ['Conquistador', 'A Spanish conqueror of the Americas, such as Cortés or Pizarro.']],
@@ -225,9 +225,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '2026 code pending',
+  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '6.H.3–6.H.8 · 6.C.4',
   title: 'Medieval Europe to the Renaissance',
-  text: 'Explain feudalism, the role of the Church, the Magna Carta, the Crusades, and the Black Death, and describe how the Renaissance and Reformation changed European society.',
+  text: 'Explain the political, social, and economic systems of medieval Europe; describe how the Black Death and other factors led to the decline of medieval society; examine key ideas of the Magna Carta; and analyze the trade, ideas, and exchanges of the Renaissance and the Reformations.',
   lesson: {
     target: 'I can explain how feudalism worked and how events like the Black Death and the Renaissance changed Europe.',
     vocab: [['Feudalism', 'A system where land was traded for loyalty and military service.'], ['Manor', 'A lord\'s estate, including a village, farmland, and castle or manor house.'], ['Magna Carta (1215)', 'A document that limited the English king\'s power; even the king had to follow the law.'], ['Black Death', 'A plague (1347–1351) that killed about one-third of Europe\'s people.'], ['Renaissance', 'A "rebirth" of art, learning, and interest in ancient Greece and Rome (about 1350–1600).'], ['Humanism', 'A Renaissance idea focused on human potential and achievement.']],
@@ -247,9 +247,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '2026 code pending',
+  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '6.G.1–6.G.3',
   title: 'Geography of Europe & the Americas',
-  text: 'Use latitude, longitude, and other map tools to locate places, identify major physical features and climate regions of Europe and the Americas, and explain how people adapt to and change their environments.',
+  text: 'Demonstrate a broad understanding of the major countries, capitals, and regions of Europe and the Americas, and locate, describe, and compare the major cultural and physical characteristics (such as climate and landforms) of these regions.',
   lesson: {
     target: 'I can use latitude and longitude and explain how physical features and climate affect how people live.',
     vocab: [['Latitude', 'Imaginary lines running east–west that measure distance north or south of the Equator.'], ['Longitude', 'Imaginary lines running north–south that measure distance east or west of the Prime Meridian.'], ['Physical feature', 'A natural feature of Earth\'s surface: mountains, rivers, plains, peninsulas.'], ['Climate', 'The usual weather of a place over a long time.'], ['Human–environment interaction', 'How people adapt to, depend on, and change their environment.']],
@@ -269,7 +269,7 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-ancient', grade: 6, subject: 'social', code: '6.H.1 · 6.H.3 · 6.C.2 · 6.C.3 · 6.G.1 · 6.G.4 · 6.E.1 · 6.E.2 · 6.E.4', sims: false,
+  id: 'g6-ss-ancient', grade: 6, subject: 'social', code: '6.H.1 · 6.H.3 · 6.C.2 · 6.C.3 · 6.G.1 · 6.G.3 · 6.E.1 · 6.E.2 · 6.E.4', sims: false,
   title: 'Ancient Greece vs. Ancient Rome (G.R.A.P.E.S.)',
   text: 'Compare ancient Greece and ancient Rome using G.R.A.P.E.S.: how geography shaped each civilization, their religions, achievements, political systems (Athenian democracy and the Roman Republic), economies and trade, and social structures, and explain how both influenced the United States today.',
   lesson: {

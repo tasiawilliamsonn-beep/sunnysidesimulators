@@ -24,7 +24,7 @@ var SS6_BG = (function () {
 
 /* ======================= Early civilizations of the Americas ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ss-three-empires', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-three-empires', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '6.H.1 · 6.H.3',
   title: 'Expedition: Maya, Aztec & Inca', model: 'expedition', minutes: 30, icon: '🛕',
   setup: {
     title: 'Mesoamerica and the Andes', bg: SS6_BG.meso, avatar: '🧑‍🔬', start: 'tenoch',
@@ -58,7 +58,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-farm-engineers', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-farm-engineers', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '6.H.1 · 6.G.3',
   title: 'Farm Engineers of the Americas', model: 'adaptLab', minutes: 20, icon: '🌽',
   setup: {
     envs: [{ id: 'andes', name: 'Andes slopes (Inca)', icon: '🏔', kind: 'mountain', problem: 'The land is steep, so rain washes the soil down the mountain and crops fall over.' }, { id: 'lake', name: 'Lake Texcoco (Aztec)', icon: '🏝', kind: 'lake', problem: 'The capital is on an island in a shallow, swampy lake with little dry farmland.' }, { id: 'yucatan', name: 'Yucatán rainforest (Maya)', icon: '🌳', kind: 'forest', problem: 'Thin rainforest soil loses its nutrients quickly when one crop is planted over and over.' }, { id: 'desert', name: 'Peru\'s desert coast', icon: '🏜', kind: 'plains', problem: 'It almost never rains, but rivers flow down from the mountains.' }],
@@ -86,7 +86,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-civ-compare', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-civ-compare', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '6.H.1–6.H.3',
   title: 'Three Civilizations Museum Sort', model: 'sortLab', minutes: 15, icon: '🏺',
   setup: {
     prompt: 'The museum\'s artifact labels got mixed up. Sort each card to the civilization it belongs to, or to "All three."',
@@ -111,7 +111,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-maya-numbers', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-maya-numbers', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '6.H.1',
   title: 'Maya Number Stele', model: 'mayaCount', minutes: 20, icon: '🗿',
   setup: { targets: [8, 13, 20, 45, 365] },
   place: 'Expedition · Tikal stone workshop',
@@ -135,7 +135,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-encounter-timeline', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-encounter-timeline', std: 'g6-ss-americas', subject: 'social', grade: 6, code: '6.H.7 · 6.H.13',
   title: 'Encounter: The Fall of Two Empires', model: 'timeline', minutes: 20, icon: '⚔️',
   setup: {
     events: [['col', 1492, 'Columbus reaches the Caribbean', 'Spain begins exploring the Americas', '⛵'], ['cortes', 1519, 'Cortés lands in Mexico', 'He allies with the Tlaxcalans, enemies of the Aztec', '🐎'], ['pox1', 1520, 'Smallpox strikes Tenochtitlan', 'Thousands die, including the emperor', '🦠'], ['fall', 1521, 'Tenochtitlan falls', 'The Aztec Empire ends', '🏚'], ['pox2', 1527, 'Smallpox reaches the Inca', 'The Inca emperor Huayna Capac dies', '🦠'], ['civil', 1529, 'Inca civil war', 'Two brothers, Huáscar and Atahualpa, fight for the throne', '⚔️'], ['capture', 1532, 'Pizarro captures Atahualpa', 'A small Spanish force takes the emperor', '⛓'], ['cusco', 1533, 'Spanish take Cusco', 'The Inca capital falls', '🏔']],
@@ -162,7 +162,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Medieval Europe to the Renaissance ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ss-feudal-manor', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-feudal-manor', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '6.H.3',
   title: 'Life on a Medieval Manor', model: 'expedition', minutes: 25, icon: '🏰',
   setup: {
     title: 'A manor in England, 1200', bg: SS6_BG.manor, avatar: '🧑‍🌾', start: 'village', compass: false,
@@ -196,7 +196,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-black-death', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-black-death', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '6.H.6',
   title: 'The Black Death Tracker', model: 'plagueMap', minutes: 25, icon: '🐀',
   setup: {},
   place: 'Expedition · Map room, 1346–1353',
@@ -221,7 +221,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-magna-carta', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-magna-carta', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '6.C.4',
   title: 'Showdown at Runnymede, 1215', model: 'turnSim', minutes: 25, icon: '📜',
   setup: {
     role: 'You are a baron of England negotiating with King John', endTitle: 'The legacy of Magna Carta',
@@ -256,7 +256,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-printing-press', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-printing-press', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '6.H.7 · 6.H.8',
   title: 'Race of the Printing Press', model: 'pressRace', minutes: 20, icon: '🖨',
   setup: { pages: 200 },
   place: 'Expedition · Mainz, Germany, about 1455',
@@ -281,7 +281,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-renaissance-florence', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-renaissance-florence', std: 'g6-ss-europe', subject: 'social', grade: 6, code: '6.H.5 · 6.H.7',
   title: 'Renaissance Florence Walk', model: 'expedition', minutes: 25, icon: '🎨',
   setup: {
     title: 'Florence, Italy, about 1500', bg: SS6_BG.florence, avatar: '🧑‍🎨', start: 'bridge',
@@ -316,7 +316,7 @@ SUNNY_SIMS.push({
 
 /* ======================= Geography of Europe and the Americas ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-ss-latlong-flight', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-latlong-flight', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '6.G.1',
   title: 'Latitude & Longitude Flight School', model: 'globeNav', minutes: 25, icon: '✈️',
   setup: {
     startLat: 40, startLon: -86,
@@ -345,7 +345,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-climate-lab', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-climate-lab', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '6.G.3',
   title: 'Climate Control Lab', model: 'climateLab', minutes: 25, icon: '🌡',
   setup: { presets: [['indy', 'Indianapolis', 40, 750, 'inland', 'none', 'about 53°F average; cold winters, hot summers'], ['london', 'London', 51, 50, 'coast', 'warm', 'about 52°F average; mild winters'], ['quito', 'Quito', 0, 9350, 'inland', 'none', 'about 58°F average all year, despite being on the Equator'], ['manaus', 'Manaus (Amazon)', 3, 300, 'inland', 'none', 'about 82°F average; hot and rainy all year'], ['moscow', 'Moscow', 56, 500, 'inland', 'none', 'about 42°F average; very cold winters']] },
   place: 'Expedition · Sunnyside Climate Lab',
@@ -370,7 +370,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-adapt-modify', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-adapt-modify', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '6.G.2 · 6.G.3',
   title: 'People & Places: Adapt or Modify?', model: 'adaptLab', minutes: 20, icon: '🌍',
   setup: {
     envs: [{ id: 'nl', name: 'The Netherlands', icon: '🌷', kind: 'lowland', problem: 'About a quarter of the country is below sea level, and the North Sea floods the land.' }, { id: 'andes', name: 'Andes of Peru', icon: '🏔', kind: 'mountain', problem: 'Steep slopes make farming difficult, and rain washes soil away.' }, { id: 'norway', name: 'Norway\'s fjord coast', icon: '🐟', kind: 'coast', problem: 'Rocky mountains and a short growing season leave little farmland, but the sea is rich.' }, { id: 'plains', name: 'Great Plains, USA', icon: '🌾', kind: 'plains', problem: 'Rich soil, but some years there is too little rain for crops.' }],
@@ -398,7 +398,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-grand-tour', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-grand-tour', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '6.G.1 · 6.G.3',
   title: 'Grand Tour of Europe\'s Landforms', model: 'expedition', minutes: 25, icon: '🗺',
   setup: {
     title: 'Physical features of Europe', bg: SS6_BG.europe, avatar: '🚂', start: 'plain', scale: { per: 4.8, unit: 'miles' },
@@ -433,7 +433,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-ss-americas-features', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '2026 code pending',
+  id: 'g6-ss-americas-features', std: 'g6-ss-geo', subject: 'social', grade: 6, code: '6.G.3',
   title: 'Mystery Features of the Americas', model: 'globeNav', minutes: 20, icon: '🧭',
   setup: {
     startLat: 40, startLon: -86, tol: 4,

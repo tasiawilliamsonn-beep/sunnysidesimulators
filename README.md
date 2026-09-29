@@ -115,19 +115,19 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - Bill of Rights Breakout (Escape Room)
 - Field Trip to Washington, D.C. (Virtual Field Trip)
 
-**Grade 6 Social Studies · 2026 code pending Early Civilizations of the Americas**
+**Grade 6 Social Studies · 6.H.1–6.H.3 · 6.H.7 · 6.H.13 Early Civilizations of the Americas**
 
 - Journey to Three Empires (Virtual Field Trip)
 - Escape the Temple of the Sun (Escape Room)
 - Artifacts of the Americas (Gallery Walk)
 
-**Grade 6 Social Studies · 2026 code pending Medieval Europe to the Renaissance**
+**Grade 6 Social Studies · 6.H.3–6.H.8 · 6.C.4 Medieval Europe to the Renaissance**
 
 - Castle Quest: Life on the Manor (Quest)
 - The Plague Detective (Mystery Case)
 - The Renaissance Gallery (Gallery Walk)
 
-**Grade 6 Social Studies · 2026 code pending Geography of Europe & the Americas**
+**Grade 6 Social Studies · 6.G.1–6.G.3 Geography of Europe & the Americas**
 
 - Lost Coordinates Escape (Escape Room)
 - Grand Tour of Two Continents (Virtual Field Trip)
