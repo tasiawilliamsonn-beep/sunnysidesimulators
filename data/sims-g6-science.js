@@ -3,9 +3,9 @@
  */
 var SUNNY_SIMS = window.SUNNY_SIMS = window.SUNNY_SIMS || [];
 
-/* ======================= MS-PS1-4: Particles and states ======================= */
+/* ======================= Particles and states (enrichment) ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-sci-particle-box', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4',
+  id: 'g6-sci-particle-box', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Particle Box', model: 'particleBox', minutes: 25, icon: '⚛️',
   place: 'Sunnyside Science Lab · Molecular Microscope',
   mission: 'The lab\'s molecular microscope zooms in 100 million times. Heat and cool water, oxygen, and iron and build a particle model that explains solids, liquids, and gases.',
@@ -37,7 +37,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-heating-curve', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4',
+  id: 'g6-sci-heating-curve', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Heating Curve Lab', model: 'heatCurve', minutes: 25, icon: '📈',
   place: 'Sunnyside Science Lab · Data Station',
   mission: 'A strange thing happens when you heat ice: the thermometer gets "stuck" twice. Heat ice steadily, graph the temperature over time, and explain the flat parts using particles.',
@@ -64,7 +64,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-diffusion', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4',
+  id: 'g6-sci-diffusion', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Food Coloring Race', model: 'diffusion', minutes: 20, icon: '🧪',
   place: 'Sunnyside Science Lab · Evidence Bench',
   mission: 'Nobody can see particles moving. But you can see their effects! Race food coloring through cold and hot water and use the results as evidence for the particle model.',
@@ -90,7 +90,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-gas-piston', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4',
+  id: 'g6-sci-gas-piston', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Gas Pressure Piston', model: 'piston', minutes: 25, icon: '🎈',
   place: 'Sunnyside Science Lab · Pressure Chamber',
   mission: 'Why does a bike tire look flat on a cold morning? Why do aerosol cans warn "do not heat"? Experiment with a gas in a piston to find how temperature, volume, and particles affect pressure.',
@@ -119,7 +119,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-thermometer-design', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4 · MS-ETS1-4',
+  id: 'g6-sci-thermometer-design', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Build-a-Thermometer', model: 'expansion', minutes: 20, icon: '🌡️',
   place: 'Sunnyside Science Lab · Engineering Bench',
   mission: 'The weather club needs a homemade thermometer. Place a bottle with a thin tube and a balloon bottle in water baths of different temperatures, calibrate the tube with marks, and explain why it works.',
@@ -145,7 +145,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-deep-freeze', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'MS-PS1-4',
+  id: 'g6-sci-deep-freeze', std: 'g6-sci-particles', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Deep Freeze to Furnace', model: 'stateChart', minutes: 20, icon: '❄️',
   place: 'Sunnyside Science Lab · Extreme Temperature Wing',
   mission: 'The extreme temperature wing can go from −250 °C to 3,000 °C. Use the chart of melting and boiling points to predict the state of seven substances in each chamber, then solve the lab\'s storage puzzles.',
@@ -168,9 +168,9 @@ SUNNY_SIMS.push({
   ]
 });
 
-/* ======================= MS-PS3-1–MS-PS3-5: Energy ======================= */
+/* ======================= Energy (enrichment) ======================= */
 SUNNY_SIMS.push({
-  id: 'g6-sci-skate-park', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-2 · MS-PS3-5',
+  id: 'g6-sci-skate-park', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Energy Skate Park', model: 'skatePark', minutes: 25, icon: '🛹',
   place: 'Sunnyside Skate Park',
   mission: 'The skate park is designing a new ramp. Drop skaters from different heights, watch the energy bar graph, and find out what controls a skater\'s speed and why skaters eventually stop.',
@@ -200,7 +200,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-ramp-energy', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-1',
+  id: 'g6-sci-ramp-energy', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Ramp & Cup Collisions', model: 'rampKE', minutes: 20, icon: '🎳',
   place: 'Sunnyside Science Lab · Collision Track',
   mission: 'A bowling alley designer asks: does a heavier ball or a faster ball knock pins harder? Roll balls of different masses down ramps of different heights into a cup and measure how far the cup slides.',
@@ -224,7 +224,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-coaster', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-2 · MS-PS3-5',
+  id: 'g6-sci-coaster', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Coaster Designer', model: 'coaster', minutes: 20, icon: '🎢',
   place: 'Sunnyside Amusement Park · Design Office',
   mission: 'The park wants a coaster with three hills and no motor after the first hill. Design hill heights so the car makes it all the way, with and without friction.',
@@ -250,7 +250,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-spoon-conduction', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-3',
+  id: 'g6-sci-spoon-conduction', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Spoon Conduction Test', model: 'conduction', minutes: 20, icon: '🥄',
   place: 'Sunnyside Café · Kitchen Lab',
   mission: 'The café needs new stirring spoons that won\'t burn hands. Put metal, wooden, and plastic spoons in hot cocoa, track the handle temperatures, and watch the butter pats.',
@@ -274,7 +274,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-cocoa-cups', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-4',
+  id: 'g6-sci-cocoa-cups', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Keep It Hot: Cup Test', model: 'cooling', minutes: 20, icon: '☕',
   place: 'Sunnyside Café · Taste Test Table',
   mission: 'Customers complain their cocoa gets cold too fast. Test four cups side by side, with and without lids, and pick the cup that keeps cocoa hot the longest.',
@@ -299,7 +299,7 @@ SUNNY_SIMS.push({
 });
 
 SUNNY_SIMS.push({
-  id: 'g6-sci-heat-stations', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'MS-PS3-3',
+  id: 'g6-sci-heat-stations', std: 'g6-sci-energy', subject: 'science', grade: 6, code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Three Ways Heat Moves', model: 'heatWays', minutes: 25, icon: '🔥',
   place: 'Sunnyside Science Lab · Heat Stations',
   mission: 'Visit three lab stations (a frying pan, a pot of water, and a heat lamp) and discover the three ways thermal energy moves: conduction, convection, and radiation.',

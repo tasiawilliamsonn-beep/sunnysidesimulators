@@ -67,7 +67,7 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - Museum of Marvelous Matter (Gallery Walk)
 - The Case of the Missing Mass (Mystery Case)
 
-**Grade 5 Science · 5-PS2-1 · 5-ESS1-1 · 5-ESS1-2 Earth, Sun, Moon & the Solar System**
+**Grade 5 Science · 5-ESS1-1 · 5-ESS1-2 Earth, Sun, Moon & the Solar System**
 
 - Grand Tour of the Solar System (Virtual Field Trip)
 - Shadow Clock Escape (Escape Room)
@@ -79,13 +79,13 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - Who Crashed the Food Web? (Mystery Case)
 - Decomposer Dash (Quest)
 
-**Grade 6 Science · MS-PS1-4 Particle Model of Matter & States of Matter**
+**Grade 6 Science · Enrichment · not in IN 2023 Gr 6 Particle Model of Matter & States of Matter**
 
 - Particle Panic at Polar Station (Escape Room)
 - The Water Molecule's Quest (Quest)
 - The Museum of Moving Particles (Gallery Walk)
 
-**Grade 6 Science · MS-PS3-1–MS-PS3-5 Kinetic & Potential Energy and Heat Transfer**
+**Grade 6 Science · Enrichment · not in IN 2023 Gr 6 Kinetic & Potential Energy and Heat Transfer**
 
 - Roller Coaster Lockdown (Escape Room)
 - The Case of the Cold Cocoa (Mystery Case)
@@ -109,25 +109,25 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - The Midnight Messenger Mystery (Mystery Case)
 - Voices of the Revolution (Gallery Walk)
 
-**Grade 5 Social Studies · 5.H.14–5.H.15 · 5.C.1–5.C.5 Founding Documents & Our Government**
+**Grade 5 Social Studies · 5.H.14–5.H.15 · 5.C.1 · 5.C.3 · 5.C.5 Founding Documents & Our Government**
 
 - Branches of Power Quest (Quest)
 - Bill of Rights Breakout (Escape Room)
 - Field Trip to Washington, D.C. (Virtual Field Trip)
 
-**Grade 6 Social Studies · 6.1.1–6.1.4 Early Civilizations of the Americas**
+**Grade 6 Social Studies · 2026 code pending Early Civilizations of the Americas**
 
 - Journey to Three Empires (Virtual Field Trip)
 - Escape the Temple of the Sun (Escape Room)
 - Artifacts of the Americas (Gallery Walk)
 
-**Grade 6 Social Studies · 6.1.5–6.1.13 Medieval Europe to the Renaissance**
+**Grade 6 Social Studies · 2026 code pending Medieval Europe to the Renaissance**
 
 - Castle Quest: Life on the Manor (Quest)
 - The Plague Detective (Mystery Case)
 - The Renaissance Gallery (Gallery Walk)
 
-**Grade 6 Social Studies · 6.3.1–6.3.12 Geography of Europe & the Americas**
+**Grade 6 Social Studies · 2026 code pending Geography of Europe & the Americas**
 
 - Lost Coordinates Escape (Escape Room)
 - Grand Tour of Two Continents (Virtual Field Trip)
@@ -169,7 +169,7 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - The Poet's Locked Notebook (Escape Room)
 - Word Detective Quest (Quest)
 
-**Grade 5 Math · 5.CA.3–5.CA.8 Adding, Subtracting & Multiplying Fractions**
+**Grade 5 Math · 5.CA.3–5.CA.5 · 5.CA.7 Adding, Subtracting & Multiplying Fractions**
 
 - The Pizza Parlor Lockdown (Escape Room)
 - Fraction Trail Quest (Quest)

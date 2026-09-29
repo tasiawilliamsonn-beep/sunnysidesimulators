@@ -24,9 +24,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5-PS2-1 · 5-ESS1-1 · 5-ESS1-2',
+  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5-ESS1-1 · 5-ESS1-2',
   title: 'Earth, Sun, Moon & the Solar System',
-  text: 'Support an argument that Earth\'s gravity pulls objects down and that the apparent brightness of the sun and stars is due to their distance from Earth; represent data to reveal patterns in shadows, day and night, and the seasonal appearance of stars.',
+  text: 'Support an argument that the apparent brightness of the sun and stars is due to their distance from Earth; represent data to reveal patterns in shadows, day and night, and the seasonal appearance of stars.',
   lesson: {
     target: 'I can use a model to explain patterns caused by Earth\'s rotation and orbit and describe the scale of the solar system.',
     vocab: [['Rotation', 'Spinning on an axis. Earth rotates once about every 24 hours.'], ['Revolution / orbit', 'Traveling around another object. Earth orbits the Sun in about 365 days.'], ['Axis', 'An imaginary line through Earth from pole to pole; it is tilted about 23.5°.'], ['Moon phase', 'The shape of the lit part of the Moon we see from Earth.'], ['Star', 'A ball of hot gas that makes its own light. The Sun is our closest star.']],
@@ -69,9 +69,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SCIENCE ======================= */
 {
-  id: 'g6-sci-particles', grade: 6, subject: 'science', code: 'MS-PS1-4',
+  id: 'g6-sci-particles', grade: 6, subject: 'science', code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Particle Model of Matter & States of Matter',
-  text: 'Develop a model that predicts and describes changes in particle motion, temperature, and state of a pure substance when thermal energy is added or removed. (NGSS middle school standard; not part of Indiana\'s 2023 Grade 6 list.)',
+  text: 'Develop a model that predicts and describes changes in particle motion, temperature, and state of a pure substance when thermal energy is added or removed. (Enrichment: this topic is not in the 2023 Indiana Grade 6 science standards.)',
   lesson: {
     target: 'I can use the particle model to explain the states of matter and changes of state.',
     vocab: [['Particle', 'A tiny piece of matter (atom or molecule) too small to see.'], ['Thermal energy', 'The total energy of moving particles in a substance.'], ['Temperature', 'A measure of the average motion (kinetic energy) of particles.'], ['Melting / freezing', 'Solid to liquid / liquid to solid.'], ['Evaporation / condensation', 'Liquid to gas / gas to liquid.'], ['Sublimation', 'Solid directly to gas (dry ice).']],
@@ -91,9 +91,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-sci-energy', grade: 6, subject: 'science', code: 'MS-PS3-1–MS-PS3-5',
+  id: 'g6-sci-energy', grade: 6, subject: 'science', code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Kinetic & Potential Energy and Heat Transfer',
-  text: 'Describe kinetic and potential energy, and investigate how thermal energy is transferred and how the amount of energy transferred depends on the type and mass of matter. (NGSS middle school standards; not part of Indiana\'s 2023 Grade 6 list.)',
+  text: 'Describe kinetic and potential energy, and investigate how thermal energy is transferred and how the amount of energy transferred depends on the type and mass of matter. (Enrichment: this topic is not in the 2023 Indiana Grade 6 science standards.)',
   lesson: {
     target: 'I can explain how energy changes between kinetic and potential forms and identify conduction, convection, and radiation.',
     vocab: [['Kinetic energy', 'Energy of motion. More mass or more speed means more kinetic energy.'], ['Potential energy', 'Stored energy. Gravitational potential energy increases with height and mass.'], ['Conduction', 'Heat transfer through direct contact.'], ['Convection', 'Heat transfer by the movement of fluids (liquids and gases) in currents.'], ['Radiation', 'Heat transfer by waves, even through empty space.'], ['Law of conservation of energy', 'Energy is not created or destroyed; it changes form.']],
@@ -180,7 +180,7 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.H.14–5.H.15 · 5.C.1–5.C.5',
+  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.H.14–5.H.15 · 5.C.1 · 5.C.3 · 5.C.5',
   title: 'Founding Documents & Our Government',
   text: 'Explain why the Constitution was created and how the Bill of Rights was drafted, the purposes in the Preamble, key ideas in the founding documents, and the functions of the three branches of government.',
   lesson: {
@@ -203,7 +203,7 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SOCIAL STUDIES ======================= */
 {
-  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '6.1.1–6.1.4',
+  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '2026 code pending',
   title: 'Early Civilizations of the Americas',
   text: 'Compare the Maya, Aztec, and Inca civilizations, including their geography, government, economy, religion, and achievements, and explain the effects of their encounters with Europeans.',
   lesson: {
@@ -225,7 +225,7 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '6.1.5–6.1.13',
+  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '2026 code pending',
   title: 'Medieval Europe to the Renaissance',
   text: 'Explain feudalism, the role of the Church, the Magna Carta, the Crusades, and the Black Death, and describe how the Renaissance and Reformation changed European society.',
   lesson: {
@@ -247,7 +247,7 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '6.3.1–6.3.12',
+  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '2026 code pending',
   title: 'Geography of Europe & the Americas',
   text: 'Use latitude, longitude, and other map tools to locate places, identify major physical features and climate regions of Europe and the Americas, and explain how people adapt to and change their environments.',
   lesson: {
@@ -448,9 +448,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 MATH ======================= */
 {
-  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.CA.3–5.CA.8',
+  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.CA.3–5.CA.5 · 5.CA.7',
   title: 'Adding, Subtracting & Multiplying Fractions',
-  text: 'Add and subtract fractions and mixed numbers with unlike denominators, use visual fraction models to multiply and divide fractions, and solve real-world problems involving all four operations with fractions and mixed numbers.',
+  text: 'Add and subtract fractions and mixed numbers with unlike denominators, use visual fraction models to multiply a fraction by a fraction or a whole number, and solve real-world problems involving adding, subtracting, and multiplying fractions and mixed numbers.',
   lesson: {
     target: 'I can add, subtract, and multiply fractions with unlike denominators and use them to solve real-world problems.',
     vocab: [['Denominator', 'The bottom number: how many equal parts make a whole.'], ['Numerator', 'The top number: how many parts we have.'], ['Common denominator', 'A shared multiple of the denominators, used to add or subtract.'], ['Equivalent fractions', 'Fractions that name the same amount (1/2 = 3/6).'], ['Mixed number', 'A whole number and a fraction (2 1/4).'], ['Simplest form', 'A fraction whose numerator and denominator share no common factor except 1.']],
