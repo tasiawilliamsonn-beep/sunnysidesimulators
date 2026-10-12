@@ -20,7 +20,7 @@
     ],
     gallery: [
       'Exhibits can be visited in any order, which spreads students out naturally. Encourage them to start at a different exhibit than their neighbor.',
-      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece plus a key fact in Part 12 of the lesson worksheet.',
+      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece in Part 12 of the lesson worksheet.',
       'Pause the class once midway and have two students share their favorite exhibit so far.'
     ],
     fieldtrip: [
@@ -154,8 +154,8 @@
     return '<table class="tbl plan"><thead><tr><th>Time</th><th>Part</th><th>Teacher does</th><th>Students do</th><th>Resource</th></tr></thead><tbody>' +
       [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in worksheet Part 2.', '<a href="#s-warm" data-jump>Warm-up</a>'],
        ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Complete worksheet Parts 1 and 3–11 with each slide.', '<a href="#teach-' + r.id + '">Presenter</a>'],
-       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece and key fact in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
-       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write a 3-2-1.', '<a href="#s-debrief" data-jump>Questions</a>'],
+       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
+       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write one thing learned.', '<a href="#s-debrief" data-jump>Questions</a>'],
        ['0:52–1:00', '5. Exit ticket', 'Hand out the ticket; sort results with the mastery guide.', 'Answer with evidence independently.', '<a href="#s-exit" data-jump>Exit ticket</a>']].map(function (x) { return '<tr>' + x.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function warmSection(r) {
@@ -187,17 +187,14 @@
   }
   var FRAME_LABEL = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s claim (Claim, Evidence, Source check, Explain)', MATH: 'Solve-Show-Explain' };
   function exitSection(r) {
-    var X = lessonOf(r), ex = X && X.exit, mcs = r.exit.filter(function (q) { return q.choices; }), crs = r.exit.filter(function (q) { return !q.choices; });
-    var total = mcs.length * 2 + crs.length * 2 + (ex ? 4 : 0), m = Math.ceil(total * 0.8), a = Math.ceil(total * 0.5), n = 0;
-    return '<section class="sec" id="s-exit"><h2><span class="step">5</span>Exit ticket <span class="when">0:52–1:00 · 8 min</span></h2><p class="lede">Every answer needs evidence. Part A asks students to justify each choice, Part B asks for an explanation, and Part C applies the standard to a brand-new situation. Total: ' + total + ' points.</p>' +
-      '<div class="ticket"><h3>Part A: Choose and justify (2 pts each)</h3><ol>' + mcs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol><i>I know because...</i></li>'; }).join('') + '</ol>' +
-      (crs.length ? '<h3>Part B: Explain with evidence (2 pts each)</h3><ol>' + crs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><br><span class="ans">Look for: ' + esc(q.answer) + '</span></li>'; }).join('') + '</ol>' : '') +
-      (ex ? '<h3>Part C: Apply it (' + esc(FRAME_LABEL[ex.frame]) + ', 4 pts)</h3><p class="stim">' + esc(ex.stim) + '</p><p><b>' + (n + 1) + '. ' + esc(ex.q) + '</b></p><details><summary>Model answer and rubric</summary><p>' + esc(ex.model) + '</p><p><b>4 = mastered:</b> ' + esc(ex.look.join('; ')) + '. <b>3</b> = correct with thin reasoning. <b>2</b> = partly correct or general evidence. <b>1</b> = inaccurate or unsupported.</p></details>' : '') + '</div>' +
-      '<h3>Sort students for tomorrow</h3><table class="tbl"><thead><tr><th>Score</th><th>Level</th><th>Next step</th></tr></thead><tbody>' +
-      '<tr><td>' + m + '–' + total + '</td><td>Mastered</td><td>Extension: replay at the Legend level or write a second evidence response; peer helper.</td></tr>' +
-      '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
-      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review the lesson worksheet, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
-      '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
+    // Same three questions as the PDF: two multiple choice and one written answer.
+    var X = lessonOf(r), ex = X && X.exit, mcs = r.exit.filter(function (q) { return q.choices; }).slice(0, 2), cr = ex ? null : r.exit.filter(function (q) { return !q.choices; })[0];
+    var total = mcs.length + (ex || cr ? 3 : 0), n = 0;
+    return '<section class="sec" id="s-exit"><h2><span class="step">5</span>Exit ticket <span class="when">0:52–1:00 · 8 min</span></h2><p class="lede">One page, three questions. Total: ' + total + ' points; ' + Math.ceil(total * 0.8) + ' or more shows mastery.</p>' +
+      '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket (PDF, page 2 is the key)</button></div>' +
+      '<div class="ticket"><ol>' + mcs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b> <small>(1 pt)</small><ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol></li>'; }).join('') + '</ol>' +
+      (ex ? '<p class="stim">' + esc(ex.stim) + '</p><p><b>' + (n + 1) + '. ' + esc(ex.q) + '</b> <small>(3 pts, ' + esc(FRAME_LABEL[ex.frame]) + ')</small></p><details><summary>Model answer</summary><p>' + esc(ex.model) + '</p><p><b>Look for:</b> ' + esc(ex.look.slice(0, 3).join('; ')) + '.</p></details>' : '') +
+      (cr ? '<p><b>' + (n + 1) + '. ' + esc(cr.q) + '</b> <small>(3 pts)</small><br><span class="ans">Look for: ' + esc(cr.answer) + '</span></p>' : '') + '</div></section>';
   }
   function isGallery(r) { return r.format === 'gallery' && r.stages.every(function (s) { return s.art; }); }
   function posterHTML(r) {
@@ -428,13 +425,13 @@
 
     // Resources
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
-      [['1–5', 'Lesson worksheet', 'The one printable packet students fill out during the whole lesson. Its 13 parts match the "Worksheet Part" badge on each slide: target in their own words, warm-up, prediction, vocabulary, fill-in notes, a task, turn-and-talk notes, and a check for every step, the worked example, we do, you do, a work-time tracker (code piece + key fact per stage), and a 3-2-1 wrap-up. Collect it as evidence of work.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
+      [['1–5', 'Lesson worksheet', 'A short packet students fill out during the lesson: fill-in notes and a quick check for each step. Its 13 small parts match the "Worksheet Part" badge on each slide.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['1', 'Warm-up worksheet (optional)', 'Standalone warm-up if you want it separate (it is also Part 2 of the lesson worksheet). Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
        ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
        ['1–5', 'Presenter script', 'What to say on every slide: directions, questions, answers, and what to do if students struggle. Slides show only student cues.', '<button class="btn" data-do="script">' + ICONS.down + 'PDF</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
 ].concat(isGallery(r) ? [['3', 'Gallery walk posters', 'One printable poster per exhibit (picture, numbered details, placard) plus setup directions for a classroom gallery walk.', '<button class="btn" data-do="posters">' + ICONS.play + 'Open posters</button>'], ['3', 'Gallery walk viewing guide', 'Student recording sheet: I see / I think / I wonder for every exhibit.', '<button class="btn" data-do="gguide">' + ICONS.down + 'PDF</button>']] : []).concat([
-       ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
+       ['5', 'Exit ticket', 'One page, three questions. Page 2 is the answer key.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
        ['All', '60-minute facilitation guide', 'Everything above in one printable teacher guide.', '<button class="btn" data-do="guide">' + ICONS.down + 'PDF</button>']]).map(function (x) {
         return '<div class="made-row"><span class="step">' + x[0] + '</span><div><b>' + x[1] + '</b><span>' + x[2] + '</span></div><div class="made-act">' + x[3] + '</div></div>';
       }).join('') + '</div>' +

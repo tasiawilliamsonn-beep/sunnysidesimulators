@@ -2964,10 +2964,10 @@ function LessonPresenter(mount, P, opts) {
       '<div class="lp-grid2"><div class="lp-box accent"><h3>Learning target</h3><p class="lp-big">' + esc(L.target) + '</p>' +
       '<h3>Success criteria</h3><ul class="lp-checks"><li>I can explain and use the key words: ' + esc(L.vocab.map(function (v) { return v[0]; }).join(', ')) + '.</li>' +
       steps.slice(0, 2).map(function (st) { return '<li>I can explain: ' + esc(st.t.toLowerCase()) + '.</li>'; }).join('') +
-      '<li>I can support my answers with evidence on the exit ticket.</li></ul><h3>You need</h3><p>Lesson worksheet · pencil</p><h3>On your worksheet (Part 1)</h3><p>Rewrite the target in your own words.</p></div>' +
+      '<li>I can support my answers with evidence on the exit ticket.</li></ul><h3>You need</h3><p>Lesson worksheet · pencil</p><h3>On your worksheet (Part 1)</h3><p>Read the target.</p></div>' +
       '<div class="lp-box"><h3>Agenda</h3><ol class="lp-agenda">' + AG.map(function (a) { return '<li><span>' + a[1] + '</span>' + esc(a[0]) + '<em>' + a[2] + ' min</em></li>'; }).join('') + '</ol>' +
       '<h3>Key vocabulary</h3><div class="lp-chips">' + L.vocab.map(function (v) { return '<span title="' + esc(v[1]) + '">' + esc(v[0]) + '</span>'; }).join('') + '</div></div></div>';
-  }, notes: ['Read the learning target aloud; have students repeat it chorally or rewrite it in Part 1 of the worksheet.', 'Point to the agenda so students know the plan and how they will show learning (exit ticket).', 'Materials: the printed lesson worksheet (one per student) and a pencil; devices closed until work time.'] });
+  }, notes: ['Read the learning target aloud; have students repeat it chorally or follow along in Part 1 of the worksheet.', 'Point to the agenda so students know the plan and how they will show learning (exit ticket).', 'Materials: the printed lesson worksheet (one per student) and a pencil; devices closed until work time.'] });
 
   slide({ part: 0, ws: '2', title: 'Warm-up', timer: 8 * 60, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Warm-up · 8 minutes</span><h2>Do now</h2></div><div class="lp-grid2 wide"><div class="lp-box"><ol class="lp-wq">' + X.warmup.map(function (w, i) { return '<li><p>' + esc(w[0]) + '</p><div class="lp-look" data-look hidden><b>Look for:</b> ' + esc(w[1]) + '</div></li>'; }).join('') + '</ol>' +
@@ -2985,7 +2985,7 @@ function LessonPresenter(mount, P, opts) {
       return '<div class="lp-head"><span class="lp-tag">Learn · step ' + (i + 1) + ' of ' + steps.length + '</span><h2>' + esc(st.t) + '</h2></div>' +
         '<div class="lp-grid2"><div><div class="lp-box accent"><h3>Key idea</h3><p class="lp-big">' + esc(st.say) + '</p></div>' +
         '<div class="lp-box"><h3>A. Fill in the blanks</h3><p class="lp-notes" data-notes>' + blanks(st.note, false) + '</p><button type="button" class="lp-btn ghost sm" data-fill>Show the missing words</button></div>' +
-        '<div class="lp-box talk"><h3>C. Turn and talk <span class="lp-small">(1 minute)</span></h3><p class="lp-big2">' + esc((X.talk || [])[i] || 'Explain this idea to your partner in your own words.') + '</p><p class="lp-small">Write what you and your partner said.</p><div class="lp-row"><button type="button" class="lp-btn ghost sm" data-starttimer="60">Start 1:00</button><button type="button" class="lp-btn ghost sm" data-pick>Pick a pair to share</button></div></div></div>' +
+        '<div class="lp-box talk"><h3>C. Turn and talk <span class="lp-small">(1 minute)</span></h3><p class="lp-big2">' + esc((X.talk || [])[i] || 'Explain this idea to your partner in your own words.') + '</p><p class="lp-small">Talk only; no writing needed.</p><div class="lp-row"><button type="button" class="lp-btn ghost sm" data-starttimer="60">Start 1:00</button><button type="button" class="lp-btn ghost sm" data-pick>Pick a pair to share</button></div></div></div>' +
         '<div><div class="lp-box tool"><h3>' + (st.tool || st.cards ? 'B. Explore it, then do this' : 'B. Do this') + '</h3>' + (st.tool ? vis(st.tool) : '') + (st.cards ? cards(st.cards) : '') + '<p class="lp-task">' + esc(((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, '')) + '</p></div>' +
         cfu(st.check, 'D. Check for understanding', ['Answer in Part ' + (5 + i) + 'D, then hold up fingers: 1 = A, 2 = B, 3 = C, 4 = D.', 'Answer in Part ' + (5 + i) + 'D and write "I know because..." Then show fingers.', 'Answer in Part ' + (5 + i) + 'D. Tell your partner why. Then we vote.', 'Answer in Part ' + (5 + i) + 'D. Be ready to explain.'][i % 4]) + '</div></div>';
     }, notes: ['Teach (about 3 minutes): ' + st.say, 'Use the tool: ' + (st.tool ? (st.tool.sim ? 'run the simulation and ask students to predict before each change.' : 'point to the model and ask "What do you notice?"') : st.cards ? 'flip each card only after students guess.' : 'walk through task B on the slide.'), 'Check: if fewer than 80% are correct, reteach with a new example before moving on.'] });
@@ -2994,11 +2994,11 @@ function LessonPresenter(mount, P, opts) {
   slide({ part: 1, ws: '9', title: 'Worked example', html: function () {
     var lines = X.model || [L.model];
     return '<div class="lp-head"><span class="lp-tag">I do · worked example</span><h2>Worked example</h2></div><div class="lp-grid2 wide"><div class="lp-box accent"><ol class="lp-steps lp-model">' + lines.map(function (t, k) { return '<li data-mstep' + (k ? ' hidden' : '') + '>' + esc(t) + '</li>'; }).join('') + '</ol><button type="button" class="lp-btn" data-nextm>Show next step</button></div>' +
-      '<div class="lp-box"><h3>As you watch, notice</h3><ul class="lp-exp"><li>What is looked at first?</li><li>Which key word or rule is used?</li><li>How is the answer checked?</li></ul><h3>On your worksheet (Part 9)</h3><p>Copy each step of the example.</p></div></div>';
+      '<div class="lp-box"><h3>As you watch, notice</h3><ul class="lp-exp"><li>What is looked at first?</li><li>Which key word or rule is used?</li><li>How is the answer checked?</li></ul><h3>On your worksheet (Part 9)</h3><p>Write the final answer.</p></div></div>';
   }, notes: ['Reveal one step at a time and think aloud (see the presenter script).'] });
 
   if (X.wedo) slide({ part: 1, ws: '10', title: 'We do: solve it together', html: function () {
-    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p><p class="lp-small">Worksheet Part 10: write each step as we solve it.</p></div>' +
+    return '<div class="lp-head"><span class="lp-tag">We do · guided practice</span><h2>Solve it together</h2></div><div class="lp-box accent"><p class="lp-big">' + esc(X.wedo.q) + '</p><p class="lp-small">Worksheet Part 10: write the answer when we finish.</p></div>' +
       '<div class="lp-box"><ol class="lp-steps">' + X.wedo.steps.map(function (t, k) { return '<li data-wstep hidden>' + esc(t) + '</li>'; }).join('') + '</ol><div class="lp-row"><button type="button" class="lp-btn" data-nextstep>Show next step</button><button type="button" class="lp-btn ghost" data-pick>Pick a student for the next step</button></div>' +
       '<div class="lp-ans" data-wans hidden><b>Answer:</b> ' + esc(X.wedo.a) + '</div></div>';
   }, notes: ['Before revealing each step, ask the class "What should we do next?" and take an answer.', 'Students write the steps in Part 10 of the worksheet.'] });
@@ -3012,19 +3012,19 @@ function LessonPresenter(mount, P, opts) {
     return '<div class="lp-head"><span class="lp-tag">Work time · 28 minutes</span><h2>' + esc(P.room.title) + '</h2><p class="lp-sub">' + esc(P.room.formatLabel) + ' · open it on your device</p></div>' +
       '<div class="lp-work"><div class="lp-box lp-bigtimer"><div class="lp-bt" data-bigtime="1680">28:00</div><div class="lp-row center"><button type="button" class="lp-btn" data-starttimer="1680">Start 28:00</button><button type="button" class="lp-btn ghost" data-toggletimer>Pause / resume</button></div>' +
       '<div class="lp-checkpts"><b>Checkpoints</b><span>10 min: ' + esc(P.room.node) + ' 2 done</span><span>20 min: ' + esc(P.room.node) + ' 4 done</span><span>28 min: final code + turn-in</span></div></div>' +
-      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Voice:</b> level 1 (whisper) with your partner only</li><li><b>Work:</b> solo or with your assigned partner</li><li><b>Stuck?</b> 1) reread the clue card 2) Show a hint 3) Supports button 4) ask your partner 5) ask the teacher</li><li><b>Level:</b> Explorer, Agent, or Legend as assigned</li><li><b>Write it down:</b> record each code piece and one key fact in Part 12</li></ul></div>' +
+      '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Voice:</b> level 1 (whisper) with your partner only</li><li><b>Work:</b> solo or with your assigned partner</li><li><b>Stuck?</b> 1) reread the clue card 2) Show a hint 3) Supports button 4) ask your partner 5) ask the teacher</li><li><b>Level:</b> Explorer, Agent, or Legend as assigned</li><li><b>Write it down:</b> record each code piece in Part 12</li></ul></div>' +
       '<div class="lp-box"><h3>Must do</h3><ul class="lp-checks"><li>Finish every ' + esc(P.room.node.toLowerCase()) + ' and open the final lock</li>' + (P.room.task ? '<li>Complete the written evidence task (' + esc(P.room.task) + ')</li>' : '') + '<li>Tap "Copy my work" and paste it into Canvas</li></ul><h3>May do (finished early?)</h3><ul class="lp-exp"><li>Replay at the Legend level</li><li>Help a classmate without giving answers</li><li>Write one new challenge question for the class</li></ul></div></div>';
   }, notes: ['Leave this slide up the whole work time. The big timer and checkpoints keep students on pace.', 'Circulate with the answer key. Prioritize students from the "Not sure" group.', 'At 20 minutes, give a 5-minute warning for the written task and turn-in.'] });
 
   slide({ part: 3, ws: '13', title: 'Debrief', timer: 4 * 60, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Debrief · 4 minutes</span><h2>What did we learn?</h2></div><div class="lp-grid2 wide"><div class="lp-box"><ol class="lp-wq">' + L.debrief.map(function (q) { return '<li><p>' + esc(q) + '</p></li>'; }).join('') + '</ol><button type="button" class="lp-btn ghost" data-pick>Pick a student</button></div>' +
-      '<div class="lp-box accent"><h3>Back to the warm-up</h3><p class="lp-big2">' + esc(X.warmup[2][0]) + '</p><button type="button" class="lp-btn ghost sm" data-showlast>Reveal</button><div class="lp-ans" data-last hidden>' + esc(X.warmup[2][1]) + '</div><h3>And the hook</h3><p>Were our predictions right? What evidence changed your mind?</p><h3>On your worksheet (Part 13)</h3><p>Check your prediction, then finish your 3-2-1.</p></div></div>';
+      '<div class="lp-box accent"><h3>Back to the warm-up</h3><p class="lp-big2">' + esc(X.warmup[2][0]) + '</p><button type="button" class="lp-btn ghost sm" data-showlast>Reveal</button><div class="lp-ans" data-last hidden>' + esc(X.warmup[2][1]) + '</div><h3>And the hook</h3><p>Were our predictions right? What evidence changed your mind?</p><h3>On your worksheet (Part 13)</h3><p>Check your prediction and write one thing you learned.</p></div></div>';
   }, notes: ['Ask for evidence: "How do you know?" after every answer.', 'Close the loop on warm-up question 3 and the hook vote.'] });
 
   slide({ part: 4, title: 'Exit ticket', timer: 8 * 60, html: function () {
     return '<div class="lp-head"><span class="lp-tag">Exit ticket · 8 minutes</span><h2>Show what you know</h2></div><div class="lp-grid2 wide"><div class="lp-box lp-bigtimer"><div class="lp-bt" data-bigtime="480">8:00</div><button type="button" class="lp-btn" data-starttimer="480">Start 8:00</button></div>' +
       '<div class="lp-box accent"><h3>Expectations</h3><ul class="lp-exp"><li><b>Voice:</b> 0, silent and independent</li><li><b>Part A:</b> choose, then write "I know because..."</li><li><b>Part B:</b> explain with evidence</li><li><b>Part C:</b> apply it to something new using ' + esc(P.frame) + '</li><li><b>Finished?</b> Reread your evidence, then turn it in face down</li></ul><h3>Reflect on the target</h3><p>' + esc(L.target) + '</p></div></div>';
-  }, notes: ['Collect and sort into Mastered / Approaching / Beginning with page 3 of the exit ticket PDF.', 'Plan tomorrow\'s small groups from the results.'] });
+  }, notes: ['Collect and sort into Mastered / Approaching / Beginning with the key on page 2 of the exit ticket PDF (mastery = 80% or more).', 'Plan tomorrow\'s small groups from the results.'] });
 
   /* ---------- shell ---------- */
   var cur = 0, notesOn = false, T = { left: 0, total: 0, running: false, iv: null }, names = null;
@@ -3378,59 +3378,44 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
   };
   var FRAME_NAME = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s Claim (Claim, Evidence, Source, Explain)', MATH: 'Solve-Show-Explain' };
   var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet (or on this sheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
-  function exitPoints(room, lesson) { var mc = room.exit.filter(function (q) { return q.choices; }).length, cr = room.exit.length - mc; return { mc: mc, cr: cr, total: mc * 2 + cr * 2 + (lesson && lesson.exit ? 4 : 0) }; }
+  // The exit ticket keeps to three questions: two multiple choice and one short written answer.
+  function exitItems(room, lesson) {
+    var mcs = room.exit.filter(function (q) { return q.choices; }).slice(0, 2), ex = lesson && lesson.exit;
+    var cr = ex ? null : room.exit.filter(function (q) { return !q.choices; })[0];
+    return { mcs: mcs, cr: cr, ex: ex };
+  }
+  function exitPoints(room, lesson) { var it = exitItems(room, lesson); return { mc: it.mcs.length, cr: it.ex || it.cr ? 1 : 0, total: it.mcs.length + (it.ex || it.cr ? 3 : 0) }; }
 
   function exitTicket(room, std, lesson) {
-    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], ex = lesson && lesson.exit, pts = exitPoints(room, lesson);
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], it = exitItems(room, lesson), ex = it.ex, pts = exitPoints(room, lesson), n = 0;
     header(d, 'EXIT TICKET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, room.title, std ? std.title : '', c);
     d.nameDate();
-    d.callout([{ label: 'Show your evidence.', text: 'For every answer, explain HOW you know. Answers without evidence earn partial credit.' }], c, { size: 10 });
-    var mcs = room.exit.filter(function (q) { return q.choices; }), crs = room.exit.filter(function (q) { return !q.choices; }), n = 0;
-    if (mcs.length) {
-      d.banner('Part A: Choose and justify', c, (mcs.length * 2) + ' points');
-      mcs.forEach(function (q) {
-        d.ensure(120); n++;
-        d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 });
-        q.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch, { size: 10.5, indent: 18, gap: 1 }); });
-        d.y -= 2; d.para('I know because (use a fact, rule, or evidence):', { size: 9.5, indent: 18, gray: 0.35, gap: 0 });
-        d.writeLines(2, 18);
-      });
-    }
-    if (crs.length) {
-      d.banner('Part B: Explain with evidence', c, (crs.length * 2) + ' points');
-      crs.forEach(function (q) { d.ensure(110); n++; d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 }); d.writeLines(q.lines || 3, 18); });
-    }
-    if (ex) {
-      d.banner('Part C: Apply it to something new (' + FRAME_NAME[ex.frame].split(' (')[0] + ')', c, '4 points');
+    d.para('Circle the best answer for 1 and 2. Answer 3 in complete sentences.', { size: 10, gray: 0.35, gap: 6 });
+    it.mcs.forEach(function (q) {
       n++;
-      d.callout([{ label: 'Read:', text: ex.stim }], c, { size: 10.5 });
-      d.para(n + '.  ' + ex.q, { size: 11, bold: true, gap: 4 });
-      (FRAMES[ex.frame] || FRAMES.CER).forEach(function (f) { d.ensure(30 + f[2] * 24); d.para(f[0] + ': ', { size: 10.5, bold: true, gap: 0, indent: 6 }); d.para(f[1], { size: 9, gray: 0.4, indent: 6, gap: 0 }); d.writeLines(f[2], 6); });
+      d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 });
+      q.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch, { size: 10.5, indent: 18, gap: 1 }); });
+      d.y -= 8;
+    });
+    if (ex) {
+      n++;
+      d.callout([{ label: 'Read:', text: String(ex.stim).replace(/^\s*Read:\s*/i, '') }], c, { size: 10 });
+      d.para(n + '.  ' + ex.q, { size: 11, bold: true, gap: 2 });
+      d.para('Use ' + FRAME_NAME[ex.frame].split(' (')[0] + ': ' + (FRAMES[ex.frame] || FRAMES.CER).map(function (f) { return f[0]; }).join(', ') + '.', { size: 9.5, gray: 0.35, indent: 18, gap: 2 });
+      d.writeLines(5, 18);
+    } else if (it.cr) {
+      n++;
+      d.para(n + '.  ' + it.cr.q, { size: 11, bold: true, gap: 3 });
+      d.writeLines(4, 18);
     }
     // Teacher key
     d.newPage();
-    header(d, 'TEACHER KEY AND MASTERY GUIDE  ·  ' + room.standard, room.title + ': Exit Ticket', 'Remove this page before copying. Total: ' + pts.total + ' points.', c);
+    header(d, 'TEACHER KEY  ·  ' + room.standard, room.title + ': Exit Ticket', 'Total: ' + pts.total + ' points. Mastery: ' + Math.ceil(pts.total * 0.8) + ' or more.', c);
     var rows = [], k = 0;
-    mcs.forEach(function (q) { k++; rows.push([String(k), q.q, '(' + LET[q.answer] + ') ' + q.choices[q.answer], '1 pt correct choice + 1 pt reason that uses the key idea (not "I guessed" or "it sounds right").']); });
-    crs.forEach(function (q) { k++; rows.push([String(k), q.q, q.answer, '2 = accurate and supported with a reason or example; 1 = partly accurate or no support; 0 = inaccurate.']); });
-    if (ex) { k++; rows.push([String(k), ex.q, ex.model + (ex.answer ? ' (Answer: ' + [].concat(ex.answer)[0] + (ex.unit ? ' ' + ex.unit : '') + ')' : ''), 'Score with the rubric below (0–4).']); }
-    d.table([{ w: 0.05, h: '#' }, { w: 0.27, h: 'Question' }, { w: 0.4, h: 'Answer / what to look for' }, { w: 0.28, h: 'Scoring' }], rows, c);
-    if (ex) {
-      d.sub('Part C rubric (' + FRAME_NAME[ex.frame] + ')');
-      d.table([{ w: 0.25, h: 'Score' }, { w: 0.75, h: 'What it looks like' }], [
-        ['4: Mastered', 'Correct and complete. ' + ex.look.join('; ') + '. Clear, precise language.'],
-        ['3: Nearly there', 'Correct claim/answer with evidence, but the reasoning or explanation is thin or missing one piece.'],
-        ['2: Approaching', 'Partly correct; evidence is general, or reasoning does not connect to the claim.'],
-        ['1: Beginning', 'Answer attempted but inaccurate or unsupported.'],
-        ['0', 'No response.']], c);
-    }
-    d.sub('Sort students for tomorrow');
-    var m = Math.ceil(pts.total * 0.8), a = Math.ceil(pts.total * 0.5);
-    d.table([{ w: 0.22, h: 'Score' }, { w: 0.2, h: 'Level' }, { w: 0.58, h: 'Next step' }], [
-      [m + '–' + pts.total + ' pts', 'Mastered', 'Extension: replay the room at the Legend level or write a second evidence response. Can serve as a peer helper.'],
-      [a + '–' + (m - 1) + ' pts', 'Approaching', 'Quick reteach (5–10 min): replay the mini-lesson presenter steps tied to the missed items, then 2 similar practice questions.'],
-      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: review the lesson worksheet, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
-    d.para('Evidence to look for: Did the student use vocabulary correctly, cite specific data or text, and explain the connection? A correct choice without a reason shows recognition, not yet mastery.', { size: 10, gap: 4 });
+    it.mcs.forEach(function (q) { k++; rows.push([String(k), '(' + LET[q.answer] + ') ' + q.choices[q.answer], '1 point']); });
+    if (ex) { k++; rows.push([String(k), ex.model + (ex.answer ? ' (Answer: ' + [].concat(ex.answer)[0] + (ex.unit ? ' ' + ex.unit : '') + ')' : ''), '3 points: ' + ex.look.slice(0, 3).join('; ') + '.']); }
+    else if (it.cr) { k++; rows.push([String(k), it.cr.answer, '3 = accurate with a reason; 2 = accurate, no reason; 1 = partly accurate.']); }
+    d.table([{ w: 0.06, h: '#' }, { w: 0.64, h: 'Answer' }, { w: 0.3, h: 'Points' }], rows, c);
     d.footer('The Broncho Escape · ' + room.title + ' · Exit Ticket');
     return d.bytes();
   }
@@ -3466,56 +3451,45 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
       else d.para('Answer: ______________________ ' + (ck.unit || ''), { size: 10.5, indent: 18, gap: 2 });
     }
     function ckAns(ck) { return (ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '')) + (ck.explain ? (/[.!?"']$/.test(String(ck.choices ? ck.choices[ck.answer] : '')) ? ' ' : '. ') + ck.explain : ''); }
-    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Complete each part when you see its number on the presenter slide.', c);
+    // Short version: one small task per part. Part numbers still match the presenter slides.
+    function mini(n, title) { d.ensure(70); d.y -= 6; d.para('PART ' + n + '  ·  ' + title.toUpperCase(), { size: 10.5, bold: true, gap: 2 }); d.line(d.margin, d.y + 2, d.pageW - d.margin, d.y + 2, 0.8, 0.55); d.y -= 4; }
+    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Fill in each part when its number appears on the slide.', c);
     if (!K) d.nameDate();
-    part(1, 'Today\'s target');
-    d.para(L.target, { size: 11, bold: true, indent: 6, gap: 3 });
-    d.para('Rewrite the target in your own words:', { size: 10.5, indent: 6, gap: 0 });
-    lines(2, 'Any accurate paraphrase of the target.');
-    part(2, 'Warm-up', '8 min');
-    X.warmup.forEach(function (w, i) { d.ensure(60); d.para((i + 1) + '.  ' + w[0], { size: 10.5, bold: true, gap: 1, indent: 6 }); lines(w[2], w[1]); });
-    part(3, 'Hook: make a prediction');
-    if (X.hook) { d.para(X.hook.q, { size: 10.5, bold: true, indent: 6, gap: 2 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
-    d.para('Why I think so:', { size: 10, indent: 18, gray: 0.35, gap: 0 }); lines(1, 'Any reasoned prediction. It is checked in Part 13.');
-    part(4, 'Key vocabulary', 'fill in as you learn');
-    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'Meaning in my own words' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], K ? v[1] : '', '']; }), c, { minH: 36 });
+    mini(1, 'Target');
+    d.para(L.target, { size: 10.5, indent: 6, gap: 2 });
+    mini(2, 'Warm-up');
+    X.warmup.forEach(function (w, i) { d.ensure(44); d.para((i + 1) + '.  ' + w[0], { size: 10.5, gap: 0, indent: 6 }); lines(1, w[1]); });
+    mini(3, 'Prediction');
+    if (X.hook) { d.para(X.hook.q, { size: 10.5, indent: 6, gap: 1 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
+    mini(4, 'Vocabulary');
+    d.table([{ w: 0.28, h: 'Word' }, { w: 0.72, h: 'Meaning' }], L.vocab.slice(0, 4).map(function (v) { return [v[0], K ? v[1] : '']; }), c, { minH: 24 });
     X.steps.forEach(function (st, i) {
-      part(5 + i, 'Learn ' + (i + 1) + ': ' + st.t, '3 min');
-      d.para('A. Fill in the blanks:', { size: 10, bold: true, indent: 6, gap: 1 });
-      d.para(blanks(st.note, K), { size: 11, indent: 18, gap: 4 });
-      d.para('B. ' + ((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
-      if (K) ans('Check that the task is complete and accurate. It should match the fill-in above: ' + blanks(st.note, true)); else { d.ensure(80); d.box(d.margin + 18, d.y - 70, d.inner() - 18, 66, 0.6); d.y -= 76; }
-      d.para('C. Turn and talk: ' + ((X.talk || [])[i] || ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
-      d.para('What my partner and I said:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, blanks(st.note, true));
-      d.ensure(70);
-      d.para('D. Check for understanding: ' + st.check.q, { size: 10.5, bold: true, indent: 6, gap: 1 });
+      mini(5 + i, st.t);
+      d.para(blanks(st.note, K), { size: 10.5, indent: 6, gap: 2 });
+      d.para('Check: ' + st.check.q, { size: 10.5, indent: 6, gap: 1 });
       choices(st.check);
-      d.para('I know because:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(1, ckAns(st.check));
+      if (K) ans(ckAns(st.check));
     });
-    part(9, 'Worked example', 'copy each step');
-    (X.model || []).forEach(function (t, k) { d.ensure(30); if (K) d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para((k + 1) + '.', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+    mini(9, 'Worked example');
+    if (K) (X.model || []).forEach(function (t, k) { d.para((k + 1) + '.  ' + t, { size: 10, indent: 12, gap: 1 }); });
+    else d.para('Final answer from the example: ________________________________________________', { size: 10.5, indent: 6, gap: 4 });
     if (X.wedo) {
-      part(10, 'We do: solve it together');
-      d.para(X.wedo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
-      X.wedo.steps.forEach(function (t, k) { d.ensure(30); if (K) d.para('Step ' + (k + 1) + ': ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para('Step ' + (k + 1) + ':', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
-      d.para('Answer: ' + (K ? X.wedo.a : '____________________________'), { size: 11, bold: true, indent: 6, gap: 12 });
+      mini(10, 'We do');
+      d.para(X.wedo.q, { size: 10.5, indent: 6, gap: 2 });
+      d.para('Answer: ' + (K ? X.wedo.a : '____________________________________________'), { size: 10.5, indent: 6, gap: 4 });
     }
     if (X.youdo) {
-      part(11, 'You do: on your own', '2 min, silent');
-      d.para(X.youdo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      mini(11, 'You do');
+      d.para(X.youdo.q, { size: 10.5, indent: 6, gap: 2 });
       choices(X.youdo);
-      d.para('Show your thinking:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, ckAns(X.youdo));
+      if (K) ans(ckAns(X.youdo));
     }
-    part(12, 'Work time: ' + room.title, '28 min');
-    d.para('As you finish each ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'part') + ', record the code piece and one key fact you learned there.', { size: 10.5, indent: 6, gap: 4 });
+    mini(12, 'Work time: ' + room.title);
     var node = { escape: 'Lock', gallery: 'Exhibit', fieldtrip: 'Stop', mystery: 'File', quest: 'Level' }[room.format] || 'Stage';
-    d.table([{ w: 0.3, h: node }, { w: 0.14, h: 'Code piece' }, { w: 0.56, h: 'One key fact I learned' }], room.stages.map(function (st, i) { return [node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + String(st.title).replace(/^(Stop|Lock|Level|Evidence File|Room|Exhibit|Artifact)\s*#?\d*:\s*/i, ''), K ? (room.code || '')[i] || '' : '', '']; }), c, { minH: 34 });
-    d.para('Final code: ________________     [ ] Written task finished     [ ] Work copied into Canvas', { size: 10.5, indent: 6, gap: 12 });
-    part(13, 'Debrief and wrap-up', '4 min');
-    d.para('Check your prediction from Part 3. Was it right? What evidence changed or confirmed it?', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
-    d.para('3 things I learned today:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(3, 'Three accurate facts from the lesson.');
-    d.para('2 vocabulary words used correctly in a sentence:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, 'Two vocabulary words used correctly.');
-    d.para('1 question I still have:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(1, 'Any genuine question.');
+    d.para('Write each code piece as you earn it:   ' + room.stages.map(function (st, i) { return node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + (K ? (room.code || '')[i] || '' : '____'); }).join('    '), { size: 10.5, indent: 6, gap: 2 });
+    d.para('Final code: ' + (K ? room.code || '' : '________________'), { size: 10.5, bold: true, indent: 6, gap: 4 });
+    mini(13, 'Wrap-up');
+    d.para('Was your prediction in Part 3 right? One thing I learned today:', { size: 10.5, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
     d.footer('The Broncho Escape · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
     return d.bytes();
   }
@@ -3529,7 +3503,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
       ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer Part 2 of the lesson worksheet; share with a partner.'],
       ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Complete worksheet Parts 4-11 as each slide appears; answer checks with fingers.'],
       ['0:20–0:48', room.formatLabel, 'Launch ' + room.title + '. Assign mission levels; circulate with the answer key.', 'Play solo or in pairs; record code pieces; complete any written evidence task.'],
-      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + 3-2-1).'],
+      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + one thing learned).'],
       ['0:52–1:00', 'Exit ticket', 'Hand out the exit ticket. Collect and sort with the mastery guide.', 'Answer with evidence independently.']], c);
     d.sub('Key vocabulary');
     d.table([{ w: 0.25, h: 'Word' }, { w: 0.75, h: 'Student-friendly definition' }], L.vocab, c);
@@ -3567,7 +3541,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
     d.table([{ w: 0.3, h: 'Resource' }, { w: 0.7, h: 'How it fits the lesson' }], [
       ['Warm-up worksheet (PDF)', 'Optional standalone warm-up (also Part 2 of the lesson worksheet), with a key.'],
       ['Mini-lesson presenter', 'Projectable, step-by-step interactive lesson with tools and quick checks (room page).'],
-      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: target, warm-up, prediction, vocabulary, fill-ins, tasks, turn-and-talks, checks, worked example, practice, a work-time tracker, and a 3-2-1 wrap-up. Parts match the presenter slides.'],
+      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: short fill-ins and quick checks in 13 small parts that match the presenter slides.'],
       [room.title + ' (.html)', 'The ' + room.formatLabel.toLowerCase() + ' for Canvas, with differentiated levels, supports, and a turn-in.'],
       ['Exit ticket (PDF + key)', 'Evidence-based check with a rubric and a mastery sorting guide.']].concat((std.resources || []).slice(0, 4).map(function (x) { return [x.name + ' (extra)', x.note + ' ' + x.url]; })), c);
     d.banner('Answer key: ' + room.title, c);
@@ -3601,7 +3575,7 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
         ['If < 80% correct', 'Go back to the Explore box and model a second example out loud, then re-ask the check with a partner discussion first. See "Misconceptions to watch for" at the end of this script.']
       ]);
     });
-    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
+    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Write the final answer in Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
     if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together in Part 10. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
     if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own: Part 11. Solve it with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
     slide('Work time: ' + room.title, '0:20–0:48', [['Say', 'Open ' + room.title + ' on your device. Type your name, choose the level I assigned, and begin. Whisper voice with your partner only.'], ['Do', 'Start the 28:00 timer and leave this slide up. Circulate with the answer key.'], ['Checkpoints', 'At 10 minutes: ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'stage') + ' 2 done. At 20 minutes: stage 4 done; give a 5-minute warning for the ' + (taskName || 'final lock') + ' and turn-in.'], ['Turn-in', 'Students tap "Copy my work" and paste it into the Canvas assignment (Text Entry).']]);
@@ -3640,9 +3614,9 @@ if (typeof module !== 'undefined') module.exports = LessonPresenter;
 window.CX_STANDARDS = [
 /* ======================= GRADE 5 SCIENCE ======================= */
 {
-  id: 'g5-sci-matter', grade: 5, subject: 'science', code: '5.PS.1–5.PS.2',
+  id: 'g5-sci-matter', grade: 5, subject: 'science', code: '5-PS1-1–5-PS1-4',
   title: 'Properties of Matter & Conservation of Mass',
-  text: 'Describe and measure the volume and mass of a sample of a material, and demonstrate that when substances are heated, cooled, or mixed, the total mass of matter is conserved.',
+  text: 'Develop a model showing that matter is made of particles too small to be seen; measure and graph to show that the total weight of matter is conserved when substances are heated, cooled, or mixed; identify materials by their properties; and investigate whether mixing substances forms new substances.',
   lesson: {
     target: 'I can measure and describe properties of matter and explain why mass stays the same when matter changes.',
     vocab: [['Matter', 'Anything that has mass and takes up space.'], ['Mass', 'The amount of matter in an object, measured in grams (g).'], ['Volume', 'The amount of space something takes up, measured in mL or cm³.'], ['Physical change', 'A change in size, shape, or state that makes no new substance.'], ['Chemical change', 'A change that makes a new substance (clues: gas, color change, heat, light).'], ['Conservation of mass', 'In a closed system, mass before a change equals mass after.']],
@@ -3662,9 +3636,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5.ESS.1–5.ESS.2',
+  id: 'g5-sci-space', grade: 5, subject: 'science', code: '5-ESS1-1 · 5-ESS1-2',
   title: 'Earth, Sun, Moon & the Solar System',
-  text: 'Analyze the scale of the solar system and its components, and use models to explain how Earth\'s rotation and orbit cause day and night, changing shadows, seasons, and the Moon\'s phases.',
+  text: 'Support an argument that the apparent brightness of the sun and stars is due to their distance from Earth; represent data to reveal patterns in shadows, day and night, and the seasonal appearance of stars.',
   lesson: {
     target: 'I can use a model to explain patterns caused by Earth\'s rotation and orbit and describe the scale of the solar system.',
     vocab: [['Rotation', 'Spinning on an axis. Earth rotates once about every 24 hours.'], ['Revolution / orbit', 'Traveling around another object. Earth orbits the Sun in about 365 days.'], ['Axis', 'An imaginary line through Earth from pole to pole; it is tilted about 23.5°.'], ['Moon phase', 'The shape of the lit part of the Moon we see from Earth.'], ['Star', 'A ball of hot gas that makes its own light. The Sun is our closest star.']],
@@ -3684,9 +3658,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-sci-eco', grade: 5, subject: 'science', code: '5.LS.1–5.LS.3',
+  id: 'g5-sci-eco', grade: 5, subject: 'science', code: '5-PS3-1 · 5-LS1-1 · 5-LS2-1',
   title: 'Ecosystems & Food Webs',
-  text: 'Classify organisms as producers, consumers, and decomposers, model the flow of energy and matter through food chains and food webs, and explain how changes to an ecosystem affect the organisms living in it.',
+  text: 'Use models to describe that the energy in animals\' food was once energy from the sun, support an argument that plants get the materials they need for growth chiefly from air and water, and model the movement of matter among plants, animals, decomposers, and the environment.',
   lesson: {
     target: 'I can model how energy and matter move through an ecosystem and predict what happens when part of it changes.',
     vocab: [['Producer', 'An organism that makes its own food from sunlight (plants, algae).'], ['Consumer', 'An organism that eats other organisms (herbivore, carnivore, omnivore).'], ['Decomposer', 'An organism that breaks down dead matter and returns nutrients to soil (fungi, bacteria, worms).'], ['Food web', 'Many connected food chains in one ecosystem.'], ['Ecosystem', 'All the living and nonliving things interacting in an area.']],
@@ -3707,9 +3681,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SCIENCE ======================= */
 {
-  id: 'g6-sci-particles', grade: 6, subject: 'science', code: '6.PS.1–6.PS.2',
+  id: 'g6-sci-particles', grade: 6, subject: 'science', code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Particle Model of Matter & States of Matter',
-  text: 'Develop a model showing that matter is made of particles in constant motion, and explain how adding or removing thermal energy changes particle motion, temperature, and state of matter.',
+  text: 'Develop a model that predicts and describes changes in particle motion, temperature, and state of a pure substance when thermal energy is added or removed. (Enrichment: this topic is not in the 2023 Indiana Grade 6 science standards.)',
   lesson: {
     target: 'I can use the particle model to explain the states of matter and changes of state.',
     vocab: [['Particle', 'A tiny piece of matter (atom or molecule) too small to see.'], ['Thermal energy', 'The total energy of moving particles in a substance.'], ['Temperature', 'A measure of the average motion (kinetic energy) of particles.'], ['Melting / freezing', 'Solid to liquid / liquid to solid.'], ['Evaporation / condensation', 'Liquid to gas / gas to liquid.'], ['Sublimation', 'Solid directly to gas (dry ice).']],
@@ -3729,9 +3703,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-sci-energy', grade: 6, subject: 'science', code: '6.PS.3–6.PS.4',
+  id: 'g6-sci-energy', grade: 6, subject: 'science', code: 'Enrichment · not in IN 2023 Gr 6',
   title: 'Kinetic & Potential Energy and Heat Transfer',
-  text: 'Compare kinetic and potential energy and the factors that affect them, and describe how thermal energy transfers by conduction, convection, and radiation.',
+  text: 'Describe kinetic and potential energy, and investigate how thermal energy is transferred and how the amount of energy transferred depends on the type and mass of matter. (Enrichment: this topic is not in the 2023 Indiana Grade 6 science standards.)',
   lesson: {
     target: 'I can explain how energy changes between kinetic and potential forms and identify conduction, convection, and radiation.',
     vocab: [['Kinetic energy', 'Energy of motion. More mass or more speed means more kinetic energy.'], ['Potential energy', 'Stored energy. Gravitational potential energy increases with height and mass.'], ['Conduction', 'Heat transfer through direct contact.'], ['Convection', 'Heat transfer by the movement of fluids (liquids and gases) in currents.'], ['Radiation', 'Heat transfer by waves, even through empty space.'], ['Law of conservation of energy', 'Energy is not created or destroyed; it changes form.']],
@@ -3751,9 +3725,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-sci-space', grade: 6, subject: 'science', code: '6.ESS.1–6.ESS.2',
+  id: 'g6-sci-space', grade: 6, subject: 'science', code: 'MS-ESS1-1–MS-ESS1-3',
   title: 'Gravity & the Earth–Sun–Moon System',
-  text: 'Use models of the Earth–Sun–Moon system to explain lunar phases, eclipses, tides, and seasons, and describe the role of gravity in the motions of objects in the solar system.',
+  text: 'Develop and use a model of the Earth-sun-moon system to describe the cyclic patterns of lunar phases, eclipses, and seasons; describe the role of gravity in the motions within galaxies and the solar system; and analyze data to determine scale properties of objects in the solar system.',
   lesson: {
     target: 'I can use a model of the Earth–Sun–Moon system to explain phases, eclipses, tides, and seasons, and explain how gravity keeps objects in orbit.',
     vocab: [['Gravity', 'A force of attraction between all objects with mass. More mass and less distance means stronger gravity.'], ['Orbit', 'The curved path of one object around another, caused by gravity and forward motion.'], ['Solar eclipse', 'The Moon passes between the Sun and Earth, blocking sunlight.'], ['Lunar eclipse', 'Earth passes between the Sun and the Moon; Earth\'s shadow falls on the Moon.'], ['Tide', 'The daily rise and fall of sea level, caused mostly by the Moon\'s gravity.'], ['Waxing / waning', 'The lit part of the Moon growing / shrinking.']],
@@ -3774,9 +3748,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 SOCIAL STUDIES ======================= */
 {
-  id: 'g5-ss-colonial', grade: 5, subject: 'social', code: '5.1.1–5.1.8',
+  id: 'g5-ss-colonial', grade: 5, subject: 'social', code: '5.H.1–5.H.6 · 5.G.5–5.G.10 · 5.E.1',
   title: 'Native Americans, Exploration & the Thirteen Colonies',
-  text: 'Describe early Native American cultures, European exploration of North America, and the founding, geography, economies, and daily life of the New England, Middle, and Southern colonies.',
+  text: 'Describe early Native American cultures and European exploration, compare the reasons for colonization, and explain the political, social, and economic organization of the New England, Middle, and Southern colonies.',
   lesson: {
     target: 'I can compare Native American cultures and the three colonial regions and explain how geography shaped how people lived.',
     vocab: [['Colony', 'A settlement ruled by a faraway country.'], ['Cash crop', 'A crop grown to sell, like tobacco or rice.'], ['Indentured servant', 'A person who worked for several years to pay for passage to America.'], ['Culture region', 'An area where groups share similar ways of life shaped by environment.'], ['Columbian Exchange', 'The movement of plants, animals, people, and diseases between the Americas and Europe/Africa after 1492.']],
@@ -3796,9 +3770,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ss-revolution', grade: 5, subject: 'social', code: '5.1.9–5.1.14',
+  id: 'g5-ss-revolution', grade: 5, subject: 'social', code: '5.H.7–5.H.13',
   title: 'The American Revolution',
-  text: 'Explain the causes of the American Revolution, key events, people, and documents including the Declaration of Independence, and the outcome and results of the war.',
+  text: 'Explain how political, religious, and economic ideas brought about the American Revolution, analyze its causes as outlined in the Declaration of Independence, and describe key leaders, events, contributions, and consequences of the war.',
   lesson: {
     target: 'I can explain the causes, key events, and results of the American Revolution in the order they happened.',
     vocab: [['Tax', 'Money people must pay to a government.'], ['Boycott', 'Refusing to buy goods as a protest.'], ['Patriot / Loyalist', 'A colonist who supported independence / a colonist loyal to the king.'], ['Declaration of Independence', 'The 1776 document explaining why the colonies were breaking from Britain.'], ['Treaty of Paris (1783)', 'The agreement that ended the war and recognized U.S. independence.']],
@@ -3818,9 +3792,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.2.1–5.2.7',
+  id: 'g5-ss-civics', grade: 5, subject: 'social', code: '5.H.14–5.H.15 · 5.C.1 · 5.C.3 · 5.C.5',
   title: 'Founding Documents & Our Government',
-  text: 'Explain the principles in the Declaration of Independence and U.S. Constitution, the three branches of government and checks and balances, and the rights protected in the Bill of Rights.',
+  text: 'Explain why the Constitution was created and how the Bill of Rights was drafted, the purposes in the Preamble, key ideas in the founding documents, and the functions of the three branches of government.',
   lesson: {
     target: 'I can explain how the Constitution divides power among three branches and which rights the Bill of Rights protects.',
     vocab: [['Constitution', 'The supreme law of the United States, written in 1787.'], ['Legislative branch', 'Congress (Senate and House). Makes laws.'], ['Executive branch', 'The President. Carries out and enforces laws.'], ['Judicial branch', 'The Supreme Court and federal courts. Interpret laws.'], ['Checks and balances', 'Each branch can limit the power of the others.'], ['Amendment', 'A change or addition to the Constitution. The first ten are the Bill of Rights.']],
@@ -3841,9 +3815,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 SOCIAL STUDIES ======================= */
 {
-  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '6.1.1–6.1.4',
+  id: 'g6-ss-americas', grade: 6, subject: 'social', code: '6.H.1–6.H.3 · 6.H.7 · 6.H.13',
   title: 'Early Civilizations of the Americas',
-  text: 'Compare the Maya, Aztec, and Inca civilizations, including their geography, government, economy, religion, and achievements, and explain the effects of their encounters with Europeans.',
+  text: 'Summarize the rise, decline, and cultural achievements of ancient civilizations in Mesoamerica and South America; describe their beliefs and the development of their political, social, and economic systems; and analyze the voyages of discovery and conquest that changed the Americas.',
   lesson: {
     target: 'I can compare the Maya, Aztec, and Inca and explain how geography shaped their achievements.',
     vocab: [['Civilization', 'A complex society with cities, government, specialized jobs, and a system of writing or records.'], ['Chinampa', 'An Aztec floating garden built in a shallow lake.'], ['Terrace farming', 'Cutting flat steps into mountainsides to farm (Inca).'], ['Quipu', 'Knotted strings the Inca used to keep records.'], ['Conquistador', 'A Spanish conqueror of the Americas, such as Cortés or Pizarro.']],
@@ -3863,9 +3837,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '6.1.5–6.1.13',
+  id: 'g6-ss-europe', grade: 6, subject: 'social', code: '6.H.3–6.H.8 · 6.C.4',
   title: 'Medieval Europe to the Renaissance',
-  text: 'Explain feudalism, the role of the Church, the Magna Carta, the Crusades, and the Black Death, and describe how the Renaissance and Reformation changed European society.',
+  text: 'Explain the political, social, and economic systems of medieval Europe; describe how the Black Death and other factors led to the decline of medieval society; examine key ideas of the Magna Carta; and analyze the trade, ideas, and exchanges of the Renaissance and the Reformations.',
   lesson: {
     target: 'I can explain how feudalism worked and how events like the Black Death and the Renaissance changed Europe.',
     vocab: [['Feudalism', 'A system where land was traded for loyalty and military service.'], ['Manor', 'A lord\'s estate, including a village, farmland, and castle or manor house.'], ['Magna Carta (1215)', 'A document that limited the English king\'s power; even the king had to follow the law.'], ['Black Death', 'A plague (1347–1351) that killed about one-third of Europe\'s people.'], ['Renaissance', 'A "rebirth" of art, learning, and interest in ancient Greece and Rome (about 1350–1600).'], ['Humanism', 'A Renaissance idea focused on human potential and achievement.']],
@@ -3885,9 +3859,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '6.3.1–6.3.12',
+  id: 'g6-ss-geo', grade: 6, subject: 'social', code: '6.G.1–6.G.3',
   title: 'Geography of Europe & the Americas',
-  text: 'Use latitude, longitude, and other map tools to locate places, identify major physical features and climate regions of Europe and the Americas, and explain how people adapt to and change their environments.',
+  text: 'Demonstrate a broad understanding of the major countries, capitals, and regions of Europe and the Americas, and locate, describe, and compare the major cultural and physical characteristics (such as climate and landforms) of these regions.',
   lesson: {
     target: 'I can use latitude and longitude and explain how physical features and climate affect how people live.',
     vocab: [['Latitude', 'Imaginary lines running east–west that measure distance north or south of the Equator.'], ['Longitude', 'Imaginary lines running north–south that measure distance east or west of the Prime Meridian.'], ['Physical feature', 'A natural feature of Earth\'s surface: mountains, rivers, plains, peninsulas.'], ['Climate', 'The usual weather of a place over a long time.'], ['Human–environment interaction', 'How people adapt to, depend on, and change their environment.']],
@@ -3907,7 +3881,7 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ss-ancient', grade: 6, subject: 'social', code: '6.H.1 · 6.H.3 · 6.C.2 · 6.C.3 · 6.G.1 · 6.G.4 · 6.E.1 · 6.E.2 · 6.E.4', sims: false,
+  id: 'g6-ss-ancient', grade: 6, subject: 'social', code: '6.H.1 · 6.H.3 · 6.C.2 · 6.C.3 · 6.G.1 · 6.G.3 · 6.E.1 · 6.E.2 · 6.E.4', sims: false,
   title: 'Ancient Greece vs. Ancient Rome (G.R.A.P.E.S.)',
   text: 'Compare ancient Greece and ancient Rome using G.R.A.P.E.S.: how geography shaped each civilization, their religions, achievements, political systems (Athenian democracy and the Roman Republic), economies and trade, and social structures, and explain how both influenced the United States today.',
   lesson: {
@@ -3930,9 +3904,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 5 ELA ======================= */
 {
-  id: 'g5-ela-theme', grade: 5, subject: 'ela', code: '5.RL.2.2',
+  id: 'g5-ela-theme', grade: 5, subject: 'ela', code: '5.RC.1 & 5.RC.2',
   title: 'Theme & Summary',
-  text: 'Determine a theme of a story, drama, or poem from details in the text, including how characters respond to challenges, and summarize the text.',
+  text: 'Quote accurately from a text when explaining what it says explicitly and when drawing inferences; determine the theme of a story, play, or poem from details in the text, including how characters respond to challenges; summarize the text.',
   lesson: {
     target: 'I can determine a theme from how characters respond to challenges and write an objective summary.',
     vocab: [['Theme', 'The message or life lesson the author wants readers to understand. It is written as a full sentence.'], ['Topic', 'What the story is about in one or two words (friendship, courage). A topic is not a theme.'], ['Summary', 'A short retelling of the most important events in order, without opinions.'], ['Conflict', 'The problem or challenge the main character faces.'], ['Resolution', 'How the conflict is solved.']],
@@ -3952,9 +3926,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ela-info', grade: 5, subject: 'ela', code: '5.RN.2.2 & 5.RN.3.2',
+  id: 'g5-ela-info', grade: 5, subject: 'ela', code: '5.RC.6 & 5.RC.8',
   title: 'Main Ideas & Text Structure',
-  text: 'Determine two or more main ideas of an informational text and explain how key details support them, and identify how a text is organized (chronology, comparison, cause/effect, problem/solution, description).',
+  text: 'Determine two or more main ideas of a text and explain how they are supported by key details; summarize the text; compare and contrast the organizational structure of events, ideas, concepts, or information in two or more texts.',
   lesson: {
     target: 'I can find the main ideas of an informational text, choose the details that support them, and name the text structure.',
     vocab: [['Main idea', 'The most important point the author makes about the topic.'], ['Key detail', 'A fact, example, or reason that supports the main idea.'], ['Text structure', 'How an author organizes information.'], ['Signal words', 'Words that hint at structure: first/then (sequence), because/as a result (cause-effect), however/both (compare), problem/solution.'], ['Chronological', 'In time order.']],
@@ -3974,9 +3948,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-ela-vocab', grade: 5, subject: 'ela', code: '5.RV.2.1, 5.RV.2.4, 5.RV.3.3',
+  id: 'g5-ela-vocab', grade: 5, subject: 'ela', code: '5.RC.11–5.RC.14',
   title: 'Context Clues, Roots & Figurative Language',
-  text: 'Use context clues and Greek and Latin affixes and roots to determine the meanings of unknown words, and explain figurative language such as similes, metaphors, idioms, and personification.',
+  text: 'Use context clues, word relationships, Greek and Latin affixes and roots, and knowledge of figurative language (similes, metaphors, hyperbole, idioms) to determine the meanings of words and phrases.',
   lesson: {
     target: 'I can use context clues and word parts to figure out new words and explain what figurative language means.',
     vocab: [['Context clues', 'Hints in nearby words or sentences that help you figure out a word.'], ['Root', 'The main part of a word that carries meaning (port = carry).'], ['Prefix / suffix', 'A word part added to the beginning / end of a root (re- = again; -less = without).'], ['Simile', 'A comparison using like or as.'], ['Metaphor', 'A comparison that says one thing IS another.'], ['Idiom', 'A saying whose meaning is different from its literal words ("break a leg").'], ['Personification', 'Giving human qualities to non-human things.']],
@@ -3997,9 +3971,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 ELA ======================= */
 {
-  id: 'g6-ela-evidence', grade: 6, subject: 'ela', code: '6.RL.2.1 & 6.RL.2.2',
+  id: 'g6-ela-evidence', grade: 6, subject: 'ela', code: '6.RC.1–6.RC.3',
   title: 'Textual Evidence, Inference & Theme',
-  text: 'Cite textual evidence to support analysis of what a literary text says explicitly as well as inferences drawn from it, and determine how a theme is conveyed through particular details.',
+  text: 'Analyze what a text says explicitly and draw inferences by citing textual evidence; determine how a theme is conveyed through particular details and provide an objective summary; analyze how a sentence, chapter, or scene fits into the overall structure and develops the theme, characterization, setting, or plot.',
   lesson: {
     target: 'I can make inferences about a literary text and support them with the strongest evidence, and explain how details develop a theme.',
     vocab: [['Inference', 'A logical conclusion based on text clues plus what you already know.'], ['Explicit', 'Stated directly in the text.'], ['Textual evidence', 'Words or sentences from the text that support an idea.'], ['Theme', 'A universal message about life developed through the story.'], ['Characterization', 'How an author reveals what a character is like: speech, thoughts, actions, and effects on others.']],
@@ -4019,9 +3993,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-central', grade: 6, subject: 'ela', code: '6.RN.2.2 & 6.RN.4.1',
+  id: 'g6-ela-central', grade: 6, subject: 'ela', code: '6.RC.5 & 6.RC.8',
   title: 'Central Idea & Author\'s Argument',
-  text: 'Determine the central idea of an informational text and how it is conveyed through details, and trace and evaluate an argument and specific claims, distinguishing claims supported by reasons and evidence from those that are not.',
+  text: 'Determine how a central idea of a text is conveyed through particular details and provide an objective summary; trace and evaluate the argument and specific claims in a text, distinguishing supported claims from unsupported ones.',
   lesson: {
     target: 'I can determine the central idea of a text and evaluate whether an author\'s claims are supported by evidence.',
     vocab: [['Central idea', 'The most important idea of the whole text.'], ['Claim', 'A statement the author wants you to believe.'], ['Reason', 'Why the author believes the claim.'], ['Evidence', 'Facts, statistics, examples, or expert quotes that prove a reason.'], ['Counterclaim', 'An opposing view the author addresses.'], ['Fact vs. opinion', 'A fact can be proven; an opinion is a belief or feeling.']],
@@ -4041,9 +4015,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-vocab', grade: 6, subject: 'ela', code: '6.RV.2.1 & 6.RV.3.3',
+  id: 'g6-ela-vocab', grade: 6, subject: 'ela', code: '6.RC.10, 6.RC.12 & 6.RC.13',
   title: 'Word Meaning, Connotation & Figurative Language',
-  text: 'Use context and word parts to determine the meanings of words, and interpret figurative language and connotation to explain how an author\'s word choice affects meaning and tone.',
+  text: 'Use context to determine the meaning of words and phrases, distinguish among the connotations of words with similar denotations, and use Greek and Latin affixes and roots as clues to word meaning.',
   lesson: {
     target: 'I can figure out word meanings from context and explain how connotation and figurative language shape tone.',
     vocab: [['Denotation', 'The dictionary definition of a word.'], ['Connotation', 'The feeling a word suggests: positive, negative, or neutral.'], ['Tone', 'The author\'s attitude toward the subject (hopeful, bitter, playful).'], ['Hyperbole', 'Extreme exaggeration for effect.'], ['Allusion', 'A reference to a well-known story, person, or event.'], ['Imagery', 'Language that appeals to the five senses.']],
@@ -4063,9 +4037,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-ela-writing', grade: 6, subject: 'ela', code: '6.W.3.2 · 6.W.6.1 · 6.W.6.2', sims: false,
+  id: 'g6-ela-writing', grade: 6, subject: 'ela', code: '6.W.2 · 6.W.6 · 6.W.7', sims: false,
   title: 'Grammar, Sentence Structure & Paragraph Structure',
-  text: 'Use correct grammar and usage (parts of speech, subject-verb agreement, pronouns, and consistent verb tense), write complete simple, compound, and complex sentences without fragments or run-ons, and organize paragraphs with a topic sentence, supporting details, transitions, and a concluding sentence.',
+  text: 'Organize informative writing with a clear topic, relevant details, transitions, and a concluding statement; use subject, object, and possessive pronouns correctly; write simple, compound, complex, and compound-complex sentences and correct fragments and run-ons; and use commas, semicolons, and colons correctly.',
   lesson: {
     target: 'I can write complete, correct sentences and organize them into a well-structured paragraph.',
     vocab: [['Fragment', 'An incomplete sentence missing a subject, a verb, or a complete thought.'], ['Run-on', 'Two complete sentences joined with no punctuation or with only a comma.'], ['Compound sentence', 'Two independent clauses joined by a comma and a conjunction (FANBOYS) or a semicolon.'], ['Complex sentence', 'An independent clause plus a dependent clause that begins with a word like because, when, or although.'], ['Topic sentence', 'The sentence that states the main idea of a paragraph.'], ['Transition', 'A word or phrase that connects ideas, like for example, however, or in addition.']],
@@ -4084,11 +4058,32 @@ window.CX_STANDARDS = [
     { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
   ]
 },
+{
+  id: 'g6-ela-purpose', grade: 6, subject: 'ela', code: '6.RC.7', sims: false, rooms: 1,
+  title: 'Author\'s Perspective & Purpose',
+  text: 'Determine an author\'s perspective or purpose in a text, and explain how it is conveyed in the text.',
+  lesson: {
+    target: 'I can determine an author\'s purpose and perspective and explain how word choice and details show it.',
+    vocab: [['Purpose', 'The reason an author writes: to persuade, to inform, or to entertain.'], ['Perspective', 'How the author sees or feels about the topic, shaped by who they are.'], ['Word choice', 'The specific words an author picks; strong or loaded words reveal feelings.'], ['Bias', 'Leaning toward one side, often shown by leaving out other views.'], ['Tone', 'The author\'s attitude toward the topic, like excited, worried, or neutral.']],
+    hook: 'Show two headlines about the same event: "Brave Students Rescue Injured Hawk" and "Hawk Found Near School." Ask which writer cares more and how they can tell. Take ideas, then explain that today students learn to read the author behind the words.',
+    teach: ['Purpose is WHY the author writes: persuade (convince you), inform (teach you), or entertain (tell a story). Look at the whole text, not one sentence.', 'Perspective is HOW the author sees the topic. Who the author is (a coach, a scientist, a kid) shapes what they notice and care about.', 'Authors convey perspective through word choice: loaded words (disaster, amazing, heroic) show feelings; neutral words (event, built, found) do not.', 'Authors also convey perspective through which details they include and which they leave out. Ask: whose side is missing?'],
+    model: 'Read: "Our town\'s gorgeous new skate park finally gives teens a safe place to play." Purpose: persuade readers the park is good. Perspective: the author supports teens. Evidence: loaded words "gorgeous," "finally," and "safe." Explain: these positive words show the author is for the park.',
+    check: 'Students show 1 finger (persuade), 2 (inform), or 3 (entertain): "Recycle now or our planet is doomed!" (1) "Aluminum cans can be recycled in 60 days." (2) "The talking can rolled away from the recycling truck." (3)',
+    misconceptions: ['"Informational texts have no perspective." Every author makes choices about words and details.', '"Purpose and perspective are the same." Purpose is why the author writes; perspective is how they see the topic.', '"One strong word proves the purpose." Look at the text as a whole.', '"If it uses facts, it can\'t be persuasive." Persuasive writers often choose facts that support only their side.'],
+    debrief: ['How can two authors use the same facts but show different perspectives?', 'What clues help you tell an author\'s purpose?', 'Why does it matter to notice what an author leaves out?']
+  },
+  resources: [
+    { type: 'Practice', name: 'CommonLit', url: 'https://www.commonlit.org/', note: 'Free nonfiction passages with author\'s purpose questions.' },
+    { type: 'Practice', name: 'ReadWorks', url: 'https://www.readworks.org/', note: 'Paired texts for comparing authors\' perspectives.' },
+    { type: 'Lessons', name: 'ReadWriteThink', url: 'https://www.readwritethink.org/', note: 'Lessons on author\'s purpose and point of view.' },
+    { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
+  ]
+},
 /* ======================= GRADE 5 MATH ======================= */
 {
-  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.C.4, 5.C.6, 5.AT.2',
+  id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.CA.3–5.CA.5 · 5.CA.7',
   title: 'Adding, Subtracting & Multiplying Fractions',
-  text: 'Add and subtract fractions and mixed numbers with unlike denominators, multiply fractions by whole numbers and by fractions, and solve real-world problems involving fractions.',
+  text: 'Add and subtract fractions and mixed numbers with unlike denominators, use visual fraction models to multiply a fraction by a fraction or a whole number, and solve real-world problems involving adding, subtracting, and multiplying fractions and mixed numbers.',
   lesson: {
     target: 'I can add, subtract, and multiply fractions with unlike denominators and use them to solve real-world problems.',
     vocab: [['Denominator', 'The bottom number: how many equal parts make a whole.'], ['Numerator', 'The top number: how many parts we have.'], ['Common denominator', 'A shared multiple of the denominators, used to add or subtract.'], ['Equivalent fractions', 'Fractions that name the same amount (1/2 = 3/6).'], ['Mixed number', 'A whole number and a fraction (2 1/4).'], ['Simplest form', 'A fraction whose numerator and denominator share no common factor except 1.']],
@@ -4108,9 +4103,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g5-math-decimals', grade: 5, subject: 'math', code: '5.NS.1, 5.NS.4, 5.C.7',
+  id: 'g5-math-decimals', grade: 5, subject: 'math', code: '5.NS.1 · 5.NS.3 · 5.CA.9–5.CA.10',
   title: 'Decimal Place Value & Operations',
-  text: 'Read, write, compare, and round decimals to the thousandths, and add, subtract, multiply, and divide decimals to the hundredths using place value strategies.',
+  text: 'Compare and order decimals to thousandths, explain place-value patterns when multiplying or dividing by powers of 10, and add, subtract, multiply, and divide decimals to hundredths to solve real-world problems, including money.',
   lesson: {
     target: 'I can compare and round decimals and add, subtract, multiply, and divide decimals using place value.',
     vocab: [['Tenths / hundredths / thousandths', 'The first, second, and third places to the right of the decimal point.'], ['Expanded form', 'A number written as a sum of each digit\'s value (3.45 = 3 + 0.4 + 0.05).'], ['Round', 'Change a number to a nearby, simpler value.'], ['Power of ten', '10, 100, 1,000... Multiplying by 10 moves each digit one place left.']],
@@ -4132,7 +4127,7 @@ window.CX_STANDARDS = [
 {
   id: 'g5-math-volume', grade: 5, subject: 'math', code: '5.M.4–5.M.5',
   title: 'Volume of Rectangular Prisms',
-  text: 'Understand volume as the number of unit cubes needed to fill a solid, and find volumes of rectangular prisms and composite figures using V = l × w × h and V = B × h.',
+  text: 'Find the volume of right rectangular prisms by packing them with unit cubes, and apply V = l × w × h and V = B × h to solve real-world problems.',
   lesson: {
     target: 'I can find the volume of rectangular prisms and composite figures and explain what volume means.',
     vocab: [['Volume', 'The amount of space inside a 3-D figure, measured in cubic units.'], ['Cubic unit', 'A cube 1 unit on each side (cm³, in³, ft³).'], ['Rectangular prism', 'A 3-D figure with 6 rectangular faces, like a box.'], ['Base (B)', 'The area of the bottom face: length × width.'], ['Composite figure', 'A solid made of two or more prisms joined together.']],
@@ -4153,9 +4148,9 @@ window.CX_STANDARDS = [
 },
 /* ======================= GRADE 6 MATH ======================= */
 {
-  id: 'g6-math-ratios', grade: 6, subject: 'math', code: '6.NS.9–6.NS.10',
+  id: 'g6-math-ratios', grade: 6, subject: 'math', code: '6.RP.1–6.RP.5',
   title: 'Ratios, Rates & Percents',
-  text: 'Use ratio and rate reasoning to solve real-world problems, including unit rates, tables of equivalent ratios, and finding a percent of a quantity.',
+  text: 'Convert between fractions, decimals, and percents; understand unit rates; make tables of equivalent ratios; and solve real-world rate and ratio problems using tables, tape diagrams, double number lines, and equations.',
   lesson: {
     target: 'I can use ratios, unit rates, and percents to solve real-world problems.',
     vocab: [['Ratio', 'A comparison of two quantities (3 to 2, 3:2, 3/2).'], ['Rate', 'A ratio comparing quantities with different units (miles per hour).'], ['Unit rate', 'A rate per 1 unit ($2 per pound).'], ['Equivalent ratios', 'Ratios that make the same comparison (2:3 = 4:6).'], ['Percent', 'A ratio out of 100 (45% = 45/100).']],
@@ -4175,9 +4170,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-math-expressions', grade: 6, subject: 'math', code: '6.AF.1–6.AF.4',
+  id: 'g6-math-expressions', grade: 6, subject: 'math', code: '6.AF.1–6.AF.4 · 6.NS.7',
   title: 'Expressions & One-Step Equations',
-  text: 'Write, evaluate, and simplify expressions with variables, apply properties of operations to create equivalent expressions, and solve one-step equations and inequalities.',
+  text: 'Write and evaluate expressions with variables, create equivalent expressions using properties of operations, use substitution to test solutions, solve one-step equations, and write inequalities to represent real-world constraints.',
   lesson: {
     target: 'I can write and evaluate expressions and solve one-step equations using inverse operations.',
     vocab: [['Variable', 'A letter that stands for an unknown number.'], ['Expression', 'Numbers, variables, and operations with no equal sign (3x + 2).'], ['Equation', 'A statement that two expressions are equal (3x + 2 = 11).'], ['Coefficient', 'The number multiplied by a variable (the 3 in 3x).'], ['Like terms', 'Terms with the same variable part (4x and 2x).'], ['Inverse operations', 'Operations that undo each other (+ and −, × and ÷).']],
@@ -4197,9 +4192,9 @@ window.CX_STANDARDS = [
   ]
 },
 {
-  id: 'g6-math-integers', grade: 6, subject: 'math', code: '6.NS.1–6.NS.3',
+  id: 'g6-math-integers', grade: 6, subject: 'math', code: '6.NS.1–6.NS.3 · 6.AF.5',
   title: 'Integers, Absolute Value & the Coordinate Plane',
-  text: 'Understand positive and negative numbers in real-world contexts, compare and order integers, interpret absolute value, and locate and find distances between points in all four quadrants of the coordinate plane.',
+  text: 'Use positive and negative numbers to represent real-world quantities, explain opposites on the number line, compare and order rational numbers, and graph points on the coordinate plane to solve problems.',
   lesson: {
     target: 'I can use integers to describe real-world situations, compare them, find absolute value, and graph points in all four quadrants.',
     vocab: [['Integer', 'Whole numbers and their opposites (…−2, −1, 0, 1, 2…).'], ['Opposite', 'A number the same distance from 0 on the other side (5 and −5).'], ['Absolute value', 'A number\'s distance from 0, always positive or zero. |−7| = 7.'], ['Quadrant', 'One of four regions of the coordinate plane, numbered I–IV counterclockwise.'], ['Ordered pair', '(x, y): move along the x-axis first, then the y-axis.']],
@@ -5003,7 +4998,7 @@ window.CX_ROOMS.push(
 window.CX_ROOMS = window.CX_ROOMS || [];
 window.CX_ROOMS.push(
 
-/* ---------- 5.RL.2.2 Theme & Summary ---------- */
+/* ---------- 5.RC.1 & 5.RC.2 Theme & Summary ---------- */
 {
   id: 'g5-ela-story-gallery', std: 'g5-ela-theme', format: 'gallery',
   title: 'The Story Gallery',
@@ -7362,6 +7357,49 @@ window.CX_ROOMS.push(
     { q: 'Which transition shows contrast?', choices: ['For example', 'In addition', 'However', 'First'], answer: 2 },
     { q: 'Write a 5-sentence paragraph about your favorite season: a topic sentence, three supporting details with transitions, and a concluding sentence.', answer: 'Example: Fall is the best season of the year. First, the leaves turn bright red, orange, and yellow. In addition, the cool air is perfect for football games and hikes. For example, my family hikes at Turkey Run every October. Overall, fall is full of color, fun, and time together.', lines: 6 }
   ]
+},
+
+/* ---------- 6.RC.7 Author's Perspective & Purpose ---------- */
+{
+  id: 'g6-ela-authors-agenda', std: 'g6-ela-purpose', format: 'escape',
+  title: 'The Author\'s Agenda',
+  tagline: 'Every writer has a reason and a point of view. Uncover them to escape the Sunnyside Times newsroom.',
+  story: '<p>You are an intern at the <b>Sunnyside Times</b>. Tonight the editor locked the newsroom with a five-letter code and left a note: <b>"No story goes to print until you can tell me WHY each author wrote it and HOW they feel about it."</b></p><p>Every article is a clue. Find the author\'s <b>purpose</b> (persuade, inform, or entertain), their <b>perspective</b> (how they see the topic), and the <b>words and details</b> that give them away.</p>',
+  code: 'VOICE',
+  stages: [
+    { title: 'Desk 1: The Purpose Pile', content: '<p>Authors write for a <b>purpose</b>:</p><ul><li><b>Persuade:</b> convince the reader to think or do something</li><li><b>Inform:</b> teach facts or explain</li><li><b>Entertain:</b> tell a story or amuse</li></ul><p>Look at the whole text before you decide.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Sort each headline or opening line by the author\'s purpose.', buckets: ['Persuade', 'Inform', 'Entertain'], items: [['Vote YES on new playground equipment!', 0], ['Our town needs a dog park now.', 0], ['The library is open 9 a.m. to 6 p.m.', 1], ['Monarch butterflies migrate up to 3,000 miles.', 1], ['The day my goldfish ran for mayor', 2], ['A dragon walked into the cafeteria...', 2]] },
+        { type: 'mc', q: '"Sign up for the reading challenge today. You will discover worlds you never imagined!" What is the author\'s purpose?', choices: ['To persuade', 'To inform', 'To entertain', 'To describe'], answer: 0 }
+      ] },
+    { title: 'Desk 2: Who Wrote This?', content: '<p><b>Perspective</b> is how the author sees the topic. Who the author is shapes what they notice.</p><p><i>Letter to the editor:</i> "As a crossing guard for 12 years, I watch drivers speed past Sunnyside every morning. A 15 mph sign is not enough. We need speed bumps before a child gets hurt."</p>',
+      puzzles: [
+        { type: 'mc', q: 'What is the crossing guard\'s perspective?', choices: ['Speed near the school is dangerous and needs stronger limits', 'Drivers are always careful', 'Speed bumps damage cars', 'The school should move'], answer: 0 },
+        { type: 'mc', q: 'How does being a crossing guard shape the author\'s perspective?', choices: ['They see speeding drivers near children every day', 'They drive a fast car', 'They do not care about the school', 'They want a new job'], answer: 0 }
+      ] },
+    { title: 'Desk 3: Loaded Words', content: '<p>Authors show perspective through <b>word choice</b>. <b>Loaded words</b> carry strong feelings; <b>neutral words</b> do not.</p><p>Two reporters wrote about the same storm:</p><ul><li>Reporter A: "A <b>terrifying</b> storm <b>ripped</b> through town, <b>destroying</b> our beloved oak trees."</li><li>Reporter B: "A storm with 50 mph winds passed through town, and several trees fell."</li></ul>',
+      puzzles: [
+        { type: 'sort', q: 'Sort the words.', buckets: ['Loaded (shows feeling)', 'Neutral'], items: [['terrifying', 0], ['ripped', 0], ['beloved', 0], ['passed', 1], ['several', 1], ['fell', 1]] },
+        { type: 'mc', q: 'What does Reporter A\'s word choice show?', choices: ['The reporter feels upset about the damage to the town', 'The reporter is neutral', 'The reporter is happy about the storm', 'The reporter is writing to entertain'], answer: 0 }
+      ] },
+    { title: 'Desk 4: What\'s Missing?', content: '<p>Authors also show perspective through the <b>details they include</b> and the details they <b>leave out</b>.</p><p><i>Article:</i> "The new four-day school week gives teachers an extra planning day and saves the district $200,000 on buses. Teachers say they feel less stressed."</p>',
+      puzzles: [
+        { type: 'mc', q: 'Which perspective is LEFT OUT of the article?', choices: ['Families who need child care on the fifth day', 'Teachers', 'The school district budget', 'Bus costs'], answer: 0 },
+        { type: 'mc', q: 'What does leaving out other views suggest about the author?', choices: ['The author supports the four-day week', 'The author is against the four-day week', 'The author has no perspective', 'The author wants to entertain'], answer: 0 }
+      ] },
+    { title: 'Desk 5: The Editor\'s Test', content: '<p>Final check. Read the editorial and explain HOW the author shows their perspective.</p><p><i>Editorial:</i> "Our cafeteria\'s soggy, tasteless lunches are a disgrace. Students deserve fresh, healthy food that gives them energy to learn. It is time for the school board to act."</p>',
+      puzzles: [
+        { type: 'mc', q: 'What is the author\'s purpose?', choices: ['To persuade the school board to improve lunches', 'To inform readers about the menu', 'To entertain with a funny story', 'To describe the cafeteria\'s size'], answer: 0 },
+        { type: 'order', q: 'Put the steps for explaining how an author conveys perspective in order.', items: ['Name the author\'s purpose', 'Name the author\'s perspective', 'Quote the loaded words or key details', 'Explain how those words show the perspective'] },
+        { type: 'mc', q: 'Which evidence BEST shows the author\'s perspective?', choices: ['"soggy, tasteless lunches are a disgrace"', '"Our cafeteria"', '"the school board"', '"It is time"'], answer: 0 }
+      ] }
+  ],
+  finale: '<p>The editor reads your notes and smiles. "Purpose, perspective, and proof. You read the author, not just the article." The newsroom door unlocks, and tomorrow\'s paper is ready to print.</p>',
+  exit: [
+    { q: '"Pandas eat up to 40 pounds of bamboo a day." What is the author\'s purpose?', choices: ['To persuade', 'To inform', 'To entertain', 'To complain'], answer: 1 },
+    { q: 'Which sentence uses loaded words to show a negative perspective?', choices: ['The new law passed on Tuesday.', 'The reckless new law punishes hardworking families.', 'The law has three parts.', 'The mayor signed the law.'], answer: 1 },
+    { q: 'Explain the author\'s perspective in: "Our amazing robotics team crushed the competition and made Sunnyside proud!" How is it shown?', answer: 'The author is proud of and excited about the team. This is shown through loaded words like "amazing," "crushed," and "proud."', lines: 4 }
+  ]
 }
 
 );
@@ -8880,6 +8918,7 @@ window.CX_FX = window.CX_FX || {};
   FX['g6-ela-sentence-case'] = { theme: 'detective' };
   FX['g6-ela-paragraph-bakery'] = { theme: 'sweets' };
 
+  FX['g6-ela-authors-agenda'] = { theme: 'parchment' };
   FX['g6-ela-inference-files'] = {
     theme: 'detective',
     stages: {
@@ -9468,6 +9507,23 @@ window.CX_LESSONS = {};
     exit: { frame: 'RACE', stim: 'Student paragraph: "Dogs are the best pets. They are loyal they protect their families. For example, my dog barks when strangers come to the door. Cats sleep a lot. In conclusion, dogs are great pets."', q: 'Is this a well-structured paragraph? Identify one strength and one problem, and use evidence from the paragraph.', model: 'Restate: The student\'s paragraph about dogs has a clear structure but needs two fixes. Answer: Its strength is a clear topic sentence and conclusion; its problems are a run-on sentence and an off-topic detail. Cite: It begins, "Dogs are the best pets," and ends, "In conclusion, dogs are great pets," but it includes "They are loyal they protect their families" and "Cats sleep a lot." Explain: The topic and concluding sentences frame one main idea, but the run-on needs punctuation ("They are loyal, and they protect their families"), and the sentence about cats should be removed because it does not support the main idea.', look: ['Names a strength (topic or concluding sentence)', 'Identifies the run-on or off-topic sentence', 'Quotes the paragraph', 'Explains how to fix it'] }
   };
 
+  X['g6-ela-purpose'] = {
+    warmup: [
+      ['Why might someone write a restaurant review?', 'To persuade readers to eat there (or avoid it) and to share their opinion.', 2],
+      ['Which word shows more feeling: "the old house" or "the creepy house"? Explain.', '"Creepy" shows feeling; it makes the reader feel uneasy about the house.', 2],
+      ['A coach and a principal both write about adding an hour to recess. How might their articles be different?', 'The coach might focus on exercise and health; the principal might focus on learning time and schedules. Who they are shapes what they notice.', 2]],
+    steps: [
+      { t: 'Purpose: why the author writes', say: 'Purpose is the reason an author writes. Authors persuade to convince you, inform to teach you, or entertain to tell a story. Look at the whole text before you decide.', note: 'An author who wants to convince me is writing to [persuade]. An author who teaches facts is writing to [inform].', do: 'Label three short texts: persuade, inform, or entertain.',
+        check: MC('"Every family should adopt a shelter pet. These loyal animals deserve a second chance!" What is the purpose?', ['To persuade', 'To inform', 'To entertain', 'To describe a setting'], 0, 'The author is trying to convince readers to adopt.') },
+      { t: 'Perspective: how the author sees it', say: 'Perspective is how the author sees or feels about a topic. Who the author is shapes what they notice. A farmer and a city driver see a rainy week very differently.', note: 'Perspective is how the author [sees] the topic. [Who] the author is shapes their perspective.', do: 'Write one sentence a farmer and one sentence a city driver might write about a rainy week.',
+        check: MC('A firefighter writes, "Fireworks cause thousands of injuries each summer." Which perspective is most likely?', ['Fireworks are dangerous and need limits', 'Fireworks are the best part of summer', 'Fireworks are cheap', 'The author has no opinion'], 0, 'A firefighter sees the injuries firsthand.') },
+      { t: 'Word choice shows perspective', say: 'Authors show perspective through word choice. Loaded words like disaster, amazing, or heroic carry strong feelings. Neutral words like event, built, or found do not.', note: 'Strong words that carry feeling are called [loaded] words. Words without feeling are [neutral].', do: 'Circle the loaded words in two sentences and tell what feeling each shows.',
+        check: MC('Which sentence shows the author is AGAINST the new mall?', ['The ugly new mall swallowed our peaceful park.', 'The new mall opened on Saturday.', 'The mall has 40 stores.', 'The mall is on Main Street.'], 0, '"Ugly" and "swallowed" are loaded words showing a negative view.') },
+      { t: 'Details included and left out', say: 'Authors also show perspective through the details they choose. What does the author include, and whose side is missing? Leaving out other views can show bias.', note: 'An author shows perspective through details they [include] and details they leave [out].', do: 'Read two short articles about the same topic and list one detail only one author includes.',
+        check: MC('An article about a four-day school week lists only the benefits for teachers. What does this suggest?', ['The author supports the four-day week and left out other views', 'The author is neutral', 'The author is against the four-day week', 'The author is writing to entertain'], 0, 'Including only one side shows the author\'s perspective.') }],
+    exit: { frame: 'RACE', stim: 'Read: "Thanks to the hardworking volunteers of Sunnyside, the once-trashed creek now sparkles. Families can finally enjoy the water again. Our community proved that small hands can make a giant difference."', q: 'What is the author\'s perspective on the creek cleanup, and how does the author show it? Use evidence from the text.', model: 'Restate: The author has a clear perspective on the creek cleanup. Answer: The author is proud of the volunteers and thinks the cleanup was a big success. Cite: The author calls the volunteers "hardworking," says the creek "now sparkles," and says they made "a giant difference." Explain: These positive, loaded words show the author admires the volunteers and wants readers to see the cleanup as a victory.', look: ['Names the perspective (proud, supportive)', 'Quotes loaded words from the text', 'Explains how the word choice shows the perspective', 'Uses RACE structure'] }
+  };
+
   /* ================= MATH ================= */
   X['g5-math-fractions'] = {
     warmup: [
@@ -9685,6 +9741,11 @@ window.CX_LESSONS = {};
     wedo: { q: 'Fix and combine: "The storm was loud. We stayed inside. Because we were scared."', steps: ['"Because we were scared." is a fragment: it is not a complete thought.', 'Attach it to a sentence: "We stayed inside because we were scared."', 'Combine with the first sentence using a conjunction: "The storm was loud, so we stayed inside."', 'Final: "The storm was so loud that we stayed inside because we were scared."'], a: 'The storm was so loud that we stayed inside because we were scared.' },
     youdo: MC('Which is the best topic sentence for a paragraph about school uniforms?', ['School uniforms can save families money and reduce distractions.', 'My shirt is blue.', 'In conclusion, uniforms are good.', 'Some schools are big.'], 0, 'It states a clear, focused main idea.')
   });
+  add('g6-ela-purpose', {
+    talk: ['Can a text have more than one purpose? Give an example.', 'How would a student and a parent write differently about homework?', 'Why do authors use loaded words instead of neutral words?', 'Why might an author leave out the other side of an issue?'],
+    wedo: { q: 'Read: "The city wasted $2 million on a fountain nobody asked for, while our roads crumble." Find the author\'s purpose and perspective.', steps: ['Ask why the author wrote it: to convince readers the city made a bad choice, so the purpose is to persuade.', 'Find loaded words: "wasted," "nobody asked for," "crumble."', 'Name the perspective: the author is against the fountain and wants money spent on roads.', 'Explain how it is shown: the negative, loaded words show the author\'s disapproval.'], a: 'Purpose: persuade. Perspective: against the fountain; shown through loaded words like "wasted" and "crumble."' },
+    youdo: MC('"Mountain gorillas live in groups called troops, led by a silverback." What is the author\'s purpose?', ['To inform', 'To persuade', 'To entertain', 'To complain'], 0, 'It shares facts with neutral words.')
+  });
   add('g5-math-fractions', {
     talk: ['Why can\'t you just add the denominators: 1/2 + 1/4 = 2/6? Use a picture to explain.', 'How do you choose the best common denominator?', 'When do you need to regroup a whole when subtracting mixed numbers?', 'Why does multiplying by a fraction less than 1 make a number smaller?'],
     wedo: { q: 'Solve: 2 1/3 + 1 3/4.', steps: ['Common denominator for 3 and 4 is 12.', '2 1/3 = 2 4/12 and 1 3/4 = 1 9/12.', 'Add wholes and fractions: 3 13/12.', '13/12 = 1 1/12, so the answer is 4 1/12.'], a: '4 1/12' },
@@ -9809,6 +9870,10 @@ window.CX_LESSONS = {};
     hook: { q: '"Went to the store. Bought apples we ate them." What is wrong?', options: ['Missing subjects', 'Sentences run together', 'Both'] },
     model: ['Broken: "Went to the store. Bought apples we ate them."', 'Fix the fragment: add a subject. "My family went to the store."', 'Fix the run-on: "We bought apples, and we ate them."', 'Combine: "When my family went to the store, we bought apples."'],
     dos: ['Circle the subject and underline the verb in each sentence.', 'Label each example: sentence, fragment, or run-on.', 'Combine two short sentences into a compound and a complex sentence.', 'Number the scrambled sentences to build a paragraph.'] });
+  add('g6-ela-purpose', {
+    hook: { q: '"Brave Students Rescue Injured Hawk" or "Hawk Found Near School": which writer cares more?', options: ['The first', 'The second', 'They care the same'] },
+    model: ['Text: "Our town\'s gorgeous new skate park finally gives teens a safe place to play."', 'Purpose: to persuade readers the park is good.', 'Perspective: the author supports the park and the teens.', 'Evidence: loaded words "gorgeous," "finally," and "safe."', 'Explain: positive words show the author is for the park.'],
+    dos: ['Label three short texts: persuade, inform, or entertain.', 'Write one sentence a farmer and one a city driver might write about a rainy week.', 'Circle the loaded words in two sentences and name the feeling.', 'List one detail only one of two authors includes.'] });
   add('g5-math-fractions', {
     hook: { q: 'You ate 1/2 of a pizza and your friend ate 1/3. Did you eat 2/5 together?', options: ['Yes, 2/5', 'No, more than 2/5', 'No, less than 2/5'] },
     model: ['Problem: 1/2 + 1/3.', 'Step 1: Halves and thirds are different sizes. Both fit into sixths.', 'Step 2: 1/2 = 3/6 and 1/3 = 2/6.', 'Step 3: 3/6 + 2/6 = 5/6.', 'Check: 5/6 is close to 1, and half a pizza plus a third is almost a whole. 2/5 was wrong.'],
@@ -10313,7 +10378,7 @@ window.CX_TASKS = {
     ],
     gallery: [
       'Exhibits can be visited in any order, which spreads students out naturally. Encourage them to start at a different exhibit than their neighbor.',
-      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece plus a key fact in Part 12 of the lesson worksheet.',
+      'Treat it like a real gallery walk: students record one "I see / I think / I wonder" per exhibit on the viewing guide, and the code piece in Part 12 of the lesson worksheet.',
       'Pause the class once midway and have two students share their favorite exhibit so far.'
     ],
     fieldtrip: [
@@ -10447,8 +10512,8 @@ window.CX_TASKS = {
     return '<table class="tbl plan"><thead><tr><th>Time</th><th>Part</th><th>Teacher does</th><th>Students do</th><th>Resource</th></tr></thead><tbody>' +
       [['0:00–0:08', '1. Warm-up', 'Project the warm-up, circulate, call on 2–3 students.', 'Answer 3 questions in worksheet Part 2.', '<a href="#s-warm" data-jump>Warm-up</a>'],
        ['0:08–0:20', '2. Mini-lesson', 'Teach 4 steps with the presenter; run each quick check.', 'Complete worksheet Parts 1 and 3–11 with each slide.', '<a href="#teach-' + r.id + '">Presenter</a>'],
-       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece and key fact in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
-       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write a 3-2-1.', '<a href="#s-debrief" data-jump>Questions</a>'],
+       ['0:20–0:48', '3. ' + esc(r.formatLabel), 'Launch the room, assign levels, circulate with the key.', 'Play solo or in pairs; log each code piece in Part 12.', '<a href="#play-' + r.id + '">Student view</a>'],
+       ['0:48–0:52', '4. Debrief', 'Ask debrief questions; revisit warm-up question 3.', 'Finish Part 13: check the prediction and write one thing learned.', '<a href="#s-debrief" data-jump>Questions</a>'],
        ['0:52–1:00', '5. Exit ticket', 'Hand out the ticket; sort results with the mastery guide.', 'Answer with evidence independently.', '<a href="#s-exit" data-jump>Exit ticket</a>']].map(function (x) { return '<tr>' + x.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function warmSection(r) {
@@ -10480,17 +10545,14 @@ window.CX_TASKS = {
   }
   var FRAME_LABEL = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s claim (Claim, Evidence, Source check, Explain)', MATH: 'Solve-Show-Explain' };
   function exitSection(r) {
-    var X = lessonOf(r), ex = X && X.exit, mcs = r.exit.filter(function (q) { return q.choices; }), crs = r.exit.filter(function (q) { return !q.choices; });
-    var total = mcs.length * 2 + crs.length * 2 + (ex ? 4 : 0), m = Math.ceil(total * 0.8), a = Math.ceil(total * 0.5), n = 0;
-    return '<section class="sec" id="s-exit"><h2><span class="step">5</span>Exit ticket <span class="when">0:52–1:00 · 8 min</span></h2><p class="lede">Every answer needs evidence. Part A asks students to justify each choice, Part B asks for an explanation, and Part C applies the standard to a brand-new situation. Total: ' + total + ' points.</p>' +
-      '<div class="ticket"><h3>Part A: Choose and justify (2 pts each)</h3><ol>' + mcs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol><i>I know because...</i></li>'; }).join('') + '</ol>' +
-      (crs.length ? '<h3>Part B: Explain with evidence (2 pts each)</h3><ol>' + crs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b><br><span class="ans">Look for: ' + esc(q.answer) + '</span></li>'; }).join('') + '</ol>' : '') +
-      (ex ? '<h3>Part C: Apply it (' + esc(FRAME_LABEL[ex.frame]) + ', 4 pts)</h3><p class="stim">' + esc(ex.stim) + '</p><p><b>' + (n + 1) + '. ' + esc(ex.q) + '</b></p><details><summary>Model answer and rubric</summary><p>' + esc(ex.model) + '</p><p><b>4 = mastered:</b> ' + esc(ex.look.join('; ')) + '. <b>3</b> = correct with thin reasoning. <b>2</b> = partly correct or general evidence. <b>1</b> = inaccurate or unsupported.</p></details>' : '') + '</div>' +
-      '<h3>Sort students for tomorrow</h3><table class="tbl"><thead><tr><th>Score</th><th>Level</th><th>Next step</th></tr></thead><tbody>' +
-      '<tr><td>' + m + '–' + total + '</td><td>Mastered</td><td>Extension: replay at the Legend level or write a second evidence response; peer helper.</td></tr>' +
-      '<tr><td>' + a + '–' + (m - 1) + '</td><td>Approaching</td><td>5–10 minute reteach with the presenter steps tied to missed items, then 2 practice questions.</td></tr>' +
-      '<tr><td>0–' + (a - 1) + '</td><td>Beginning</td><td>Small group: review the lesson worksheet, replay the room at the Explorer level with you, then a new exit ticket.</td></tr></tbody></table>' +
-      '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket PDF (with key and mastery guide)</button></div></section>';
+    // Same three questions as the PDF: two multiple choice and one written answer.
+    var X = lessonOf(r), ex = X && X.exit, mcs = r.exit.filter(function (q) { return q.choices; }).slice(0, 2), cr = ex ? null : r.exit.filter(function (q) { return !q.choices; })[0];
+    var total = mcs.length + (ex || cr ? 3 : 0), n = 0;
+    return '<section class="sec" id="s-exit"><h2><span class="step">5</span>Exit ticket <span class="when">0:52–1:00 · 8 min</span></h2><p class="lede">One page, three questions. Total: ' + total + ' points; ' + Math.ceil(total * 0.8) + ' or more shows mastery.</p>' +
+      '<div><button class="btn primary" data-do="exit">' + ICONS.down + 'Download exit ticket (PDF, page 2 is the key)</button></div>' +
+      '<div class="ticket"><ol>' + mcs.map(function (q) { n++; return '<li value="' + n + '"><b>' + esc(q.q) + '</b> <small>(1 pt)</small><ol class="ch">' + q.choices.map(function (c, k) { return '<li' + (k === q.answer ? ' class="ans"' : '') + '>' + esc(c) + '</li>'; }).join('') + '</ol></li>'; }).join('') + '</ol>' +
+      (ex ? '<p class="stim">' + esc(ex.stim) + '</p><p><b>' + (n + 1) + '. ' + esc(ex.q) + '</b> <small>(3 pts, ' + esc(FRAME_LABEL[ex.frame]) + ')</small></p><details><summary>Model answer</summary><p>' + esc(ex.model) + '</p><p><b>Look for:</b> ' + esc(ex.look.slice(0, 3).join('; ')) + '.</p></details>' : '') +
+      (cr ? '<p><b>' + (n + 1) + '. ' + esc(cr.q) + '</b> <small>(3 pts)</small><br><span class="ans">Look for: ' + esc(cr.answer) + '</span></p>' : '') + '</div></section>';
   }
   function isGallery(r) { return r.format === 'gallery' && r.stages.every(function (s) { return s.art; }); }
   function posterHTML(r) {
@@ -10721,13 +10783,13 @@ window.CX_TASKS = {
 
     // Resources
     html += '<section class="sec" id="s-res"><h2>Teacher resources</h2><h3>Made for this lesson</h3><p class="lede">Each resource matches a part of the 60-minute plan, in order.</p><div class="made">' +
-      [['1–5', 'Lesson worksheet', 'The one printable packet students fill out during the whole lesson. Its 13 parts match the "Worksheet Part" badge on each slide: target in their own words, warm-up, prediction, vocabulary, fill-in notes, a task, turn-and-talk notes, and a check for every step, the worked example, we do, you do, a work-time tracker (code piece + key fact per stage), and a 3-2-1 wrap-up. Collect it as evidence of work.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
+      [['1–5', 'Lesson worksheet', 'A short packet students fill out during the lesson: fill-in notes and a quick check for each step. Its 13 small parts match the "Worksheet Part" badge on each slide.', '<button class="btn" data-do="notes">' + ICONS.down + 'Student</button><button class="btn" data-do="noteskey">' + ICONS.down + 'Key</button>'],
        ['1', 'Warm-up worksheet (optional)', 'Standalone warm-up if you want it separate (it is also Part 2 of the lesson worksheet). Page 2 is the key.', '<button class="btn" data-do="warm">' + ICONS.down + 'PDF</button>'],
        ['1–5', 'Lesson presenter', 'Project the whole hour: target and agenda, warm-up with timer, 4 teaching steps with tools, turn and talk, and checks for understanding, I do / we do / you do, a work-time screen, debrief, and exit ticket.', '<a class="btn primary" href="#teach-' + r.id + '">' + ICONS.play + 'Open</a>'],
        ['1–5', 'Presenter script', 'What to say on every slide: directions, questions, answers, and what to do if students struggle. Slides show only student cues.', '<button class="btn" data-do="script">' + ICONS.down + 'PDF</button>'],
        ['3', esc(r.title), 'The ' + esc(r.formatLabel.toLowerCase()) + ' for Canvas, with levels, supports, and a turn-in.', '<button class="btn" data-do="html">' + ICONS.down + '.html</button>'],
 ].concat(isGallery(r) ? [['3', 'Gallery walk posters', 'One printable poster per exhibit (picture, numbered details, placard) plus setup directions for a classroom gallery walk.', '<button class="btn" data-do="posters">' + ICONS.play + 'Open posters</button>'], ['3', 'Gallery walk viewing guide', 'Student recording sheet: I see / I think / I wonder for every exhibit.', '<button class="btn" data-do="gguide">' + ICONS.down + 'PDF</button>']] : []).concat([
-       ['5', 'Exit ticket', 'Evidence-based exit ticket with rubric and mastery sorting guide.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
+       ['5', 'Exit ticket', 'One page, three questions. Page 2 is the answer key.', '<button class="btn" data-do="exit">' + ICONS.down + 'PDF</button>'],
        ['All', '60-minute facilitation guide', 'Everything above in one printable teacher guide.', '<button class="btn" data-do="guide">' + ICONS.down + 'PDF</button>']]).map(function (x) {
         return '<div class="made-row"><span class="step">' + x[0] + '</span><div><b>' + x[1] + '</b><span>' + x[2] + '</span></div><div class="made-act">' + x[3] + '</div></div>';
       }).join('') + '</div>' +

@@ -53,6 +53,7 @@ window.CX_FX = window.CX_FX || {};
   FX['g6-ela-sentence-case'] = { theme: 'detective' };
   FX['g6-ela-paragraph-bakery'] = { theme: 'sweets' };
 
+  FX['g6-ela-authors-agenda'] = { theme: 'parchment' };
   FX['g6-ela-inference-files'] = {
     theme: 'detective',
     stages: {

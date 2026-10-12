@@ -230,59 +230,44 @@
   };
   var FRAME_NAME = { CER: 'Claim-Evidence-Reasoning', RACE: 'RACE', SOURCE: 'Historian\'s Claim (Claim, Evidence, Source, Explain)', MATH: 'Solve-Show-Explain' };
   var NOTEBOOK = ['Answer in Part 2 of the lesson worksheet (or on this sheet).', 'Number each answer to match the question.', 'Answer in complete sentences. For math, show your work.', 'Work silently for 5 minutes, then share with a partner for 2 minutes.', 'Be ready to share one answer with the class.'];
-  function exitPoints(room, lesson) { var mc = room.exit.filter(function (q) { return q.choices; }).length, cr = room.exit.length - mc; return { mc: mc, cr: cr, total: mc * 2 + cr * 2 + (lesson && lesson.exit ? 4 : 0) }; }
+  // The exit ticket keeps to three questions: two multiple choice and one short written answer.
+  function exitItems(room, lesson) {
+    var mcs = room.exit.filter(function (q) { return q.choices; }).slice(0, 2), ex = lesson && lesson.exit;
+    var cr = ex ? null : room.exit.filter(function (q) { return !q.choices; })[0];
+    return { mcs: mcs, cr: cr, ex: ex };
+  }
+  function exitPoints(room, lesson) { var it = exitItems(room, lesson); return { mc: it.mcs.length, cr: it.ex || it.cr ? 1 : 0, total: it.mcs.length + (it.ex || it.cr ? 3 : 0) }; }
 
   function exitTicket(room, std, lesson) {
-    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], ex = lesson && lesson.exit, pts = exitPoints(room, lesson);
+    var d = new Doc(), c = SUBJ[room.subject] || [0.2, 0.2, 0.2], it = exitItems(room, lesson), ex = it.ex, pts = exitPoints(room, lesson), n = 0;
     header(d, 'EXIT TICKET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, room.title, std ? std.title : '', c);
     d.nameDate();
-    d.callout([{ label: 'Show your evidence.', text: 'For every answer, explain HOW you know. Answers without evidence earn partial credit.' }], c, { size: 10 });
-    var mcs = room.exit.filter(function (q) { return q.choices; }), crs = room.exit.filter(function (q) { return !q.choices; }), n = 0;
-    if (mcs.length) {
-      d.banner('Part A: Choose and justify', c, (mcs.length * 2) + ' points');
-      mcs.forEach(function (q) {
-        d.ensure(120); n++;
-        d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 });
-        q.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch, { size: 10.5, indent: 18, gap: 1 }); });
-        d.y -= 2; d.para('I know because (use a fact, rule, or evidence):', { size: 9.5, indent: 18, gray: 0.35, gap: 0 });
-        d.writeLines(2, 18);
-      });
-    }
-    if (crs.length) {
-      d.banner('Part B: Explain with evidence', c, (crs.length * 2) + ' points');
-      crs.forEach(function (q) { d.ensure(110); n++; d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 }); d.writeLines(q.lines || 3, 18); });
-    }
-    if (ex) {
-      d.banner('Part C: Apply it to something new (' + FRAME_NAME[ex.frame].split(' (')[0] + ')', c, '4 points');
+    d.para('Circle the best answer for 1 and 2. Answer 3 in complete sentences.', { size: 10, gray: 0.35, gap: 6 });
+    it.mcs.forEach(function (q) {
       n++;
-      d.callout([{ label: 'Read:', text: ex.stim }], c, { size: 10.5 });
-      d.para(n + '.  ' + ex.q, { size: 11, bold: true, gap: 4 });
-      (FRAMES[ex.frame] || FRAMES.CER).forEach(function (f) { d.ensure(30 + f[2] * 24); d.para(f[0] + ': ', { size: 10.5, bold: true, gap: 0, indent: 6 }); d.para(f[1], { size: 9, gray: 0.4, indent: 6, gap: 0 }); d.writeLines(f[2], 6); });
+      d.para(n + '.  ' + q.q, { size: 11, bold: true, gap: 3 });
+      q.choices.forEach(function (ch, k) { d.para('(' + LET[k] + ')  ' + ch, { size: 10.5, indent: 18, gap: 1 }); });
+      d.y -= 8;
+    });
+    if (ex) {
+      n++;
+      d.callout([{ label: 'Read:', text: String(ex.stim).replace(/^\s*Read:\s*/i, '') }], c, { size: 10 });
+      d.para(n + '.  ' + ex.q, { size: 11, bold: true, gap: 2 });
+      d.para('Use ' + FRAME_NAME[ex.frame].split(' (')[0] + ': ' + (FRAMES[ex.frame] || FRAMES.CER).map(function (f) { return f[0]; }).join(', ') + '.', { size: 9.5, gray: 0.35, indent: 18, gap: 2 });
+      d.writeLines(5, 18);
+    } else if (it.cr) {
+      n++;
+      d.para(n + '.  ' + it.cr.q, { size: 11, bold: true, gap: 3 });
+      d.writeLines(4, 18);
     }
     // Teacher key
     d.newPage();
-    header(d, 'TEACHER KEY AND MASTERY GUIDE  ·  ' + room.standard, room.title + ': Exit Ticket', 'Remove this page before copying. Total: ' + pts.total + ' points.', c);
+    header(d, 'TEACHER KEY  ·  ' + room.standard, room.title + ': Exit Ticket', 'Total: ' + pts.total + ' points. Mastery: ' + Math.ceil(pts.total * 0.8) + ' or more.', c);
     var rows = [], k = 0;
-    mcs.forEach(function (q) { k++; rows.push([String(k), q.q, '(' + LET[q.answer] + ') ' + q.choices[q.answer], '1 pt correct choice + 1 pt reason that uses the key idea (not "I guessed" or "it sounds right").']); });
-    crs.forEach(function (q) { k++; rows.push([String(k), q.q, q.answer, '2 = accurate and supported with a reason or example; 1 = partly accurate or no support; 0 = inaccurate.']); });
-    if (ex) { k++; rows.push([String(k), ex.q, ex.model + (ex.answer ? ' (Answer: ' + [].concat(ex.answer)[0] + (ex.unit ? ' ' + ex.unit : '') + ')' : ''), 'Score with the rubric below (0–4).']); }
-    d.table([{ w: 0.05, h: '#' }, { w: 0.27, h: 'Question' }, { w: 0.4, h: 'Answer / what to look for' }, { w: 0.28, h: 'Scoring' }], rows, c);
-    if (ex) {
-      d.sub('Part C rubric (' + FRAME_NAME[ex.frame] + ')');
-      d.table([{ w: 0.25, h: 'Score' }, { w: 0.75, h: 'What it looks like' }], [
-        ['4: Mastered', 'Correct and complete. ' + ex.look.join('; ') + '. Clear, precise language.'],
-        ['3: Nearly there', 'Correct claim/answer with evidence, but the reasoning or explanation is thin or missing one piece.'],
-        ['2: Approaching', 'Partly correct; evidence is general, or reasoning does not connect to the claim.'],
-        ['1: Beginning', 'Answer attempted but inaccurate or unsupported.'],
-        ['0', 'No response.']], c);
-    }
-    d.sub('Sort students for tomorrow');
-    var m = Math.ceil(pts.total * 0.8), a = Math.ceil(pts.total * 0.5);
-    d.table([{ w: 0.22, h: 'Score' }, { w: 0.2, h: 'Level' }, { w: 0.58, h: 'Next step' }], [
-      [m + '–' + pts.total + ' pts', 'Mastered', 'Extension: replay the room at the Legend level or write a second evidence response. Can serve as a peer helper.'],
-      [a + '–' + (m - 1) + ' pts', 'Approaching', 'Quick reteach (5–10 min): replay the mini-lesson presenter steps tied to the missed items, then 2 similar practice questions.'],
-      ['0–' + (a - 1) + ' pts', 'Beginning', 'Small group: review the lesson worksheet, then replay the room at the Explorer level with the teacher. Recheck with a new exit ticket.']], c);
-    d.para('Evidence to look for: Did the student use vocabulary correctly, cite specific data or text, and explain the connection? A correct choice without a reason shows recognition, not yet mastery.', { size: 10, gap: 4 });
+    it.mcs.forEach(function (q) { k++; rows.push([String(k), '(' + LET[q.answer] + ') ' + q.choices[q.answer], '1 point']); });
+    if (ex) { k++; rows.push([String(k), ex.model + (ex.answer ? ' (Answer: ' + [].concat(ex.answer)[0] + (ex.unit ? ' ' + ex.unit : '') + ')' : ''), '3 points: ' + ex.look.slice(0, 3).join('; ') + '.']); }
+    else if (it.cr) { k++; rows.push([String(k), it.cr.answer, '3 = accurate with a reason; 2 = accurate, no reason; 1 = partly accurate.']); }
+    d.table([{ w: 0.06, h: '#' }, { w: 0.64, h: 'Answer' }, { w: 0.3, h: 'Points' }], rows, c);
     d.footer('The Broncho Escape · ' + room.title + ' · Exit Ticket');
     return d.bytes();
   }
@@ -318,56 +303,45 @@
       else d.para('Answer: ______________________ ' + (ck.unit || ''), { size: 10.5, indent: 18, gap: 2 });
     }
     function ckAns(ck) { return (ck.type === 'mc' ? '(' + LET[ck.answer] + ') ' + ck.choices[ck.answer] : ck.type === 'order' ? ck.items.join(' -> ') : ck.type === 'highlight' ? ck.answer.map(function (k) { return ck.segments[k]; }).join(' + ') : ck.answer[0] + (ck.unit ? ' ' + ck.unit : '')) + (ck.explain ? (/[.!?"']$/.test(String(ck.choices ? ck.choices[ck.answer] : '')) ? ' ' : '. ') + ck.explain : ''); }
-    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Complete each part when you see its number on the presenter slide.', c);
+    // Short version: one small task per part. Part numbers still match the presenter slides.
+    function mini(n, title) { d.ensure(70); d.y -= 6; d.para('PART ' + n + '  ·  ' + title.toUpperCase(), { size: 10.5, bold: true, gap: 2 }); d.line(d.margin, d.y + 2, d.pageW - d.margin, d.y + 2, 0.8, 0.55); d.y -= 4; }
+    header(d, (K ? 'TEACHER KEY  ·  ' : '') + 'LESSON WORKSHEET  ·  GRADE ' + room.grade + '  ·  ' + room.standard, std.title, 'Fill in each part when its number appears on the slide.', c);
     if (!K) d.nameDate();
-    part(1, 'Today\'s target');
-    d.para(L.target, { size: 11, bold: true, indent: 6, gap: 3 });
-    d.para('Rewrite the target in your own words:', { size: 10.5, indent: 6, gap: 0 });
-    lines(2, 'Any accurate paraphrase of the target.');
-    part(2, 'Warm-up', '8 min');
-    X.warmup.forEach(function (w, i) { d.ensure(60); d.para((i + 1) + '.  ' + w[0], { size: 10.5, bold: true, gap: 1, indent: 6 }); lines(w[2], w[1]); });
-    part(3, 'Hook: make a prediction');
-    if (X.hook) { d.para(X.hook.q, { size: 10.5, bold: true, indent: 6, gap: 2 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
-    d.para('Why I think so:', { size: 10, indent: 18, gray: 0.35, gap: 0 }); lines(1, 'Any reasoned prediction. It is checked in Part 13.');
-    part(4, 'Key vocabulary', 'fill in as you learn');
-    d.table([{ w: 0.24, h: 'Word' }, { w: 0.46, h: 'Meaning in my own words' }, { w: 0.3, h: 'Example or sketch' }], L.vocab.map(function (v) { return [v[0], K ? v[1] : '', '']; }), c, { minH: 36 });
+    mini(1, 'Target');
+    d.para(L.target, { size: 10.5, indent: 6, gap: 2 });
+    mini(2, 'Warm-up');
+    X.warmup.forEach(function (w, i) { d.ensure(44); d.para((i + 1) + '.  ' + w[0], { size: 10.5, gap: 0, indent: 6 }); lines(1, w[1]); });
+    mini(3, 'Prediction');
+    if (X.hook) { d.para(X.hook.q, { size: 10.5, indent: 6, gap: 1 }); d.para('Circle one:   ' + X.hook.options.map(function (o) { return '[ ] ' + o; }).join('      '), { size: 10.5, indent: 18, gap: 2 }); }
+    mini(4, 'Vocabulary');
+    d.table([{ w: 0.28, h: 'Word' }, { w: 0.72, h: 'Meaning' }], L.vocab.slice(0, 4).map(function (v) { return [v[0], K ? v[1] : '']; }), c, { minH: 24 });
     X.steps.forEach(function (st, i) {
-      part(5 + i, 'Learn ' + (i + 1) + ': ' + st.t, '3 min');
-      d.para('A. Fill in the blanks:', { size: 10, bold: true, indent: 6, gap: 1 });
-      d.para(blanks(st.note, K), { size: 11, indent: 18, gap: 4 });
-      d.para('B. ' + ((X.dos || [])[i] || st.do).replace(/^In your notes:\s*/i, ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
-      if (K) ans('Check that the task is complete and accurate. It should match the fill-in above: ' + blanks(st.note, true)); else { d.ensure(80); d.box(d.margin + 18, d.y - 70, d.inner() - 18, 66, 0.6); d.y -= 76; }
-      d.para('C. Turn and talk: ' + ((X.talk || [])[i] || ''), { size: 10.5, bold: true, indent: 6, gap: 0 });
-      d.para('What my partner and I said:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, blanks(st.note, true));
-      d.ensure(70);
-      d.para('D. Check for understanding: ' + st.check.q, { size: 10.5, bold: true, indent: 6, gap: 1 });
+      mini(5 + i, st.t);
+      d.para(blanks(st.note, K), { size: 10.5, indent: 6, gap: 2 });
+      d.para('Check: ' + st.check.q, { size: 10.5, indent: 6, gap: 1 });
       choices(st.check);
-      d.para('I know because:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(1, ckAns(st.check));
+      if (K) ans(ckAns(st.check));
     });
-    part(9, 'Worked example', 'copy each step');
-    (X.model || []).forEach(function (t, k) { d.ensure(30); if (K) d.para((k + 1) + '.  ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para((k + 1) + '.', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
+    mini(9, 'Worked example');
+    if (K) (X.model || []).forEach(function (t, k) { d.para((k + 1) + '.  ' + t, { size: 10, indent: 12, gap: 1 }); });
+    else d.para('Final answer from the example: ________________________________________________', { size: 10.5, indent: 6, gap: 4 });
     if (X.wedo) {
-      part(10, 'We do: solve it together');
-      d.para(X.wedo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
-      X.wedo.steps.forEach(function (t, k) { d.ensure(30); if (K) d.para('Step ' + (k + 1) + ': ' + t, { size: 10.5, indent: 12, gap: 2 }); else { d.para('Step ' + (k + 1) + ':', { size: 10.5, indent: 6, gap: 0 }); d.writeLines(1, 18); } });
-      d.para('Answer: ' + (K ? X.wedo.a : '____________________________'), { size: 11, bold: true, indent: 6, gap: 12 });
+      mini(10, 'We do');
+      d.para(X.wedo.q, { size: 10.5, indent: 6, gap: 2 });
+      d.para('Answer: ' + (K ? X.wedo.a : '____________________________________________'), { size: 10.5, indent: 6, gap: 4 });
     }
     if (X.youdo) {
-      part(11, 'You do: on your own', '2 min, silent');
-      d.para(X.youdo.q, { size: 10.5, bold: true, indent: 6, gap: 2 });
+      mini(11, 'You do');
+      d.para(X.youdo.q, { size: 10.5, indent: 6, gap: 2 });
       choices(X.youdo);
-      d.para('Show your thinking:', { size: 9.5, indent: 18, gray: 0.35, gap: 0 }); lines(2, ckAns(X.youdo));
+      if (K) ans(ckAns(X.youdo));
     }
-    part(12, 'Work time: ' + room.title, '28 min');
-    d.para('As you finish each ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'part') + ', record the code piece and one key fact you learned there.', { size: 10.5, indent: 6, gap: 4 });
+    mini(12, 'Work time: ' + room.title);
     var node = { escape: 'Lock', gallery: 'Exhibit', fieldtrip: 'Stop', mystery: 'File', quest: 'Level' }[room.format] || 'Stage';
-    d.table([{ w: 0.3, h: node }, { w: 0.14, h: 'Code piece' }, { w: 0.56, h: 'One key fact I learned' }], room.stages.map(function (st, i) { return [node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + String(st.title).replace(/^(Stop|Lock|Level|Evidence File|Room|Exhibit|Artifact)\s*#?\d*:\s*/i, ''), K ? (room.code || '')[i] || '' : '', '']; }), c, { minH: 34 });
-    d.para('Final code: ________________     [ ] Written task finished     [ ] Work copied into Canvas', { size: 10.5, indent: 6, gap: 12 });
-    part(13, 'Debrief and wrap-up', '4 min');
-    d.para('Check your prediction from Part 3. Was it right? What evidence changed or confirmed it?', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
-    d.para('3 things I learned today:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(3, 'Three accurate facts from the lesson.');
-    d.para('2 vocabulary words used correctly in a sentence:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(2, 'Two vocabulary words used correctly.');
-    d.para('1 question I still have:', { size: 10.5, bold: true, indent: 6, gap: 0 }); lines(1, 'Any genuine question.');
+    d.para('Write each code piece as you earn it:   ' + room.stages.map(function (st, i) { return node + ' ' + (room.format === 'gallery' ? 'ABCDEFGH'[i] : i + 1) + ': ' + (K ? (room.code || '')[i] || '' : '____'); }).join('    '), { size: 10.5, indent: 6, gap: 2 });
+    d.para('Final code: ' + (K ? room.code || '' : '________________'), { size: 10.5, bold: true, indent: 6, gap: 4 });
+    mini(13, 'Wrap-up');
+    d.para('Was your prediction in Part 3 right? One thing I learned today:', { size: 10.5, indent: 6, gap: 0 }); lines(2, X.warmup[2][1]);
     d.footer('The Broncho Escape · ' + std.code + ' · Lesson Worksheet' + (K ? ' (Key)' : ''));
     return d.bytes();
   }
@@ -381,7 +355,7 @@
       ['0:00–0:08', 'Warm-up', 'Project the warm-up. Circulate, then call on 2–3 students. Save question 3 for the debrief.', 'Answer Part 2 of the lesson worksheet; share with a partner.'],
       ['0:08–0:20', 'Mini-lesson', 'Teach with the 4-step presenter. Run each quick check with the whole class.', 'Complete worksheet Parts 4-11 as each slide appears; answer checks with fingers.'],
       ['0:20–0:48', room.formatLabel, 'Launch ' + room.title + '. Assign mission levels; circulate with the answer key.', 'Play solo or in pairs; record code pieces; complete any written evidence task.'],
-      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + 3-2-1).'],
+      ['0:48–0:52', 'Debrief', 'Ask 2 debrief questions and revisit warm-up question 3.', 'Finish worksheet Part 13 (prediction check + one thing learned).'],
       ['0:52–1:00', 'Exit ticket', 'Hand out the exit ticket. Collect and sort with the mastery guide.', 'Answer with evidence independently.']], c);
     d.sub('Key vocabulary');
     d.table([{ w: 0.25, h: 'Word' }, { w: 0.75, h: 'Student-friendly definition' }], L.vocab, c);
@@ -419,7 +393,7 @@
     d.table([{ w: 0.3, h: 'Resource' }, { w: 0.7, h: 'How it fits the lesson' }], [
       ['Warm-up worksheet (PDF)', 'Optional standalone warm-up (also Part 2 of the lesson worksheet), with a key.'],
       ['Mini-lesson presenter', 'Projectable, step-by-step interactive lesson with tools and quick checks (room page).'],
-      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: target, warm-up, prediction, vocabulary, fill-ins, tasks, turn-and-talks, checks, worked example, practice, a work-time tracker, and a 3-2-1 wrap-up. Parts match the presenter slides.'],
+      ['Lesson worksheet (PDF + key)', 'One printable packet students complete during the whole lesson: short fill-ins and quick checks in 13 small parts that match the presenter slides.'],
       [room.title + ' (.html)', 'The ' + room.formatLabel.toLowerCase() + ' for Canvas, with differentiated levels, supports, and a turn-in.'],
       ['Exit ticket (PDF + key)', 'Evidence-based check with a rubric and a mastery sorting guide.']].concat((std.resources || []).slice(0, 4).map(function (x) { return [x.name + ' (extra)', x.note + ' ' + x.url]; })), c);
     d.banner('Answer key: ' + room.title, c);
@@ -453,7 +427,7 @@
         ['If < 80% correct', 'Go back to the Explore box and model a second example out loud, then re-ask the check with a partner discussion first. See "Misconceptions to watch for" at the end of this script.']
       ]);
     });
-    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Copy each step into Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
+    slide('Worked example (I do)', '2 min', [['Say', 'Watch how I solve this. Write the final answer in Part 9 of your worksheet.'], ['Think aloud', L.model], ['Reveal', (X.model || []).join('  |  ')]]);
     if (X.wedo) slide('We do', '2 min', [['Say', 'Now we solve one together in Part 10. Read the problem with me.'], ['Do', 'Before revealing each step, ask: "What should we do next?" Take one answer, then tap "Show next step."'], ['Steps', X.wedo.steps.join('  |  ')], ['Answer', X.wedo.a]]);
     if (X.youdo) { var yd = X.youdo; slide('You do', '2 min', [['Say', 'Now on your own: Part 11. Solve it with no talking. You have 2 minutes.'], ['Answer', (yd.choices ? '(' + LET[yd.answer] + ') ' + yd.choices[yd.answer] : yd.answer[0]) + (yd.explain ? '. ' + yd.explain : '')], ['Then', 'Students who got it: launch the room. Students who missed it: 3-minute reteach at your table, then start the room at the Explorer level.']]); }
     slide('Work time: ' + room.title, '0:20–0:48', [['Say', 'Open ' + room.title + ' on your device. Type your name, choose the level I assigned, and begin. Whisper voice with your partner only.'], ['Do', 'Start the 28:00 timer and leave this slide up. Circulate with the answer key.'], ['Checkpoints', 'At 10 minutes: ' + (room.formatLabel === 'Gallery Walk' ? 'exhibit' : 'stage') + ' 2 done. At 20 minutes: stage 4 done; give a 5-minute warning for the ' + (taskName || 'final lock') + ' and turn-in.'], ['Turn-in', 'Students tap "Copy my work" and paste it into the Canvas assignment (Text Entry).']]);

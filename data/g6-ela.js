@@ -645,6 +645,49 @@ window.CX_ROOMS.push(
     { q: 'Which transition shows contrast?', choices: ['For example', 'In addition', 'However', 'First'], answer: 2 },
     { q: 'Write a 5-sentence paragraph about your favorite season: a topic sentence, three supporting details with transitions, and a concluding sentence.', answer: 'Example: Fall is the best season of the year. First, the leaves turn bright red, orange, and yellow. In addition, the cool air is perfect for football games and hikes. For example, my family hikes at Turkey Run every October. Overall, fall is full of color, fun, and time together.', lines: 6 }
   ]
+},
+
+/* ---------- 6.RC.7 Author's Perspective & Purpose ---------- */
+{
+  id: 'g6-ela-authors-agenda', std: 'g6-ela-purpose', format: 'escape',
+  title: 'The Author\'s Agenda',
+  tagline: 'Every writer has a reason and a point of view. Uncover them to escape the Sunnyside Times newsroom.',
+  story: '<p>You are an intern at the <b>Sunnyside Times</b>. Tonight the editor locked the newsroom with a five-letter code and left a note: <b>"No story goes to print until you can tell me WHY each author wrote it and HOW they feel about it."</b></p><p>Every article is a clue. Find the author\'s <b>purpose</b> (persuade, inform, or entertain), their <b>perspective</b> (how they see the topic), and the <b>words and details</b> that give them away.</p>',
+  code: 'VOICE',
+  stages: [
+    { title: 'Desk 1: The Purpose Pile', content: '<p>Authors write for a <b>purpose</b>:</p><ul><li><b>Persuade:</b> convince the reader to think or do something</li><li><b>Inform:</b> teach facts or explain</li><li><b>Entertain:</b> tell a story or amuse</li></ul><p>Look at the whole text before you decide.</p>',
+      puzzles: [
+        { type: 'sort', q: 'Sort each headline or opening line by the author\'s purpose.', buckets: ['Persuade', 'Inform', 'Entertain'], items: [['Vote YES on new playground equipment!', 0], ['Our town needs a dog park now.', 0], ['The library is open 9 a.m. to 6 p.m.', 1], ['Monarch butterflies migrate up to 3,000 miles.', 1], ['The day my goldfish ran for mayor', 2], ['A dragon walked into the cafeteria...', 2]] },
+        { type: 'mc', q: '"Sign up for the reading challenge today. You will discover worlds you never imagined!" What is the author\'s purpose?', choices: ['To persuade', 'To inform', 'To entertain', 'To describe'], answer: 0 }
+      ] },
+    { title: 'Desk 2: Who Wrote This?', content: '<p><b>Perspective</b> is how the author sees the topic. Who the author is shapes what they notice.</p><p><i>Letter to the editor:</i> "As a crossing guard for 12 years, I watch drivers speed past Sunnyside every morning. A 15 mph sign is not enough. We need speed bumps before a child gets hurt."</p>',
+      puzzles: [
+        { type: 'mc', q: 'What is the crossing guard\'s perspective?', choices: ['Speed near the school is dangerous and needs stronger limits', 'Drivers are always careful', 'Speed bumps damage cars', 'The school should move'], answer: 0 },
+        { type: 'mc', q: 'How does being a crossing guard shape the author\'s perspective?', choices: ['They see speeding drivers near children every day', 'They drive a fast car', 'They do not care about the school', 'They want a new job'], answer: 0 }
+      ] },
+    { title: 'Desk 3: Loaded Words', content: '<p>Authors show perspective through <b>word choice</b>. <b>Loaded words</b> carry strong feelings; <b>neutral words</b> do not.</p><p>Two reporters wrote about the same storm:</p><ul><li>Reporter A: "A <b>terrifying</b> storm <b>ripped</b> through town, <b>destroying</b> our beloved oak trees."</li><li>Reporter B: "A storm with 50 mph winds passed through town, and several trees fell."</li></ul>',
+      puzzles: [
+        { type: 'sort', q: 'Sort the words.', buckets: ['Loaded (shows feeling)', 'Neutral'], items: [['terrifying', 0], ['ripped', 0], ['beloved', 0], ['passed', 1], ['several', 1], ['fell', 1]] },
+        { type: 'mc', q: 'What does Reporter A\'s word choice show?', choices: ['The reporter feels upset about the damage to the town', 'The reporter is neutral', 'The reporter is happy about the storm', 'The reporter is writing to entertain'], answer: 0 }
+      ] },
+    { title: 'Desk 4: What\'s Missing?', content: '<p>Authors also show perspective through the <b>details they include</b> and the details they <b>leave out</b>.</p><p><i>Article:</i> "The new four-day school week gives teachers an extra planning day and saves the district $200,000 on buses. Teachers say they feel less stressed."</p>',
+      puzzles: [
+        { type: 'mc', q: 'Which perspective is LEFT OUT of the article?', choices: ['Families who need child care on the fifth day', 'Teachers', 'The school district budget', 'Bus costs'], answer: 0 },
+        { type: 'mc', q: 'What does leaving out other views suggest about the author?', choices: ['The author supports the four-day week', 'The author is against the four-day week', 'The author has no perspective', 'The author wants to entertain'], answer: 0 }
+      ] },
+    { title: 'Desk 5: The Editor\'s Test', content: '<p>Final check. Read the editorial and explain HOW the author shows their perspective.</p><p><i>Editorial:</i> "Our cafeteria\'s soggy, tasteless lunches are a disgrace. Students deserve fresh, healthy food that gives them energy to learn. It is time for the school board to act."</p>',
+      puzzles: [
+        { type: 'mc', q: 'What is the author\'s purpose?', choices: ['To persuade the school board to improve lunches', 'To inform readers about the menu', 'To entertain with a funny story', 'To describe the cafeteria\'s size'], answer: 0 },
+        { type: 'order', q: 'Put the steps for explaining how an author conveys perspective in order.', items: ['Name the author\'s purpose', 'Name the author\'s perspective', 'Quote the loaded words or key details', 'Explain how those words show the perspective'] },
+        { type: 'mc', q: 'Which evidence BEST shows the author\'s perspective?', choices: ['"soggy, tasteless lunches are a disgrace"', '"Our cafeteria"', '"the school board"', '"It is time"'], answer: 0 }
+      ] }
+  ],
+  finale: '<p>The editor reads your notes and smiles. "Purpose, perspective, and proof. You read the author, not just the article." The newsroom door unlocks, and tomorrow\'s paper is ready to print.</p>',
+  exit: [
+    { q: '"Pandas eat up to 40 pounds of bamboo a day." What is the author\'s purpose?', choices: ['To persuade', 'To inform', 'To entertain', 'To complain'], answer: 1 },
+    { q: 'Which sentence uses loaded words to show a negative perspective?', choices: ['The new law passed on Tuesday.', 'The reckless new law punishes hardworking families.', 'The law has three parts.', 'The mayor signed the law.'], answer: 1 },
+    { q: 'Explain the author\'s perspective in: "Our amazing robotics team crushed the competition and made Sunnyside proud!" How is it shown?', answer: 'The author is proud of and excited about the team. This is shown through loaded words like "amazing," "crushed," and "proud."', lines: 4 }
+  ]
 }
 
 );

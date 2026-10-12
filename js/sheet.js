@@ -33,10 +33,10 @@
     return h;
   }
   function stepHTML(st) {
-    var h = '<div style="margin-top:6px"><b>' + esc(st.title) + '</b>' + (st.levels && st.levels.indexOf('legend') >= 0 ? '<span class="leg">🏆 Legend only</span>' : '') + '</div>';
+    var h = '<div class="step"><div style="margin-top:6px"><b>' + esc(st.title) + '</b>' + (st.levels && st.levels.indexOf('legend') >= 0 ? '<span class="leg">🏆 Legend only</span>' : '') + '</div>';
     if (st.goal && st.goal.text) h += '<div class="note">In the simulator: ' + md(st.goal.text) + '</div>';
-    if (st.q) h += question(st); else h += '<div class="item">What did you notice?</div>' + lines(2);
-    return h;
+    if (st.q) h += question(st); else h += '<div class="item">What did you notice?</div>' + lines(1);
+    return h + '</div>';
   }
 
   var boxes = {}, maxN = 0;
@@ -48,10 +48,10 @@
   h += '<h1>' + esc(s.icon) + ' ' + esc(s.title) + '</h1>';
   if (!key) h += '<div class="who"><span>Name:</span><span>Date:</span><span>Class:</span></div><div class="lvl"><b>My level:</b><span><i></i>🧭 Explorer</span><span><i></i>🔎 Investigator</span><span><i></i>🏆 Legend</span></div>';
   h += '<div class="mission"><b>Mission:</b> ' + esc(s.mission) + '<br><b>Big question:</b> ' + esc(s.question) + '</div>';
-  if (s.warmup) h += '<div class="box"><h2><span class="num">★</span>Warm-up: ' + esc(s.warmup.style || '') + '</h2><div class="note">' + esc(s.warmup.prompt || '') + '</div>' + (s.warmup.items || []).map(function (it) { return '<div class="item">' + esc(it[0]) + (key ? ' <span class="ans">✔ ' + esc(it[1]) + '</span>' : '') + '</div>' + (key ? '' : lines(1)); }).join('') + '</div>';
+  if (s.warmup) h += '<div class="box"><h2><span class="num">★</span>Warm-up: ' + esc(s.warmup.style || '') + '</h2><div class="note">' + esc(s.warmup.prompt || '') + '</div>' + (s.warmup.items || []).slice(0, 2).map(function (it) { return '<div class="item">' + esc(it[0]) + (key ? ' <span class="ans">✔ ' + esc(it[1]) + '</span>' : '') + '</div>' + (key ? '' : lines(1)); }).join('') + '</div>';
   if (s.vocab && s.vocab.length) h += '<table class="vocab"><tr><th colspan="2">Key vocabulary</th></tr>' + s.vocab.map(function (v) { return '<tr><td>' + esc(v[0]) + '</td><td>' + esc(v[1]) + '</td></tr>'; }).join('') + '</table>';
   for (var n = 1; n <= maxN; n++) { if (!boxes[n]) continue; h += '<div class="box"><h2><span class="num">' + n + '</span>Box ' + n + '</h2>' + boxes[n].map(stepHTML).join('') + '</div>'; }
-  h += '<div class="box"><h2><span class="num">✎</span>Exit ticket: answer the big question in your own words</h2><div class="note">' + esc(s.question) + '</div>' + (key ? '<div class="ans">Look for: ' + esc(s.takeaway) + '</div>' : lines(3)) + '</div>';
+  h += '<div class="box"><h2><span class="num">✎</span>Exit ticket: answer the big question in your own words</h2><div class="note">' + esc(s.question) + '</div>' + (key ? '<div class="ans">Look for: ' + esc(s.takeaway) + '</div>' : lines(2)) + '</div>';
   if (key) {
     h += '<div class="box"><h2><span class="num">#</span>Completion codes</h2><p class="note">Students see a code like <b>ABC-I3</b> when they finish. The first part must match below. The letter is the level (E = Explorer, I = Investigator, L = Legend), and the number at the end is how many stars they earned.</p><table><tr><th>Level</th><th>Code starts with</th></tr>' + [['explorer', '🧭 Explorer'], ['scientist', '🔎 Investigator'], ['legend', '🏆 Legend']].map(function (l) { return '<tr><td>' + l[1] + '</td><td><b>' + esc(code(s.id, l[0])) + '</b></td></tr>'; }).join('') + '</table></div>';
     if (std && std.lesson && std.lesson.misconceptions) h += '<div class="box"><h2><span class="num">!</span>Watch for these misconceptions</h2>' + std.lesson.misconceptions.map(function (m) { return '<div class="item">• ' + esc(m) + '</div>'; }).join('') + '</div>';

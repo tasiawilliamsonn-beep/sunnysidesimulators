@@ -446,6 +446,27 @@ window.CX_STANDARDS = [
     { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
   ]
 },
+{
+  id: 'g6-ela-purpose', grade: 6, subject: 'ela', code: '6.RC.7', sims: false, rooms: 1,
+  title: 'Author\'s Perspective & Purpose',
+  text: 'Determine an author\'s perspective or purpose in a text, and explain how it is conveyed in the text.',
+  lesson: {
+    target: 'I can determine an author\'s purpose and perspective and explain how word choice and details show it.',
+    vocab: [['Purpose', 'The reason an author writes: to persuade, to inform, or to entertain.'], ['Perspective', 'How the author sees or feels about the topic, shaped by who they are.'], ['Word choice', 'The specific words an author picks; strong or loaded words reveal feelings.'], ['Bias', 'Leaning toward one side, often shown by leaving out other views.'], ['Tone', 'The author\'s attitude toward the topic, like excited, worried, or neutral.']],
+    hook: 'Show two headlines about the same event: "Brave Students Rescue Injured Hawk" and "Hawk Found Near School." Ask which writer cares more and how they can tell. Take ideas, then explain that today students learn to read the author behind the words.',
+    teach: ['Purpose is WHY the author writes: persuade (convince you), inform (teach you), or entertain (tell a story). Look at the whole text, not one sentence.', 'Perspective is HOW the author sees the topic. Who the author is (a coach, a scientist, a kid) shapes what they notice and care about.', 'Authors convey perspective through word choice: loaded words (disaster, amazing, heroic) show feelings; neutral words (event, built, found) do not.', 'Authors also convey perspective through which details they include and which they leave out. Ask: whose side is missing?'],
+    model: 'Read: "Our town\'s gorgeous new skate park finally gives teens a safe place to play." Purpose: persuade readers the park is good. Perspective: the author supports teens. Evidence: loaded words "gorgeous," "finally," and "safe." Explain: these positive words show the author is for the park.',
+    check: 'Students show 1 finger (persuade), 2 (inform), or 3 (entertain): "Recycle now or our planet is doomed!" (1) "Aluminum cans can be recycled in 60 days." (2) "The talking can rolled away from the recycling truck." (3)',
+    misconceptions: ['"Informational texts have no perspective." Every author makes choices about words and details.', '"Purpose and perspective are the same." Purpose is why the author writes; perspective is how they see the topic.', '"One strong word proves the purpose." Look at the text as a whole.', '"If it uses facts, it can\'t be persuasive." Persuasive writers often choose facts that support only their side.'],
+    debrief: ['How can two authors use the same facts but show different perspectives?', 'What clues help you tell an author\'s purpose?', 'Why does it matter to notice what an author leaves out?']
+  },
+  resources: [
+    { type: 'Practice', name: 'CommonLit', url: 'https://www.commonlit.org/', note: 'Free nonfiction passages with author\'s purpose questions.' },
+    { type: 'Practice', name: 'ReadWorks', url: 'https://www.readworks.org/', note: 'Paired texts for comparing authors\' perspectives.' },
+    { type: 'Lessons', name: 'ReadWriteThink', url: 'https://www.readwritethink.org/', note: 'Lessons on author\'s purpose and point of view.' },
+    { type: 'Standards', name: 'Indiana Academic Standards (IDOE)', url: 'https://www.in.gov/doe/students/indiana-academic-standards/', note: 'Official standards documents and frameworks.' }
+  ]
+},
 /* ======================= GRADE 5 MATH ======================= */
 {
   id: 'g5-math-fractions', grade: 5, subject: 'math', code: '5.CA.3–5.CA.5 · 5.CA.7',

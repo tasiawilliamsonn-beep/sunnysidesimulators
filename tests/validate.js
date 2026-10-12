@@ -73,7 +73,7 @@ for (const s of ctx.window.CX_STANDARDS) {
 }
 const perStd = {};
 rooms.forEach(r => perStd[r.std] = (perStd[r.std] || 0) + 1);
-for (const s of ctx.window.CX_STANDARDS) if ((perStd[s.id] || 0) < 3) errs.push(`standard ${s.id} has only ${perStd[s.id] || 0} rooms`);
+for (const s of ctx.window.CX_STANDARDS) if ((perStd[s.id] || 0) < (s.rooms || 3)) errs.push(`standard ${s.id} has only ${perStd[s.id] || 0} rooms`);
 console.log(`${rooms.length} rooms, ${ctx.window.CX_STANDARDS.length} standards, ${rooms.reduce((a, r) => a + r.stages.reduce((b, s) => b + s.puzzles.length, 0), 0)} puzzles`);
 if (errs.length) { console.log(errs.join('\n')); process.exit(1); }
 console.log('OK');

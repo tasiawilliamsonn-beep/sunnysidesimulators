@@ -169,6 +169,10 @@ The Canvas page editor removes `<script>` tags, so pasting the HTML code into a 
 - The Poet's Locked Notebook (Escape Room)
 - Word Detective Quest (Quest)
 
+**Grade 6 ELA · 6.RC.7 Author's Perspective & Purpose**
+
+- The Author's Agenda (Escape Room)
+
 **Grade 5 Math · 5.CA.3–5.CA.5 · 5.CA.7 Adding, Subtracting & Multiplying Fractions**
 
 - The Pizza Parlor Lockdown (Escape Room)
