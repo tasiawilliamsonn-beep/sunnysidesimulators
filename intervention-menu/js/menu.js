@@ -10,6 +10,8 @@
   (plan.behaviors || []).forEach(function (b) { sel[b.key] = true; });
   (plan.functions || []).forEach(function (f) { funcs[f] = true; });
   if ((plan.functions || []).length) funcsTouched = true;
+  var qf = (location.search.match(/[?&]f=([a-z]+)/g) || []).map(function (m) { return m.split("=")[1]; }).filter(function (f) { return FUNCTIONS[f]; });
+  if (qf.length) { funcs = {}; qf.forEach(function (f) { funcs[f] = true; }); funcsTouched = true; }
   plan.interventions = plan.interventions || [];
 
   var byId = {};
@@ -97,6 +99,15 @@
       return { id: id, score: scores[id], for: Object.keys(why[id]) };
     });
   }
+  /* No behavior chosen, but a function is (e.g., arriving from the ABC organizer) */
+  function rankByFunction() {
+    var fl = Object.keys(funcs);
+    return Object.keys(INTERVENTIONS).map(function (id) {
+      var it = INTERVENTIONS[id];
+      var fit = it.functions.filter(function (f) { return fl.indexOf(f) > -1; });
+      return { id: id, score: fit.length / it.functions.length * 4 + fit.length * 2 + (it.m ? 0.5 : 0), for: fit.map(function (f) { return FUNCTIONS[f].name; }) };
+    }).filter(function (r) { return r.for.length; }).sort(function (a, b) { return b.score - a.score; });
+  }
 
   function card(r, best) {
     var it = INTERVENTIONS[r.id];
@@ -132,11 +143,12 @@
 
     var tier = sb.filter(function (b) { return b.level <= 2; });
     var out = document.getElementById("results");
-    if (!tier.length) {
+    var byFn = !tier.length && !sb.length && Object.keys(funcs).length;
+    if (!tier.length && !byFn) {
       out.innerHTML = sb.length ? "" : '<div class="panel empty"><img src="img/broncho-logo.png" alt=""><h2 style="text-transform:uppercase">Start with what you see</h2><p>Open a behavior on the left and check what it looks like in your classroom. You can choose more than one.</p>' + legend() + "</div>";
       return;
     }
-    var ranked = rank(tier);
+    var ranked = byFn ? rankByFunction() : rank(tier);
     var counts = { all: ranked.length };
     ranked.forEach(function (r) { var t = INTERVENTIONS[r.id].type; counts[t] = (counts[t] || 0) + 1; });
     var shown = ranked.filter(function (r) { return typeFilter === "all" || INTERVENTIONS[r.id].type === typeFilter; });
@@ -145,6 +157,7 @@
       ["all", "prevent", "teach", "reinforce", "respond"].map(function (t) {
         return '<button type="button" class="chip" data-type="' + t + '" aria-pressed="' + (typeFilter === t) + '">' + (t === "all" ? "All" : TYPES[t].name) + " (" + (counts[t] || 0) + ")</button>";
       }).join("") + "</div></div>";
+    if (byFn) html += '<div class="alert ok"><p>Showing interventions matched to the <b>function</b> you chose. Add the behavior on the left to rank them by behavior too and see the matrix level.</p></div>';
     html += '<p class="hint">Ranked by how directly each one addresses the behaviors you chose and the likely function. A strong plan uses at least one <b>Prevent</b> or <b>Teach</b> strategy, plus <b>Reinforce</b>, not only in-the-moment responses.</p>';
     var notes = tier.map(function (b) { return byId[b.bid].note; }).filter(Boolean);
     notes.filter(function (n, i) { return notes.indexOf(n) === i; }).forEach(function (n) { html += '<div class="alert warn"><p>' + esc(n) + "</p></div>"; });
